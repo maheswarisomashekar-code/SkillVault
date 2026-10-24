@@ -9,7 +9,7 @@ import {
 
 const LOCAL_PROFILES_KEY = 'skillvault_local_profiles';
 
-const defaultProfile = {
+const DEMO_EVALUATOR_PROFILE = {
   fullName: 'Arjun Sharma',
   email: 'arjun.ise@student.edu',
   usn: '1IS22CS042',
@@ -24,7 +24,23 @@ const defaultProfile = {
   themeColor: '#0ea5e9'
 };
 
-export const getUserProfile = async (userId) => {
+const createBlankProfile = (userId, email = '', displayName = '') => ({
+  userId,
+  fullName: displayName || (email ? email.split('@')[0] : 'Student'),
+  email: email,
+  usn: '',
+  institution: 'Department of Information Science & Engineering',
+  degree: 'Bachelor of Engineering (ISE)',
+  semester: '5th Semester',
+  bio: '',
+  skills: ['Cloud Computing', 'Database Management', 'Web Development'],
+  github: '',
+  linkedin: '',
+  isPortfolioPublic: true,
+  themeColor: '#0ea5e9'
+});
+
+export const getUserProfile = async (userId, userDetails = {}) => {
   if (isFirebaseConfigured && db) {
     try {
       const userRef = doc(db, 'users', userId);
@@ -39,7 +55,20 @@ export const getUserProfile = async (userId) => {
 
   // Fallback / local storage
   const local = JSON.parse(localStorage.getItem(LOCAL_PROFILES_KEY) || '{}');
-  return local[userId] || { ...defaultProfile, userId };
+  if (local[userId]) {
+    return local[userId];
+  }
+
+  // If this is the specific 1-click demo evaluator account, use demo data
+  if (userId === 'student_cloud_demo_01') {
+    return { ...DEMO_EVALUATOR_PROFILE, userId };
+  }
+
+  // For any custom user, create a clean profile with their actual details
+  const newProfile = createBlankProfile(userId, userDetails.email, userDetails.displayName);
+  local[userId] = newProfile;
+  localStorage.setItem(LOCAL_PROFILES_KEY, JSON.stringify(local));
+  return newProfile;
 };
 
 export const saveUserProfile = async (userId, profileData) => {

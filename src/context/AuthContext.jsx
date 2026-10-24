@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
       unsubscribe = onAuthStateChanged(auth, async (user) => {
         if (user) {
           setCurrentUser(user);
-          const profile = await getUserProfile(user.uid);
+          const profile = await getUserProfile(user.uid, { email: user.email, displayName: user.displayName });
           setUserProfile(profile);
         } else {
           setCurrentUser(null);
@@ -47,7 +47,7 @@ export const AuthProvider = ({ children }) => {
         try {
           const parsed = JSON.parse(savedUser);
           setCurrentUser(parsed);
-          getUserProfile(parsed.uid).then(setUserProfile);
+          getUserProfile(parsed.uid, { email: parsed.email, displayName: parsed.displayName }).then(setUserProfile);
         } catch {
           // ignore
         }
@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }) => {
     if (isFirebaseConfigured && auth) {
       try {
         const cred = await signInWithEmailAndPassword(auth, email, password);
-        const profile = await getUserProfile(cred.user.uid);
+        const profile = await getUserProfile(cred.user.uid, { email: cred.user.email, displayName: cred.user.displayName });
         setUserProfile(profile);
         return cred.user;
       } catch (err) {
@@ -79,7 +79,7 @@ export const AuthProvider = ({ children }) => {
       };
       localStorage.setItem('skillvault_demo_user', JSON.stringify(userObj));
       setCurrentUser(userObj);
-      const profile = await getUserProfile(userObj.uid);
+      const profile = await getUserProfile(userObj.uid, { email: userObj.email, displayName: userObj.displayName });
       setUserProfile(profile);
       return userObj;
     }
@@ -152,7 +152,7 @@ export const AuthProvider = ({ children }) => {
 
   const refreshProfile = async () => {
     if (currentUser) {
-      const profile = await getUserProfile(currentUser.uid);
+      const profile = await getUserProfile(currentUser.uid, { email: currentUser.email, displayName: currentUser.displayName });
       setUserProfile(profile);
     }
   };

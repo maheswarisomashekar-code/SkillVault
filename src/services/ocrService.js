@@ -62,10 +62,51 @@ export const extractCertificateFields = (rawText) => {
     }
   }
 
-  // 3. Detect Recipient Name
-  const recipientMatch = fullText.match(/(?:this is to certify that|certify that|awarded to|presented to|conferred upon|proudly presented to|granted to)\s+([A-Za-z.\s]{3,35})(?:\s+has|\s+for|\s+on|\s+successfully|\n|$)/i);
-  if (recipientMatch) {
-    recipient = recipientMatch[1].trim();
+  // 3. Detect Recipient Name (Multi-pass intelligent detection)
+  // Pass 3A: Line-by-line inspection (most certificates place recipient name on the line immediately below the intro phrase)
+  const introPatterns = /(?:this is to certify that|certify that|awarded to|presented to|proudly presented to|conferred upon|granted to|certifies that|this certificate is awarded to|is hereby awarded to)/i;
+  
+  for (let i = 0; i < lines.length; i++) {
+    const currentLine = lines[i];
+    if (introPatterns.test(currentLine)) {
+      // Check if name is on the same line after the phrase
+      const sameLineMatch = currentLine.match(/(?:this is to certify that|certify that|awarded to|presented to|proudly presented to|conferred upon|granted to|certifies that)\s*[:\-]?\s*(?:Mr\.|Ms\.|Mrs\.|Dr\.)?\s*([A-Za-z][A-Za-z.\s]{1,35})(?:\s+(?:has|for|on|in|successfully)|$)/i);
+      if (sameLineMatch && sameLineMatch[1].trim().length > 2 && !/^(has|for|on|in|the|a|an)$/i.test(sameLineMatch[1].trim())) {
+        recipient = sameLineMatch[1].trim();
+        break;
+      }
+      
+      // Otherwise, check the immediate next lines (i+1, i+2)
+      for (let nextIdx = i + 1; nextIdx <= Math.min(i + 3, lines.length - 1); nextIdx++) {
+        const candidateLine = lines[nextIdx].replace(/^(?:Mr\.|Ms\.|Mrs\.|Dr\.|Prof\.)\s*/i, '').trim();
+        // Ignore connector lines like "for successfully...", "has participated...", etc.
+        if (/^(?:has|for|in recognition|who has|to certify|successfully|completion)/i.test(candidateLine)) {
+          continue;
+        }
+        // Valid name line: letters, spaces, dots, between 2 and 40 characters
+        if (/^[A-Za-z][A-Za-z.\s]{1,38}$/.test(candidateLine) && candidateLine.length >= 3) {
+          recipient = candidateLine;
+          break;
+        }
+      }
+      if (recipient) break;
+    }
+  }
+
+  // Pass 3B: Full-text multi-line regex fallback
+  if (!recipient) {
+    const multiLineMatch = fullText.match(/(?:this is to certify that|certify that|awarded to|presented to|conferred upon|proudly presented to|granted to)\s*[:\-]?\s*(?:Mr\.|Ms\.|Mrs\.|Dr\.)?\s*([A-Za-z][A-Za-z.\s]{1,35}?)(?:\s+(?:has|for|on|in|successfully|who)|$)/i);
+    if (multiLineMatch && multiLineMatch[1].trim().length > 2) {
+      const candidate = multiLineMatch[1].trim();
+      if (!/^(has|for|on|in|the|a|an|completion|course)$/i.test(candidate)) {
+        recipient = candidate;
+      }
+    }
+  }
+
+  // Clean recipient name of any lingering punctuation
+  if (recipient) {
+    recipient = recipient.replace(/^[,.:;\s]+|[,.:;\s]+$/g, '').trim();
   }
 
   // 4. Detect Certificate Title

@@ -124,11 +124,11 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
       setOcrConfidence(extracted.confidenceScore);
       setOcrWarnings(extracted.warnings || []);
 
-      // Auto-populate form
+      // Auto-populate form prioritizing genuine OCR readings
       setFormData({
         title: extracted.title || '',
         issuer: extracted.issuer || '',
-        recipient: extracted.recipient || userProfile?.fullName || currentUser.displayName || '',
+        recipient: extracted.recipient || '',
         issueDate: extracted.issueDate || new Date().toISOString().split('T')[0],
         category: extracted.category || 'course',
         description: `Uploaded and scanned via SkillVault Cloud OCR on ${new Date().toLocaleDateString()}`,
@@ -485,10 +485,29 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                 </div>
 
                 <div className="form-group" style={{ marginBottom: '14px' }}>
-                  <label className="form-label">Recipient Name</label>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <label className="form-label" style={{ marginBottom: 0 }}>
+                      Recipient Name
+                      {formData.recipient && (
+                        <span style={{ color: '#34d399', fontSize: '0.74rem', marginLeft: '6px', fontWeight: 600 }}>
+                          ✓ Detected from Document
+                        </span>
+                      )}
+                    </label>
+                    {!formData.recipient && (userProfile?.fullName || currentUser?.displayName) && (
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, recipient: userProfile?.fullName || currentUser?.displayName || '' })}
+                        style={{ fontSize: '0.74rem', color: '#38bdf8', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer' }}
+                      >
+                        Use account name
+                      </button>
+                    )}
+                  </div>
                   <input 
                     type="text" 
                     className="form-input" 
+                    placeholder="Enter student name on certificate"
                     value={formData.recipient} 
                     onChange={(e) => setFormData({ ...formData, recipient: e.target.value })}
                   />
@@ -572,6 +591,36 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                   style={{ width: '18px', height: '18px', accentColor: '#0ea5e9' }}
                 />
               </div>
+
+              {/* Raw OCR Text Diagnostic Drawer */}
+              {formData.rawOcrText && (
+                <details style={{
+                  background: 'var(--bg-main)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '10px 14px',
+                  fontSize: '0.78rem',
+                  marginBottom: '16px'
+                }}>
+                  <summary style={{ cursor: 'pointer', fontWeight: 600, color: '#38bdf8' }}>
+                    View Raw Text Scanned from Document by Cloud OCR
+                  </summary>
+                  <pre style={{
+                    marginTop: '8px',
+                    padding: '10px',
+                    background: 'var(--bg-surface-elevated)',
+                    borderRadius: 'var(--radius-sm)',
+                    overflowX: 'auto',
+                    fontFamily: 'var(--font-mono)',
+                    color: 'var(--text-secondary)',
+                    whiteSpace: 'pre-wrap',
+                    maxHeight: '160px',
+                    overflowY: 'auto'
+                  }}>
+                    {formData.rawOcrText}
+                  </pre>
+                </details>
+              )}
 
               {/* Action Buttons */}
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
