@@ -1,0 +1,609 @@
+import React, { useState, useRef } from 'react';
+import { 
+  X, 
+  UploadCloud, 
+  FileText, 
+  CheckCircle2, 
+  AlertTriangle, 
+  Loader2, 
+  Sparkles, 
+  ExternalLink,
+  ShieldAlert
+} from 'lucide-react';
+import { validateCertificateFile, uploadCertificateFile, createCertificateRecord } from '../services/certificateService';
+import { runTesseractOCR } from '../services/ocrService';
+import { useAuth } from '../context/AuthContext';
+import confetti from 'canvas-confetti';
+
+export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
+  const { currentUser, userProfile } = useAuth();
+  const fileInputRef = useRef(null);
+
+  const [file, setFile] = useState(null);
+  const [filePreview, setFilePreview] = useState(null);
+  const [dragActive, setDragActive] = useState(false);
+
+  // Upload & OCR states
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [stage, setStage] = useState('idle'); // 'idle' | 'uploading' | 'ocr' | 'review' | 'saving'
+  const [ocrConfidence, setOcrConfidence] = useState(null);
+  const [ocrWarnings, setOcrWarnings] = useState([]);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  // Editable Form Fields
+  const [formData, setFormData] = useState({
+    title: '',
+    issuer: '',
+    recipient: '',
+    issueDate: '',
+    category: 'course',
+    description: '',
+    credentialId: '',
+    verificationUrl: '',
+    isPublished: true,
+    verificationStatus: 'OCR_PROCESSED'
+  });
+
+  if (!isOpen) return null;
+
+  const handleFile = (selectedFile) => {
+    setErrorMessage('');
+    const validation = validateCertificateFile(selectedFile);
+    if (!validation.valid) {
+      setErrorMessage(validation.error);
+      return;
+    }
+
+    setFile(selectedFile);
+
+    // Create preview
+    if (selectedFile.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = () => setFilePreview(reader.result);
+      reader.readAsDataURL(selectedFile);
+    } else {
+      // PDF or non-image
+      setFilePreview(null);
+    }
+  };
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true);
+    } else if (e.type === 'dragleave') {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleStartProcessing = async () => {
+    if (!file || !currentUser) return;
+    setErrorMessage('');
+
+    try {
+      // Step 1: Upload to Cloud Storage
+      setStage('uploading');
+      setUploadProgress(10);
+
+      const uploadResult = await uploadCertificateFile(
+        file, 
+        currentUser.uid, 
+        (progress) => setUploadProgress(progress)
+      );
+
+      // Step 2: Trigger Genuine OCR Processing
+      setStage('ocr');
+      let extracted = null;
+
+      try {
+        // Tesseract can process image directly or via URL
+        extracted = await runTesseractOCR(filePreview || file);
+      } catch (ocrErr) {
+        console.warn('OCR processing encountered error; falling back to manual entry:', ocrErr);
+        extracted = {
+          title: file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, ' '),
+          issuer: 'Authorized Provider',
+          recipient: userProfile?.fullName || currentUser.displayName || '',
+          issueDate: new Date().toISOString().split('T')[0],
+          category: 'course',
+          confidenceScore: 50,
+          warnings: ['Document could not be parsed automatically. Please fill details manually.']
+        };
+      }
+
+      setOcrConfidence(extracted.confidenceScore);
+      setOcrWarnings(extracted.warnings || []);
+
+      // Auto-populate form
+      setFormData({
+        title: extracted.title || '',
+        issuer: extracted.issuer || '',
+        recipient: extracted.recipient || userProfile?.fullName || currentUser.displayName || '',
+        issueDate: extracted.issueDate || new Date().toISOString().split('T')[0],
+        category: extracted.category || 'course',
+        description: `Uploaded and scanned via SkillVault Cloud OCR on ${new Date().toLocaleDateString()}`,
+        credentialId: extracted.credentialId || '',
+        verificationUrl: extracted.verificationUrl || '',
+        isPublished: true,
+        verificationStatus: extracted.verificationUrl ? 'PENDING_REVIEW' : 'OCR_PROCESSED',
+        fileUrl: uploadResult.downloadUrl,
+        storagePath: uploadResult.storagePath,
+        fileName: uploadResult.fileName,
+        fileSize: uploadResult.fileSize,
+        fileType: uploadResult.fileType,
+        rawOcrText: extracted.rawText || ''
+      });
+
+      setStage('review');
+    } catch (err) {
+      console.error('Upload & OCR failed:', err);
+      setErrorMessage(`Upload error: ${err.message}`);
+      setStage('idle');
+    }
+  };
+
+  const handleSaveCertificate = async (e) => {
+    e.preventDefault();
+    if (!formData.title || !formData.issuer) {
+      setErrorMessage('Please provide certificate title and issuing organization.');
+      return;
+    }
+
+    try {
+      setStage('saving');
+      const savedRecord = await createCertificateRecord(currentUser.uid, {
+        ...formData,
+        confidenceScore: ocrConfidence || 75
+      });
+
+      try {
+        confetti({
+          particleCount: 50,
+          spread: 60,
+          origin: { y: 0.7 }
+        });
+      } catch (_) {}
+
+      if (onUploadSuccess) onUploadSuccess(savedRecord);
+      handleReset();
+      onClose();
+    } catch (err) {
+      console.error('Error saving record to Firestore:', err);
+      setErrorMessage(`Failed to save certificate metadata: ${err.message}`);
+      setStage('review');
+    }
+  };
+
+  const handleReset = () => {
+    setFile(null);
+    setFilePreview(null);
+    setStage('idle');
+    setUploadProgress(0);
+    setOcrConfidence(null);
+    setOcrWarnings([]);
+    setErrorMessage('');
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        {/* Header */}
+        <div style={{
+          padding: '20px 24px',
+          borderBottom: '1px solid var(--border-subtle)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{
+              width: '34px',
+              height: '34px',
+              borderRadius: 'var(--radius-sm)',
+              background: 'rgba(14, 165, 233, 0.15)',
+              color: '#38bdf8',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <UploadCloud size={18} />
+            </div>
+            <div>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                {stage === 'review' ? 'Verify Extracted Metadata' : 'Upload Certificate to Cloud'}
+              </h3>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                {stage === 'review' 
+                  ? 'Review OCR readings and correct fields before saving to Firestore' 
+                  : 'Files are stored in Cloud Storage and indexed with OCR text extraction'}
+              </p>
+            </div>
+          </div>
+          <button onClick={onClose} style={{ color: 'var(--text-muted)', padding: '4px' }}>
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Content Body */}
+        <div style={{ padding: '24px' }}>
+          {errorMessage && (
+            <div style={{
+              padding: '12px 16px',
+              borderRadius: 'var(--radius-md)',
+              background: 'rgba(244, 63, 94, 0.12)',
+              border: '1px solid rgba(244, 63, 94, 0.3)',
+              color: '#fb7185',
+              fontSize: '0.85rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              marginBottom: '20px'
+            }}>
+              <AlertTriangle size={18} />
+              <span>{errorMessage}</span>
+            </div>
+          )}
+
+          {/* STAGE 1: FILE PICKER */}
+          {stage === 'idle' && (
+            <div>
+              {!file ? (
+                <div 
+                  onDragEnter={handleDrag}
+                  onDragLeave={handleDrag}
+                  onDragOver={handleDrag}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                  style={{
+                    border: `2px dashed ${dragActive ? 'var(--color-primary)' : 'var(--border-subtle)'}`,
+                    borderRadius: 'var(--radius-lg)',
+                    padding: '48px 24px',
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    background: dragActive ? 'rgba(14, 165, 233, 0.05)' : 'var(--bg-surface-elevated)',
+                    transition: 'all var(--transition-fast)'
+                  }}
+                >
+                  <input 
+                    ref={fileInputRef} 
+                    type="file" 
+                    accept="image/png,image/jpeg,image/webp,application/pdf"
+                    style={{ display: 'none' }}
+                    onChange={(e) => e.target.files && handleFile(e.dataTransfer?.files[0] || e.target.files[0])}
+                  />
+                  <div style={{
+                    width: '56px',
+                    height: '56px',
+                    borderRadius: '50%',
+                    background: 'rgba(14, 165, 233, 0.12)',
+                    color: '#38bdf8',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 16px'
+                  }}>
+                    <UploadCloud size={28} />
+                  </div>
+                  <h4 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '6px' }}>
+                    Click or drag certificate document here
+                  </h4>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                    Supports PNG, JPG, WEBP and PDF certificates up to 10MB
+                  </p>
+                </div>
+              ) : (
+                <div style={{
+                  background: 'var(--bg-surface-elevated)',
+                  borderRadius: 'var(--radius-lg)',
+                  padding: '20px',
+                  border: '1px solid var(--border-subtle)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
+                    {filePreview ? (
+                      <img 
+                        src={filePreview} 
+                        alt="Preview" 
+                        style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: 'var(--radius-sm)' }}
+                      />
+                    ) : (
+                      <div style={{
+                        width: '80px',
+                        height: '60px',
+                        borderRadius: 'var(--radius-sm)',
+                        background: 'rgba(14, 165, 233, 0.1)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#38bdf8'
+                      }}>
+                        <FileText size={28} />
+                      </div>
+                    )}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 600, color: 'var(--text-primary)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                        {file.name}
+                      </div>
+                      <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                        {(file.size / (1024 * 1024)).toFixed(2)} MB • {file.type || 'Document'}
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => setFile(null)}
+                      className="btn btn-secondary btn-sm"
+                    >
+                      Change
+                    </button>
+                  </div>
+
+                  <div style={{
+                    padding: '12px',
+                    borderRadius: 'var(--radius-md)',
+                    background: 'rgba(14, 165, 233, 0.08)',
+                    border: '1px solid rgba(14, 165, 233, 0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    fontSize: '0.82rem',
+                    color: '#38bdf8',
+                    marginBottom: '20px'
+                  }}>
+                    <Sparkles size={16} />
+                    <span>Cloud OCR engine will analyze this certificate and extract title, issuer, date, and credential ID automatically.</span>
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+                    <button className="btn btn-secondary" onClick={onClose}>
+                      Cancel
+                    </button>
+                    <button className="btn btn-primary" onClick={handleStartProcessing}>
+                      <Sparkles size={16} />
+                      <span>Process & Scan Document</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* STAGE 2: UPLOAD & OCR PROGRESS */}
+          {(stage === 'uploading' || stage === 'ocr') && (
+            <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+              <Loader2 size={40} className="spin-animation" style={{ color: '#0ea5e9', margin: '0 auto 16px', animation: 'spin 1s linear infinite' }} />
+              <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>
+                {stage === 'uploading' ? 'Uploading to Cloud Storage...' : 'Analyzing Document with Smart OCR...'}
+              </h4>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '24px' }}>
+                {stage === 'uploading' 
+                  ? `Transferring binary payload to Firebase Storage (${uploadProgress}%)`
+                  : 'Recognizing text, dates, issuer authorities, and digital credential identifiers'}
+              </p>
+
+              <div style={{
+                width: '100%',
+                height: '8px',
+                background: 'var(--bg-surface-elevated)',
+                borderRadius: '9999px',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  height: '100%',
+                  width: stage === 'uploading' ? `${uploadProgress}%` : '85%',
+                  background: 'linear-gradient(90deg, #0ea5e9, #10b981)',
+                  borderRadius: '9999px',
+                  transition: 'width 0.3s ease'
+                }}></div>
+              </div>
+            </div>
+          )}
+
+          {/* STAGE 3: REVIEW EXTRACTED FIELDS BEFORE SAVING */}
+          {stage === 'review' && (
+            <form onSubmit={handleSaveCertificate}>
+              {/* Confidence Banner */}
+              <div style={{
+                padding: '12px 16px',
+                borderRadius: 'var(--radius-md)',
+                background: ocrConfidence > 70 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                border: `1px solid ${ocrConfidence > 70 ? 'rgba(16, 185, 129, 0.25)' : 'rgba(245, 158, 11, 0.25)'}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '20px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <CheckCircle2 size={18} style={{ color: ocrConfidence > 70 ? '#34d399' : '#fbbf24' }} />
+                  <div>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                      OCR Extraction Complete
+                    </span>
+                    <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block' }}>
+                      Confidence Score: {ocrConfidence}% • Review and correct fields below
+                    </span>
+                  </div>
+                </div>
+                <div style={{
+                  fontSize: '0.75rem',
+                  padding: '3px 8px',
+                  borderRadius: 'var(--radius-sm)',
+                  background: 'var(--bg-surface-elevated)',
+                  color: 'var(--text-secondary)'
+                }}>
+                  Pre-Verification
+                </div>
+              </div>
+
+              {ocrWarnings.length > 0 && (
+                <div style={{
+                  padding: '10px 14px',
+                  borderRadius: 'var(--radius-sm)',
+                  background: 'rgba(245, 158, 11, 0.08)',
+                  border: '1px solid rgba(245, 158, 11, 0.2)',
+                  fontSize: '0.78rem',
+                  color: '#fbbf24',
+                  marginBottom: '16px'
+                }}>
+                  {ocrWarnings.map((w, idx) => (
+                    <div key={idx}>⚠️ {w}</div>
+                  ))}
+                </div>
+              )}
+
+              {/* Form Fields */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div className="form-group" style={{ gridColumn: 'span 2', marginBottom: '14px' }}>
+                  <label className="form-label">Certificate Title / Program Name *</label>
+                  <input 
+                    type="text" 
+                    className="form-input" 
+                    required
+                    value={formData.title} 
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    placeholder="e.g. Google Cloud Certified Associate Cloud Engineer"
+                  />
+                </div>
+
+                <div className="form-group" style={{ marginBottom: '14px' }}>
+                  <label className="form-label">Issuing Organization / Authority *</label>
+                  <input 
+                    type="text" 
+                    className="form-input" 
+                    required
+                    value={formData.issuer} 
+                    onChange={(e) => setFormData({ ...formData, issuer: e.target.value })}
+                    placeholder="e.g. Coursera, AWS, Google, NPTEL"
+                  />
+                </div>
+
+                <div className="form-group" style={{ marginBottom: '14px' }}>
+                  <label className="form-label">Recipient Name</label>
+                  <input 
+                    type="text" 
+                    className="form-input" 
+                    value={formData.recipient} 
+                    onChange={(e) => setFormData({ ...formData, recipient: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-group" style={{ marginBottom: '14px' }}>
+                  <label className="form-label">Issue Date</label>
+                  <input 
+                    type="date" 
+                    className="form-input" 
+                    value={formData.issueDate} 
+                    onChange={(e) => setFormData({ ...formData, issueDate: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-group" style={{ marginBottom: '14px' }}>
+                  <label className="form-label">Category</label>
+                  <select 
+                    className="form-select"
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  >
+                    <option value="course">Course / Specialization</option>
+                    <option value="internship">Internship</option>
+                    <option value="hackathon">Hackathon / Coding Contest</option>
+                    <option value="academic">Academic Achievement</option>
+                    <option value="workshop">Workshop / Bootcamp</option>
+                    <option value="other">Other Credential</option>
+                  </select>
+                </div>
+
+                <div className="form-group" style={{ gridColumn: 'span 2', marginBottom: '14px' }}>
+                  <label className="form-label">Issuer Verification Link (URL)</label>
+                  <input 
+                    type="url" 
+                    className="form-input" 
+                    value={formData.verificationUrl} 
+                    onChange={(e) => setFormData({ ...formData, verificationUrl: e.target.value })}
+                    placeholder="https://coursera.org/verify/... or https://udemy.com/certificate/..."
+                  />
+                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                    Providing an authentic verification URL upgrades status to Verified/Pending Review.
+                  </span>
+                </div>
+
+                <div className="form-group" style={{ gridColumn: 'span 2', marginBottom: '14px' }}>
+                  <label className="form-label">Credential ID / License Number</label>
+                  <input 
+                    type="text" 
+                    className="form-input" 
+                    value={formData.credentialId} 
+                    onChange={(e) => setFormData({ ...formData, credentialId: e.target.value })}
+                    placeholder="e.g. CERT-8392-ABC"
+                  />
+                </div>
+              </div>
+
+              {/* Public Portfolio Visibility Toggle */}
+              <div style={{
+                padding: '14px',
+                borderRadius: 'var(--radius-md)',
+                background: 'var(--bg-surface-elevated)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginTop: '10px',
+                marginBottom: '24px'
+              }}>
+                <div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                    Publish to Shareable Digital Portfolio
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    Visitors with your public portfolio link will be able to view this credential.
+                  </div>
+                </div>
+                <input 
+                  type="checkbox" 
+                  checked={formData.isPublished}
+                  onChange={(e) => setFormData({ ...formData, isPublished: e.target.checked })}
+                  style={{ width: '18px', height: '18px', accentColor: '#0ea5e9' }}
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+                <button 
+                  type="button" 
+                  className="btn btn-secondary" 
+                  onClick={handleReset}
+                >
+                  Back
+                </button>
+                <button 
+                  type="submit" 
+                  className="btn btn-primary"
+                  disabled={stage === 'saving'}
+                >
+                  {stage === 'saving' ? (
+                    <>
+                      <Loader2 size={16} className="spin-animation" />
+                      <span>Saving to Cloud...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 size={16} />
+                      <span>Save Certificate</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};

@@ -1,0 +1,31 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // User profiles
+    match /users/{userId} {
+      // Allow user to read and update their own profile
+      allow read: if true; // Public portfolios need to read published student info
+      allow create, update: if request.auth != null && request.auth.uid == userId;
+      allow delete: if false; // Disallow deleting root user profiles casually
+    }
+
+    // Certificates collection
+    match /certificates/{certificateId} {
+      // Owner has full read, write, update, delete permissions
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+      
+      // Public reading is permitted ONLY if the certificate is explicitly published for portfolio
+      // or for credential verification lookups
+      allow read: if (request.auth != null && resource.data.userId == request.auth.uid) ||
+                     resource.data.isPublished == true;
+    }
+
+    // Public portfolio settings
+    match /portfolios/{portfolioId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == portfolioId;
+    }
+  }
+}

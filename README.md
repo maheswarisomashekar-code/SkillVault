@@ -1,16 +1,173 @@
-# React + Vite
+# SkillVault | Cloud-Based Skill Credential & Portfolio System
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+> **Information Science and Engineering — 5th Semester Cloud Computing Individual Project**  
+> **Course Evaluation: 30 Marks**  
+> **Author:** Information Science & Engineering Student  
+> **Stack:** React (Vite), Firebase Authentication, Cloud Firestore, Cloud Storage for Firebase, Cloud OCR Pipeline (Google Cloud Vision & Tesseract.js), Firebase Hosting.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 📌 1. Project Overview & Objectives
 
-## React Compiler
+In academic and professional hiring, students acquire various course completions, internship letters, and hackathon certificates. However, credentials are often fragmented across PDFs and emails without centralized verification or structured skill indexing.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+**SkillVault** solves this with a complete cloud-native architecture:
+1. **Cloud Binary Persistence:** Uploads original certificate documents (PDF/PNG/JPG) to **Cloud Storage for Firebase** with owner-scoped access rules.
+2. **Intelligent Cloud Document Processing (OCR):** Genuine OCR pipeline extracts recipient names, issuing organizations (Coursera, Udemy, AWS, Google, NPTEL), issue dates, and unique credential IDs.
+3. **Structured Cloud Database:** Stores certificate metadata, categories, and verification logs in **Cloud Firestore** with strict security rules.
+4. **Credential Verification Pipeline:** Enforces a defensible multi-tier authenticity workflow (`UPLOADED` → `OCR_PROCESSED` → `PENDING_REVIEW` → `VERIFIED`) to prevent unverified claims.
+5. **Dynamic Digital Portfolio & Public Verification:** Generates a unique, shareable public portfolio URL (`#/p/:userId`) with student privacy controls, plus a dedicated recruiter verification registry.
 
-## Expanding the Oxlint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## 🏗️ 2. Cloud Architecture
+
+```mermaid
+flowchart TD
+    subgraph Client ["Student Client (React + Vite SPA)"]
+        UI["Dashboard & Certificate Manager"]
+        OCR_Worker["Smart OCR Engine (Tesseract.js / Vision API)"]
+        PortfolioView["Public Portfolio & Verification Portal"]
+    end
+
+    subgraph FirebaseCloud ["Google Cloud Platform / Firebase Infrastructure"]
+        Auth["Firebase Authentication\n(Email/Password, Tokens, User Sessions)"]
+        Storage["Cloud Storage for Firebase\n(Path: certificates/{userId}/{timestamp}_{file})"]
+        Firestore["Cloud Firestore\n(Collections: users, certificates, portfolios)"]
+        Hosting["Firebase Hosting / CDN\n(Global edge delivery, SSL)"]
+    end
+
+    subgraph External ["External Issuer Portals"]
+        IssuerVerification["Issuer Verification URL\n(Coursera, AWS, Accredible, NPTEL)"]
+    end
+
+    UI -->|"1. User Authentication (JWT)"| Auth
+    UI -->|"2. Direct Binary Upload (Resumable)"| Storage
+    UI -->|"3. OCR Analysis & Entity Parsing"| OCR_Worker
+    OCR_Worker -->|"4. Persist Structured Metadata"| Firestore
+    PortfolioView -->|"5. Query Public Published Records"| Firestore
+    PortfolioView -->|"6. Inspect Credential Proof"| Storage
+    PortfolioView -->|"7. External Verification Check"| IssuerVerification
+    Hosting -->|"Deploys & Serves Web App"| Client
+```
+
+---
+
+## 🔐 3. Cloud Security & Access Rules
+
+Security is enforced at the cloud infrastructure layer, not merely in client code:
+
+### Firestore Security Rules (`firestore.rules`)
+- **User Profile Isolation:** Only authenticated owners can write to `users/{userId}`.
+- **Certificate Data Isolation:** Students can read, create, update, and delete only documents where `request.auth.uid == userId`.
+- **Controlled Public Sharing:** Public visitors can read certificates **only if** `resource.data.isPublished == true`.
+
+### Cloud Storage Security Rules (`storage.rules`)
+- Files stored under `certificates/{userId}/` are restricted to `request.auth.uid == userId`.
+- Restricts uploaded file sizes to `< 10MB` and validates MIME types (`image/*` and `application/pdf`).
+
+---
+
+## 🚀 4. Local Setup & Quick Start
+
+### Prerequisites
+- Node.js `v20.x` or higher
+- Windows PowerShell / Command Prompt
+
+### Step 1: Install Dependencies
+```bash
+cd "d:\CC mini project\skill-portfolio"
+npm.cmd install
+```
+
+### Step 2: Configure Firebase Environment (Optional for Live Firebase)
+Create a `.env` file from `.env.example`:
+```bash
+cp .env.example .env
+```
+Fill in your Firebase credentials from [Firebase Console](https://console.firebase.google.com):
+```env
+VITE_FIREBASE_API_KEY=AIzaSy...
+VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your-project
+VITE_FIREBASE_STORAGE_BUCKET=your-project.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=1234567890
+VITE_FIREBASE_APP_ID=1:1234567890:web:...
+```
+
+> **Note on Cloud Sandbox Mode:** If `.env` is not yet configured, SkillVault automatically runs in **Cloud Sandbox Mode** with complete mock cloud persistence and pre-seeded sample certificates so evaluators can test every single feature immediately without setup delay.
+
+### Step 3: Run the Development Server
+```bash
+npm.cmd run dev
+```
+Open `http://localhost:5173` in your browser.
+
+### Step 4: Build for Production
+```bash
+npm.cmd run build
+```
+
+---
+
+## 🌐 5. Deployment to Firebase Hosting
+
+To deploy your live cloud application:
+
+1. Install Firebase CLI globally:
+   ```bash
+   npm.cmd install -g firebase-tools
+   ```
+2. Log in to Firebase:
+   ```bash
+   firebase login
+   ```
+3. Initialize hosting in `skill-portfolio`:
+   ```bash
+   firebase init hosting
+   ```
+   - Public directory: `dist`
+   - Single-page app: `Yes`
+   - Automatic GitHub actions: `No` (or as preferred)
+4. Deploy:
+   ```bash
+   npm.cmd run build
+   firebase deploy
+   ```
+
+---
+
+## 🎯 6. Key Features Implemented
+
+| Module | Features |
+|---|---|
+| **1. Authentication** | Registration, Login, Logout, Session Persistence, Fast 1-Click Evaluator Login |
+| **2. Certificate Cloud Storage** | PDF/PNG/JPG validator, 10MB limit, resumable chunked upload, live progress bar |
+| **3. Smart Cloud OCR** | Automated text parsing, extracts Title, Issuer, Date, Credential ID, confidence score |
+| **4. Verification Pipeline** | 4-tier verification (`UPLOADED`, `OCR_PROCESSED`, `PENDING_REVIEW`, `VERIFIED`) |
+| **5. Student Dashboard** | Real-time counts, category distribution bar charts, recent certificates |
+| **6. Shareable Portfolio** | Unique URL (`#/p/:userId`), public/private toggle, selective publishing |
+| **7. Verification Registry** | Public lookup tool for recruiters to verify credential authenticity by ID |
+| **8. Profile Manager** | USN, Degree, Department, Semester, Bio, verified skill demonstration tags |
+
+---
+
+## 🎓 7. Cloud Computing Viva Examination Guide (30 Marks)
+
+### Q1: What makes this a genuine Cloud Computing project rather than a normal web app?
+> **Answer:** "This project relies on four core cloud computing service models:
+> 1. **BaaS / Serverless Storage:** Binary certificate payloads are partitioned and stored in Firebase Cloud Storage with bucket access rules.
+> 2. **Cloud NoSQL Database:** Document metadata is stored in Cloud Firestore, leveraging document-level security rules for multi-tenant data isolation.
+> 3. **Cloud Document Processing (OCR):** Unstructured image/PDF binaries undergo optical character recognition to extract structured JSON entities.
+> 4. **Cloud Authentication & Global Edge CDN:** Authentication utilizes JWT tokens issued by Firebase Auth, and the frontend is distributed via global Cloud CDN nodes on Firebase Hosting."
+
+### Q2: How is data privacy enforced in the cloud database?
+> **Answer:** "Through Firestore Security Rules (`firestore.rules`). A visitor can never perform a blanket query on private student certificates. Reading is restricted by checking `resource.data.userId == request.auth.uid || resource.data.isPublished == true`. This separation ensures that even if client-side code were modified, the cloud database will reject unauthorized read or write operations."
+
+### Q3: Why doesn't OCR extraction alone mark a certificate as 'Verified'?
+> **Answer:** "OCR simply extracts text from an uploaded raster image. Because images can be edited or forged, treating OCR output as proof of authenticity is a security flaw. In SkillVault, OCR only advances a document to `OCR_PROCESSED`. Full verification (`VERIFIED`) requires matching with an external issuer verification URL or cryptographic signature."
+
+---
+
+## 📄 License
+Academic Project developed for 5th Semester ISE Cloud Computing Lab Evaluation.
