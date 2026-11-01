@@ -301,23 +301,45 @@ export const extractCertificateFields = (rawText) => {
     verificationUrl = urlMatch[0];
   }
 
-  // 7. Confidence Score
-  if (title) confidenceScore += 10;
-  if (issuer) confidenceScore += 10;
-  if (recipient) confidenceScore += 15;
-  if (credentialId || verificationUrl) confidenceScore += 15;
-  if (issueDate) confidenceScore += 5;
+  // 7. Academic Credential Legitimacy Check & Confidence Score
+  const cleanedRawText = (rawText || '').trim();
+  const wordCount = cleanedRawText.split(/\s+/).filter(Boolean).length;
+
+  // Key academic keywords expected in any valid credential, award, or internship letter
+  const credentialKeywords = [
+    'certificate', 'certify', 'awarded', 'completion', 'achievement', 
+    'successfully', 'completed', 'course', 'internship', 'hackathon', 
+    'workshop', 'training', 'grade', 'score', 'university', 'institute', 
+    'swayam', 'nptel', 'coursera', 'udemy', 'credits', 'roll no', 'reg no'
+  ];
+
+  const matchedKeywords = credentialKeywords.filter(kw => lowerText.includes(kw));
+  const isLikelyCertificate = matchedKeywords.length >= 2 || (wordCount >= 15 && (recipient || title || issuer));
+
+  if (!isLikelyCertificate) {
+    confidenceScore = 15;
+    warnings.push('This image does not appear to be an academic certificate, transcript, or internship letter.');
+  } else {
+    confidenceScore = 40;
+    if (title) confidenceScore += 15;
+    if (issuer && issuer !== 'Authorized Provider') confidenceScore += 15;
+    if (recipient) confidenceScore += 15;
+    if (credentialId || verificationUrl) confidenceScore += 10;
+    if (issueDate) confidenceScore += 5;
+  }
 
   return {
-    title: title || 'Course Certificate',
+    title: title || (isLikelyCertificate ? 'Certificate of Achievement' : ''),
     recipient: recipient || '',
-    issuer: issuer || 'Authorized Provider',
+    issuer: issuer || (isLikelyCertificate ? 'Authorized Provider' : ''),
     issueDate: issueDate || new Date().toISOString().split('T')[0],
     category,
     credentialId,
     verificationUrl,
     rawText,
     confidenceScore: Math.min(confidenceScore, 98),
+    isLikelyCertificate,
+    wordCount,
     warnings
   };
 };

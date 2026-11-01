@@ -27,6 +27,7 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [stage, setStage] = useState('idle'); // 'idle' | 'uploading' | 'ocr' | 'review' | 'saving'
   const [ocrConfidence, setOcrConfidence] = useState(null);
+  const [isLikelyCertificate, setIsLikelyCertificate] = useState(true);
   const [ocrWarnings, setOcrWarnings] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -124,27 +125,50 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
       }
 
       setOcrConfidence(extracted.confidenceScore);
+      setIsLikelyCertificate(extracted.isLikelyCertificate !== false);
       setOcrWarnings(extracted.warnings || []);
 
-      // Auto-populate form prioritizing genuine OCR readings
-      setFormData({
-        title: extracted.title || '',
-        issuer: extracted.issuer || '',
-        recipient: extracted.recipient || '',
-        issueDate: extracted.issueDate || new Date().toISOString().split('T')[0],
-        category: extracted.category || 'course',
-        description: `Uploaded and scanned via SkillVault Cloud OCR on ${new Date().toLocaleDateString()}`,
-        credentialId: extracted.credentialId || '',
-        verificationUrl: extracted.verificationUrl || '',
-        isPublished: true,
-        verificationStatus: extracted.verificationUrl ? 'PENDING_REVIEW' : 'OCR_PROCESSED',
-        fileUrl: uploadResult.downloadUrl,
-        storagePath: uploadResult.storagePath,
-        fileName: uploadResult.fileName,
-        fileSize: uploadResult.fileSize,
-        fileType: uploadResult.fileType,
-        rawOcrText: extracted.rawText || ''
-      });
+      // If document is completely unrelated garbage (like random animal, landscape, meme)
+      if (extracted.isLikelyCertificate === false) {
+        setFormData({
+          title: '',
+          issuer: '',
+          recipient: '',
+          issueDate: new Date().toISOString().split('T')[0],
+          category: 'other',
+          description: 'Uploaded document failed academic validation check.',
+          credentialId: '',
+          verificationUrl: '',
+          isPublished: false,
+          verificationStatus: 'UPLOADED',
+          fileUrl: uploadResult.downloadUrl,
+          storagePath: uploadResult.storagePath,
+          fileName: uploadResult.fileName,
+          fileSize: uploadResult.fileSize,
+          fileType: uploadResult.fileType,
+          rawOcrText: extracted.rawText || ''
+        });
+      } else {
+        // Auto-populate form prioritizing genuine OCR readings
+        setFormData({
+          title: extracted.title || '',
+          issuer: extracted.issuer || '',
+          recipient: extracted.recipient || '',
+          issueDate: extracted.issueDate || new Date().toISOString().split('T')[0],
+          category: extracted.category || 'course',
+          description: `Uploaded and scanned via SkillVault Cloud OCR on ${new Date().toLocaleDateString()}`,
+          credentialId: extracted.credentialId || '',
+          verificationUrl: extracted.verificationUrl || '',
+          isPublished: true,
+          verificationStatus: extracted.verificationUrl ? 'PENDING_REVIEW' : 'OCR_PROCESSED',
+          fileUrl: uploadResult.downloadUrl,
+          storagePath: uploadResult.storagePath,
+          fileName: uploadResult.fileName,
+          fileSize: uploadResult.fileSize,
+          fileType: uploadResult.fileType,
+          rawOcrText: extracted.rawText || ''
+        });
+      }
 
       setStage('review');
     } catch (err) {
@@ -411,25 +435,35 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
           {/* STAGE 3: REVIEW EXTRACTED FIELDS BEFORE SAVING */}
           {stage === 'review' && (
             <form onSubmit={handleSaveCertificate}>
-              {/* Confidence Banner */}
+              {/* Confidence & Legitimacy Banner */}
               <div style={{
                 padding: '12px 16px',
                 borderRadius: 'var(--radius-md)',
-                background: ocrConfidence > 70 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
-                border: `1px solid ${ocrConfidence > 70 ? 'rgba(16, 185, 129, 0.25)' : 'rgba(245, 158, 11, 0.25)'}`,
+                background: !isLikelyCertificate 
+                  ? 'rgba(244, 63, 94, 0.12)' 
+                  : (ocrConfidence > 70 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)'),
+                border: `1px solid ${!isLikelyCertificate 
+                  ? 'rgba(244, 63, 94, 0.35)' 
+                  : (ocrConfidence > 70 ? 'rgba(16, 185, 129, 0.25)' : 'rgba(245, 158, 11, 0.25)')}`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 marginBottom: '20px'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <CheckCircle2 size={18} style={{ color: ocrConfidence > 70 ? '#34d399' : '#fbbf24' }} />
+                  {!isLikelyCertificate ? (
+                    <AlertTriangle size={20} style={{ color: '#fb7185' }} />
+                  ) : (
+                    <CheckCircle2 size={18} style={{ color: ocrConfidence > 70 ? '#34d399' : '#fbbf24' }} />
+                  )}
                   <div>
                     <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                      OCR Extraction Complete
+                      {!isLikelyCertificate ? 'Non-Academic Document Detected' : 'OCR Extraction Complete'}
                     </span>
                     <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block' }}>
-                      Confidence Score: {ocrConfidence}% • Review and correct fields below
+                      {!isLikelyCertificate 
+                        ? 'Image contains no verifiable certificate or credential text. Unverified & unpublishable.' 
+                        : `Confidence Score: ${ocrConfidence}% • Review and correct fields below`}
                     </span>
                   </div>
                 </div>
@@ -438,9 +472,9 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                   padding: '3px 8px',
                   borderRadius: 'var(--radius-sm)',
                   background: 'var(--bg-surface-elevated)',
-                  color: 'var(--text-secondary)'
+                  color: !isLikelyCertificate ? '#fb7185' : 'var(--text-secondary)'
                 }}>
-                  Pre-Verification
+                  {!isLikelyCertificate ? 'Rejected / Unverified' : 'Pre-Verification'}
                 </div>
               </div>
 
