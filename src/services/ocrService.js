@@ -55,6 +55,101 @@ export const extractTextAndCanvasFromPdf = async (pdfFileOrUrl) => {
 };
 
 /**
+ * Converts any recognized certificate date string or academic session into strict ISO YYYY-MM-DD
+ */
+export const normalizeToIsoDate = (dateStr) => {
+  if (!dateStr || typeof dateStr !== 'string') return '';
+  const clean = dateStr.trim();
+
+  // Already in YYYY-MM-DD format
+  if (/^\d{4}-\d{2}-\d{2}$/.test(clean)) return clean;
+
+  const monthMap = {
+    jan: '01', january: '01',
+    feb: '02', february: '02',
+    mar: '03', march: '03',
+    apr: '04', april: '04',
+    may: '05',
+    jun: '06', june: '06',
+    jul: '07', july: '07',
+    aug: '08', august: '08',
+    sep: '09', sept: '09', september: '09',
+    oct: '10', october: '10',
+    nov: '11', november: '11',
+    dec: '12', december: '12'
+  };
+
+  // 1. Session format: e.g. "JUL-SEP 2026" or "JAN-APR 2025" -> convert to exam completion month
+  const sessionMatch = clean.match(/(?:[A-Za-z]{3,9})\s*[-–]\s*([A-Za-z]{3,9})\s+(\d{4})/i);
+  if (sessionMatch) {
+    const endMonth = sessionMatch[1].toLowerCase();
+    const year = sessionMatch[2];
+    const m = monthMap[endMonth] || monthMap[endMonth.slice(0, 3)] || '09';
+    return `${year}-${m}-01`;
+  }
+
+  // 2. Month Day, Year: e.g. "Nov 1, 2026" or "November 12, 2024" or "Nov 1 2026"
+  const mdyMatch = clean.match(/([A-Za-z]{3,9})[.,]?\s+(\d{1,2}),?\s+(\d{4})/i);
+  if (mdyMatch) {
+    const m = monthMap[mdyMatch[1].toLowerCase()] || monthMap[mdyMatch[1].toLowerCase().slice(0, 3)];
+    if (m) {
+      const d = mdyMatch[2].padStart(2, '0');
+      const y = mdyMatch[3];
+      return `${y}-${m}-${d}`;
+    }
+  }
+
+  // 3. Day Month Year: e.g. "12 November 2024" or "01 Nov 2026"
+  const dmyTextMatch = clean.match(/(\d{1,2})\s+([A-Za-z]{3,9})[.,]?\s+(\d{4})/i);
+  if (dmyTextMatch) {
+    const m = monthMap[dmyTextMatch[2].toLowerCase()] || monthMap[dmyTextMatch[2].toLowerCase().slice(0, 3)];
+    if (m) {
+      const d = dmyTextMatch[1].padStart(2, '0');
+      const y = dmyTextMatch[3];
+      return `${y}-${m}-${d}`;
+    }
+  }
+
+  // 4. Month Year: e.g. "September 2024" or "Nov 2026"
+  const myTextMatch = clean.match(/^([A-Za-z]{3,9})\s+(\d{4})$/i);
+  if (myTextMatch) {
+    const m = monthMap[myTextMatch[1].toLowerCase()] || monthMap[myTextMatch[1].toLowerCase().slice(0, 3)];
+    if (m) {
+      return `${myTextMatch[2]}-${m}-01`;
+    }
+  }
+
+  // 5. DD-MM-YYYY or DD/MM/YYYY or DD.MM.YYYY
+  const dmyNumMatch = clean.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/);
+  if (dmyNumMatch) {
+    const p1 = parseInt(dmyNumMatch[1], 10);
+    const p2 = parseInt(dmyNumMatch[2], 10);
+    const y = dmyNumMatch[3];
+    // If p1 > 12, p1 is day, p2 is month (DD/MM/YYYY)
+    if (p1 > 12 && p2 <= 12) {
+      return `${y}-${String(p2).padStart(2, '0')}-${String(p1).padStart(2, '0')}`;
+    }
+    // Standard Indian certificates use DD/MM/YYYY
+    return `${y}-${String(p2).padStart(2, '0')}-${String(p1).padStart(2, '0')}`;
+  }
+
+  // 6. YYYY-MM-DD or YYYY/MM/DD
+  const ymdNumMatch = clean.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})$/);
+  if (ymdNumMatch) {
+    return `${ymdNumMatch[1]}-${ymdNumMatch[2].padStart(2, '0')}-${ymdNumMatch[3].padStart(2, '0')}`;
+  }
+
+  // Fallback: Date.parse
+  const parsed = Date.parse(clean);
+  if (!isNaN(parsed)) {
+    const d = new Date(parsed);
+    return d.toISOString().split('T')[0];
+  }
+
+  return '';
+};
+
+/**
  * Intelligent certificate field extractor using text heuristics
  */
 export const extractCertificateFields = (rawText) => {
@@ -263,9 +358,22 @@ export const extractCertificateFields = (rawText) => {
   }
 
   if (!issueDate) {
+    // Check explicit labeled date markers: "Date:", "Dated:", "Issue Date:", "Issued on:"
+    const labeledDateMatch = fullText.match(/(?:date of issue|issue date|date|dated|issued on|issued)[:\s]+([A-Za-z0-9,.\s/-]{4,25})/i);
+    if (labeledDateMatch) {
+      const candidate = labeledDateMatch[1].trim();
+      const normalized = normalizeToIsoDate(candidate);
+      if (normalized) {
+        issueDate = normalized;
+      }
+    }
+  }
+
+  if (!issueDate) {
     const datePatterns = [
       /\b(?:January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[.,]?\s+\d{1,2},?\s+\d{4}\b/i,
       /\b\d{1,2}\s+(?:January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[.,]?\s+\d{4}\b/i,
+      /\b(?:January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\s+\d{4}\b/i,
       /\b\d{1,2}[-/.]\d{1,2}[-/.]\d{4}\b/,
       /\b\d{4}[-/.]\d{1,2}[-/.]\d{1,2}\b/
     ];
@@ -278,6 +386,8 @@ export const extractCertificateFields = (rawText) => {
       }
     }
   }
+
+  const isoIssueDate = normalizeToIsoDate(issueDate);
 
   // 6. Universal Credential ID & URL Extractor
   // Roll number, Certificate ID, License No, Credential ID
@@ -332,7 +442,7 @@ export const extractCertificateFields = (rawText) => {
     title: title || (isLikelyCertificate ? 'Certificate of Achievement' : ''),
     recipient: recipient || '',
     issuer: issuer || (isLikelyCertificate ? 'Authorized Provider' : ''),
-    issueDate: issueDate || new Date().toISOString().split('T')[0],
+    issueDate: isoIssueDate || '',
     category,
     credentialId,
     verificationUrl,

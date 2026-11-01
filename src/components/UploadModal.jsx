@@ -161,7 +161,7 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
           title: file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, ' '),
           issuer: '',
           recipient: '',
-          issueDate: new Date().toISOString().split('T')[0],
+          issueDate: '',
           category: 'course',
           confidenceScore: 30,
           warnings: ['Document could not be parsed automatically. Please fill details manually.']
@@ -179,7 +179,7 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
           title: '',
           issuer: '',
           recipient: '',
-          issueDate: new Date().toISOString().split('T')[0],
+          issueDate: '',
           category: 'other',
           description: 'Uploaded document failed academic validation check.',
           credentialId: '',
@@ -199,7 +199,7 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
           title: extracted.title || '',
           issuer: extracted.issuer || '',
           recipient: extracted.recipient || '',
-          issueDate: extracted.issueDate || new Date().toISOString().split('T')[0],
+          issueDate: extracted.issueDate || '',
           category: extracted.category || 'course',
           description: `Uploaded and scanned via SkillVault Cloud OCR on ${new Date().toLocaleDateString()}`,
           credentialId: extracted.credentialId || '',
@@ -645,13 +645,25 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                 </div>
 
                 <div className="form-group" style={{ marginBottom: '14px' }}>
-                  <label className="form-label">Issue Date</label>
+                  <label className="form-label">
+                    Issue Date
+                    {formData.issueDate && Boolean(formData.rawOcrText) && (
+                      <span style={{ color: '#34d399', fontSize: '0.74rem', marginLeft: '6px', fontWeight: 600 }}>
+                        ✓ Detected from Document
+                      </span>
+                    )}
+                  </label>
                   <input 
                     type="date" 
                     className="form-input" 
                     value={formData.issueDate} 
                     onChange={(e) => setFormData({ ...formData, issueDate: e.target.value })}
                   />
+                  {!formData.issueDate && (
+                    <div style={{ fontSize: '0.74rem', color: '#fbbf24', marginTop: '4px' }}>
+                      ⚠️ Date not detected on certificate. Please pick issue date.
+                    </div>
+                  )}
                 </div>
 
                 <div className="form-group" style={{ marginBottom: '14px' }}>
