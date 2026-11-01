@@ -46,7 +46,14 @@ export const getUserProfile = async (userId, userDetails = {}) => {
       const userRef = doc(db, 'users', userId);
       const snapshot = await getDoc(userRef);
       if (snapshot.exists()) {
-        return snapshot.data();
+        const data = snapshot.data();
+        if (userId !== 'student_cloud_demo_01') {
+          if (data.institution === 'Department of Information Science & Engineering') data.institution = '';
+          if (data.degree === 'B.E. Information Science and Engineering' || data.degree === 'Bachelor of Engineering (ISE)') data.degree = '';
+          if (data.semester === '5th Semester' && (!data.usn || data.usn.startsWith('1MS22') || data.usn.startsWith('1IS22'))) data.semester = '';
+          if (Array.isArray(data.skills) && data.skills.includes('Database Management') && data.skills.includes('Web Development')) data.skills = [];
+        }
+        return data;
       }
     } catch (e) {
       console.warn('Error fetching user profile from Firestore:', e);
@@ -70,6 +77,10 @@ export const getUserProfile = async (userId, userDetails = {}) => {
       }
       if (p.semester === '5th Semester' && (!p.usn || p.usn.startsWith('1MS22') || p.usn.startsWith('1IS22'))) {
         p.semester = '';
+        modified = true;
+      }
+      if (Array.isArray(p.skills) && p.skills.includes('Database Management') && p.skills.includes('Web Development')) {
+        p.skills = [];
         modified = true;
       }
       if (modified) {

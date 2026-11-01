@@ -39,6 +39,11 @@ export const ProfilePage = () => {
 
   useEffect(() => {
     if (userProfile) {
+      // Clean out boilerplate placeholder skills for real users
+      const rawSkills = Array.isArray(userProfile.skills) ? userProfile.skills : [];
+      const isBoilerplate = rawSkills.includes('Database Management') && rawSkills.includes('Web Development');
+      const cleanSkills = isBoilerplate ? [] : rawSkills;
+
       setFormData({
         fullName: userProfile.fullName || currentUser?.displayName || '',
         email: userProfile.email || currentUser?.email || '',
@@ -47,7 +52,7 @@ export const ProfilePage = () => {
         degree: userProfile.degree || '',
         semester: userProfile.semester || '',
         bio: userProfile.bio || '',
-        skills: userProfile.skills || [],
+        skills: cleanSkills,
         github: userProfile.github || '',
         linkedin: userProfile.linkedin || '',
         isPortfolioPublic: userProfile.isPortfolioPublic !== false
