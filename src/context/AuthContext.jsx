@@ -41,8 +41,8 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
       });
     } else {
-      // Local demo mode persistence check
-      const savedUser = localStorage.getItem('skillvault_demo_user');
+      // In sandbox mode, require explicit sign in (session storage only, reset on fresh start)
+      const savedUser = sessionStorage.getItem('skillvault_active_session');
       if (savedUser) {
         try {
           const parsed = JSON.parse(savedUser);
@@ -77,7 +77,7 @@ export const AuthProvider = ({ children }) => {
         email,
         displayName: email.split('@')[0],
       };
-      localStorage.setItem('skillvault_demo_user', JSON.stringify(userObj));
+      sessionStorage.setItem('skillvault_active_session', JSON.stringify(userObj));
       setCurrentUser(userObj);
       const profile = await getUserProfile(userObj.uid, { email: userObj.email, displayName: userObj.displayName });
       setUserProfile(profile);
@@ -115,7 +115,7 @@ export const AuthProvider = ({ children }) => {
         email,
         displayName: displayName || email.split('@')[0],
       };
-      localStorage.setItem('skillvault_demo_user', JSON.stringify(userObj));
+      sessionStorage.setItem('skillvault_active_session', JSON.stringify(userObj));
       setCurrentUser(userObj);
       const initialProfile = {
         fullName: displayName || email.split('@')[0],
@@ -134,7 +134,7 @@ export const AuthProvider = ({ children }) => {
 
   const loginDemoStudent = async () => {
     setAuthError(null);
-    localStorage.setItem('skillvault_demo_user', JSON.stringify(DEMO_USER));
+    sessionStorage.setItem('skillvault_active_session', JSON.stringify(DEMO_USER));
     setCurrentUser(DEMO_USER);
     const profile = await getUserProfile(DEMO_USER.uid);
     setUserProfile(profile);
@@ -145,6 +145,7 @@ export const AuthProvider = ({ children }) => {
     if (isFirebaseConfigured && auth) {
       await signOut(auth);
     }
+    sessionStorage.removeItem('skillvault_active_session');
     localStorage.removeItem('skillvault_demo_user');
     setCurrentUser(null);
     setUserProfile(null);

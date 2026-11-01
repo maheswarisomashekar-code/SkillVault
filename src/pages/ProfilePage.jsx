@@ -89,8 +89,15 @@ export const ProfilePage = () => {
         return { valid: false, error: `Invalid protocol. URL must start with https://` };
       }
       if (expectedHost && !parsed.hostname.toLowerCase().includes(expectedHost)) {
-        return { valid: false, error: `Please enter a valid ${expectedHost} URL (e.g. https://${expectedHost}.com/username)` };
+        return { valid: false, error: `Please enter a valid ${expectedHost} URL (e.g. https://${expectedHost}.com/your-username)` };
       }
+
+      // Check for generic homepage URLs like https://github.com or https://github.com/
+      const pathname = parsed.pathname.replace(/^\/+|\/+$/g, '');
+      if (expectedHost && !pathname) {
+        return { valid: false, error: `Please include your specific username in your ${expectedHost} URL (e.g. https://${expectedHost}.com/your-username)` };
+      }
+
       return { valid: true, sanitized: trimmed };
     } catch {
       return { valid: false, error: `Invalid web address format. Please enter a valid URL starting with https://` };
