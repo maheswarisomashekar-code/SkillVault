@@ -54,42 +54,91 @@ export const AuthPage = () => {
       position: 'relative',
       overflow: 'hidden'
     }}>
-      {/* Subtle Ambient Background Cloud Glows */}
-      <div style={{
+      {/* Ambient Cloud Layers & Glowing Nebulas */}
+      <div className="floating-cloud-1" style={{
         position: 'absolute',
-        top: '10%',
+        top: '6%',
         left: '5%',
-        width: '320px',
-        height: '320px',
-        background: 'rgba(14, 165, 233, 0.08)',
-        filter: 'blur(100px)',
-        borderRadius: '50%',
-        pointerEvents: 'none'
-      }}></div>
-      <div style={{
-        position: 'absolute',
-        bottom: '10%',
-        right: '5%',
-        width: '340px',
-        height: '340px',
-        background: 'rgba(99, 102, 241, 0.08)',
-        filter: 'blur(110px)',
+        width: '420px',
+        height: '420px',
+        background: 'radial-gradient(circle, rgba(14, 165, 233, 0.25) 0%, rgba(14, 165, 233, 0.06) 50%, transparent 70%)',
+        filter: 'blur(60px)',
         borderRadius: '50%',
         pointerEvents: 'none'
       }}></div>
 
+      <div className="floating-cloud-2" style={{
+        position: 'absolute',
+        bottom: '6%',
+        right: '4%',
+        width: '460px',
+        height: '460px',
+        background: 'radial-gradient(circle, rgba(99, 102, 241, 0.22) 0%, rgba(99, 102, 241, 0.05) 50%, transparent 70%)',
+        filter: 'blur(70px)',
+        borderRadius: '50%',
+        pointerEvents: 'none'
+      }}></div>
+
+      <div className="floating-cloud-3" style={{
+        position: 'absolute',
+        top: '40%',
+        right: '25%',
+        width: '320px',
+        height: '320px',
+        background: 'radial-gradient(circle, rgba(20, 184, 166, 0.18) 0%, rgba(20, 184, 166, 0.04) 55%, transparent 75%)',
+        filter: 'blur(55px)',
+        borderRadius: '50%',
+        pointerEvents: 'none'
+      }}></div>
+
+      {/* Decorative Cloud Grid & Cloud Icon Watermarks */}
+      <div className="floating-cloud-1" style={{
+        position: 'absolute',
+        top: '4%',
+        right: '12%',
+        opacity: 0.18,
+        color: '#38bdf8',
+        pointerEvents: 'none',
+        filter: 'drop-shadow(0 0 16px rgba(56, 189, 248, 0.4))'
+      }}>
+        <Cloud size={160} strokeWidth={1.2} />
+      </div>
+
+      <div className="floating-cloud-2" style={{
+        position: 'absolute',
+        bottom: '6%',
+        left: '10%',
+        opacity: 0.14,
+        color: '#818cf8',
+        pointerEvents: 'none',
+        filter: 'drop-shadow(0 0 20px rgba(129, 140, 248, 0.35))'
+      }}>
+        <Cloud size={200} strokeWidth={1} />
+      </div>
+
+      <div className="floating-cloud-3" style={{
+        position: 'absolute',
+        top: '22%',
+        left: '2%',
+        opacity: 0.12,
+        color: '#2dd4bf',
+        pointerEvents: 'none',
+        filter: 'drop-shadow(0 0 12px rgba(45, 212, 191, 0.3))'
+      }}>
+        <Cloud size={110} strokeWidth={1.3} />
+      </div>
+
       {/* Main Two-Panel Card */}
-      <div style={{
+      <div className="auth-panel-glow" style={{
         maxWidth: '1040px',
         width: '100%',
         display: 'grid',
         gridTemplateColumns: '1.05fr 0.95fr',
-        background: 'rgba(15, 23, 42, 0.85)',
-        backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
+        background: 'rgba(15, 23, 42, 0.88)',
+        backdropFilter: 'blur(24px)',
+        border: '1px solid rgba(255, 255, 255, 0.12)',
         borderRadius: 'var(--radius-xl)',
         overflow: 'hidden',
-        boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.6)',
         position: 'relative',
         zIndex: 1
       }}>
@@ -106,8 +155,8 @@ export const AuthPage = () => {
           <div>
             {/* Brand Header */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '28px' }}>
-              <div className="brand-icon-wrapper" style={{ width: '44px', height: '44px' }}>
-                <Layers size={22} />
+              <div className="brand-icon-wrapper" style={{ width: '44px', height: '44px', boxShadow: '0 0 18px rgba(14, 165, 233, 0.3)' }}>
+                <Cloud size={22} />
               </div>
               <div>
                 <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.02em' }}>
@@ -136,7 +185,7 @@ export const AuthPage = () => {
 
             {/* Feature Highlights Grid */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{
+              <div className="feature-pill-hover" style={{
                 padding: '14px 16px',
                 borderRadius: 'var(--radius-md)',
                 background: 'rgba(255, 255, 255, 0.03)',
@@ -145,9 +194,9 @@ export const AuthPage = () => {
                 alignItems: 'center',
                 gap: '14px'
               }}>
-                <div style={{
-                  width: '36px',
-                  height: '36px',
+                <div className="feature-icon-box" style={{
+                  width: '38px',
+                  height: '38px',
                   borderRadius: 'var(--radius-sm)',
                   background: 'rgba(14, 165, 233, 0.15)',
                   color: '#38bdf8',
@@ -163,7 +212,7 @@ export const AuthPage = () => {
                 </div>
               </div>
 
-              <div style={{
+              <div className="feature-pill-hover" style={{
                 padding: '14px 16px',
                 borderRadius: 'var(--radius-md)',
                 background: 'rgba(255, 255, 255, 0.03)',
@@ -172,9 +221,9 @@ export const AuthPage = () => {
                 alignItems: 'center',
                 gap: '14px'
               }}>
-                <div style={{
-                  width: '36px',
-                  height: '36px',
+                <div className="feature-icon-box" style={{
+                  width: '38px',
+                  height: '38px',
                   borderRadius: 'var(--radius-sm)',
                   background: 'rgba(16, 185, 129, 0.15)',
                   color: '#34d399',
@@ -190,7 +239,7 @@ export const AuthPage = () => {
                 </div>
               </div>
 
-              <div style={{
+              <div className="feature-pill-hover" style={{
                 padding: '14px 16px',
                 borderRadius: 'var(--radius-md)',
                 background: 'rgba(255, 255, 255, 0.03)',
@@ -199,9 +248,9 @@ export const AuthPage = () => {
                 alignItems: 'center',
                 gap: '14px'
               }}>
-                <div style={{
-                  width: '36px',
-                  height: '36px',
+                <div className="feature-icon-box" style={{
+                  width: '38px',
+                  height: '38px',
                   borderRadius: 'var(--radius-sm)',
                   background: 'rgba(99, 102, 241, 0.15)',
                   color: '#a5b4fc',
@@ -322,7 +371,7 @@ export const AuthPage = () => {
 
             <button 
               type="submit" 
-              className="btn btn-primary" 
+              className="btn btn-primary auth-glow-btn" 
               style={{ width: '100%', padding: '12px' }}
               disabled={loading}
             >
