@@ -29,11 +29,11 @@ const createBlankProfile = (userId, email = '', displayName = '') => ({
   fullName: displayName || (email ? email.split('@')[0] : 'Student'),
   email: email,
   usn: '',
-  institution: 'Department of Information Science & Engineering',
-  degree: 'Bachelor of Engineering (ISE)',
-  semester: '5th Semester',
+  institution: '',
+  degree: '',
+  semester: '',
   bio: '',
-  skills: ['Cloud Computing', 'Database Management', 'Web Development'],
+  skills: [],
   github: '',
   linkedin: '',
   isPortfolioPublic: true,
@@ -56,6 +56,26 @@ export const getUserProfile = async (userId, userDetails = {}) => {
   // Fallback / local storage
   const local = JSON.parse(localStorage.getItem(LOCAL_PROFILES_KEY) || '{}');
   if (local[userId]) {
+    // Sanitize any previously auto-injected academic placeholders for custom student accounts
+    if (userId !== 'student_cloud_demo_01') {
+      let modified = false;
+      const p = local[userId];
+      if (p.institution === 'Department of Information Science & Engineering') {
+        p.institution = '';
+        modified = true;
+      }
+      if (p.degree === 'B.E. Information Science and Engineering' || p.degree === 'Bachelor of Engineering (ISE)') {
+        p.degree = '';
+        modified = true;
+      }
+      if (p.semester === '5th Semester' && (!p.usn || p.usn.startsWith('1MS22') || p.usn.startsWith('1IS22'))) {
+        p.semester = '';
+        modified = true;
+      }
+      if (modified) {
+        localStorage.setItem(LOCAL_PROFILES_KEY, JSON.stringify(local));
+      }
+    }
     return local[userId];
   }
 

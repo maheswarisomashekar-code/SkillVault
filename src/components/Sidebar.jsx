@@ -37,7 +37,7 @@ export const Sidebar = ({ activeTab, setActiveTab, isOpen, setIsOpen }) => {
         </div>
         <div className="brand-info" style={{ flex: 1 }}>
           <h1>SkillVault</h1>
-          <span className="brand-badge">Cloud IS&E</span>
+          <span className="brand-badge">Cloud Vault</span>
         </div>
         {setIsOpen && (
           <button 
@@ -78,7 +78,7 @@ export const Sidebar = ({ activeTab, setActiveTab, isOpen, setIsOpen }) => {
               {userProfile?.fullName || currentUser?.displayName || 'Student'}
             </div>
             <div className="user-subtext">
-              {userProfile?.usn || userProfile?.degree || 'ISE Dept'}
+              {userProfile?.usn || userProfile?.degree || currentUser?.email || 'Student Account'}
             </div>
           </div>
         </div>

@@ -29,7 +29,7 @@ export const ProfilePage = () => {
     usn: '',
     institution: '',
     degree: '',
-    semester: '5th Semester',
+    semester: '',
     bio: '',
     skills: [],
     github: '',
@@ -43,11 +43,11 @@ export const ProfilePage = () => {
         fullName: userProfile.fullName || currentUser?.displayName || '',
         email: userProfile.email || currentUser?.email || '',
         usn: userProfile.usn || '',
-        institution: userProfile.institution || 'Department of Information Science & Engineering',
-        degree: userProfile.degree || 'Bachelor of Engineering (ISE)',
-        semester: userProfile.semester || '5th Semester',
+        institution: userProfile.institution || '',
+        degree: userProfile.degree || '',
+        semester: userProfile.semester || '',
         bio: userProfile.bio || '',
-        skills: userProfile.skills || ['Cloud Computing', 'Firebase', 'React.js'],
+        skills: userProfile.skills || [],
         github: userProfile.github || '',
         linkedin: userProfile.linkedin || '',
         isPortfolioPublic: userProfile.isPortfolioPublic !== false
@@ -213,7 +213,7 @@ export const ProfilePage = () => {
               type="text" 
               className="form-input" 
               required
-              placeholder="Enter your USN (e.g. 1MS22IS001)"
+              placeholder="Enter your USN (e.g. 1RV22CS001)"
               value={formData.usn}
               onChange={(e) => setFormData({ ...formData, usn: e.target.value })}
             />
@@ -226,6 +226,11 @@ export const ProfilePage = () => {
               value={formData.semester}
               onChange={(e) => setFormData({ ...formData, semester: e.target.value })}
             >
+              <option value="">Select Semester</option>
+              <option value="1st Semester">1st Semester</option>
+              <option value="2nd Semester">2nd Semester</option>
+              <option value="3rd Semester">3rd Semester</option>
+              <option value="4th Semester">4th Semester</option>
               <option value="5th Semester">5th Semester</option>
               <option value="6th Semester">6th Semester</option>
               <option value="7th Semester">7th Semester</option>
@@ -240,7 +245,7 @@ export const ProfilePage = () => {
               className="form-input" 
               value={formData.degree}
               onChange={(e) => setFormData({ ...formData, degree: e.target.value })}
-              placeholder="e.g. B.E. Information Science and Engineering"
+              placeholder="e.g. B.E. Computer Science, ISE, ECE, Mechanical..."
             />
           </div>
 
@@ -251,7 +256,7 @@ export const ProfilePage = () => {
               className="form-input" 
               value={formData.institution}
               onChange={(e) => setFormData({ ...formData, institution: e.target.value })}
-              placeholder="e.g. Department of Information Science & Engineering"
+              placeholder="e.g. College / University Department Name"
             />
           </div>
         </div>

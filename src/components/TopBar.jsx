@@ -15,6 +15,15 @@ export const TopBar = ({ activeTab, setIsSidebarOpen, onOpenUpload, onOpenPortfo
     profile: 'Student Identity & Academic Profile'
   };
 
+  const subtitles = {
+    dashboard: 'Real-time credential metrics & cloud distribution',
+    certificates: 'Securely stored multi-format digital certificates',
+    upload: 'Automated entity extraction and anti-tamper verification',
+    portfolio: 'Publicly shareable showcase with privacy controls',
+    validator: 'Defensible multi-tier authenticity lookup registry',
+    profile: 'Manage personal details, institutional records, and verified skills'
+  };
+
   return (
     <header className="top-bar">
       <div className="top-bar-left">
@@ -36,7 +45,7 @@ export const TopBar = ({ activeTab, setIsSidebarOpen, onOpenUpload, onOpenPortfo
             {titles[activeTab] || 'SkillVault'}
           </h2>
           <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-            Cloud Computing Lab Project • 5th Sem Information Science
+            {subtitles[activeTab] || 'Cloud-Based Skill Credential Platform'}
           </p>
         </div>
       </div>

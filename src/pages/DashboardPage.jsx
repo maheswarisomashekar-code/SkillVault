@@ -70,7 +70,7 @@ export const DashboardPage = ({
             marginBottom: '12px'
           }}>
             <Sparkles size={12} />
-            <span>Cloud Computing Project Showcase</span>
+            <span>Verified Cloud Credential Vault</span>
           </div>
 
           <h2 style={{ fontSize: '1.65rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: '8px' }}>
@@ -78,7 +78,7 @@ export const DashboardPage = ({
           </h2>
 
           <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-            {userProfile?.institution || 'Information Science & Engineering Department'} • {userProfile?.degree || 'B.E. ISE'}
+            {[userProfile?.institution, userProfile?.degree].filter(Boolean).join(' • ') || 'Academic & Professional Credentials'}
             <br />
             Manage, OCR-extract, and securely publish your academic credentials to the cloud.
           </p>

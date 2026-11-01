@@ -96,10 +96,12 @@ export const AuthProvider = ({ children }) => {
         const initialProfile = {
           fullName: displayName || email.split('@')[0],
           email,
-          institution: 'Department of Information Science & Engineering',
-          degree: 'B.E. Information Science and Engineering',
-          semester: '5th Semester',
-          skills: ['Cloud Computing', 'Database Management', 'Web Development'],
+          usn: '',
+          institution: '',
+          degree: '',
+          semester: '',
+          bio: '',
+          skills: [],
           isPortfolioPublic: true
         };
         await saveUserProfile(cred.user.uid, initialProfile);
@@ -120,10 +122,12 @@ export const AuthProvider = ({ children }) => {
       const initialProfile = {
         fullName: displayName || email.split('@')[0],
         email,
-        institution: 'Department of Information Science & Engineering',
-        degree: 'B.E. Information Science and Engineering',
-        semester: '5th Semester',
-        skills: ['Cloud Computing', 'Firebase', 'React'],
+        usn: '',
+        institution: '',
+        degree: '',
+        semester: '',
+        bio: '',
+        skills: [],
         isPortfolioPublic: true
       };
       await saveUserProfile(userObj.uid, initialProfile);

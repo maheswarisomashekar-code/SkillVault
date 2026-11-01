@@ -209,7 +209,7 @@ export const PublicPortfolioPage = ({ portfolioId, onBackToApp }) => {
                 </div>
 
                 <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
-                  {profile?.degree || 'Bachelor of Engineering'} • {profile?.institution || 'Information Science & Engineering'}
+                  {[profile?.degree, profile?.institution].filter(Boolean).join(' • ') || 'Verified Candidate'}
                   {profile?.usn && <span style={{ fontFamily: 'var(--font-mono)', marginLeft: '8px', color: '#38bdf8' }}>[{profile.usn}]</span>}
                 </div>
               </div>
