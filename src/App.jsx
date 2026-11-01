@@ -35,7 +35,11 @@ function MainAppContent() {
   const [publicPortfolioId, setPublicPortfolioId] = useState(null);
 
   useEffect(() => {
-    seedInitialSampleData();
+    seedInitialSampleData().then(() => {
+      if (currentUser) {
+        loadCertificates();
+      }
+    });
 
     // Check hash for #/p/:id
     const checkHash = () => {

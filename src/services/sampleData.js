@@ -95,9 +95,30 @@ export const SAMPLE_CERTIFICATES = [
   }
 ];
 
-export const seedInitialSampleData = () => {
-  const existing = localStorage.getItem('skillvault_local_certificates');
-  if (!existing || JSON.parse(existing).length === 0) {
-    localStorage.setItem('skillvault_local_certificates', JSON.stringify(SAMPLE_CERTIFICATES));
+import { idbSaveCertificate, idbGetAllCertificates } from './indexedDbService';
+
+export const seedInitialSampleData = async () => {
+  try {
+    const existing = await idbGetAllCertificates();
+    if (!existing || existing.length === 0) {
+      // Migrate from localStorage if present
+      const oldLocal = localStorage.getItem('skillvault_local_certificates');
+      if (oldLocal) {
+        try {
+          const parsed = JSON.parse(oldLocal);
+          for (const cert of parsed) {
+            await idbSaveCertificate(cert);
+          }
+          return;
+        } catch (_) {}
+      }
+
+      // Seed default demo certificates into IndexedDB
+      for (const cert of SAMPLE_CERTIFICATES) {
+        await idbSaveCertificate(cert);
+      }
+    }
+  } catch (err) {
+    console.warn('Could not seed initial sample data to IndexedDB:', err);
   }
 };
