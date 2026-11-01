@@ -1,6 +1,5 @@
-// Local cloud storage simulator used when Firebase credentials are not yet configured in .env
-
-const STORAGE_KEY = 'skillvault_mock_storage_files';
+// Local cloud storage simulator backed by browser IndexedDB (avoiding 5MB localStorage quota limits)
+import { idbSaveFile, idbDeleteFile } from './indexedDbService';
 
 export const mockUploadFile = async (file, path, onProgress) => {
   return new Promise((resolve, reject) => {
@@ -14,7 +13,7 @@ export const mockUploadFile = async (file, path, onProgress) => {
         clearInterval(interval);
         
         const reader = new FileReader();
-        reader.onload = () => {
+        reader.onload = async () => {
           const fileData = {
             path,
             name: file.name,
@@ -25,12 +24,10 @@ export const mockUploadFile = async (file, path, onProgress) => {
           };
           
           try {
-            const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-            existing[path] = fileData;
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
+            await idbSaveFile(path, fileData);
             resolve(reader.result);
           } catch (e) {
-            // If localStorage is full, still resolve with blob URL
+            console.warn('IndexedDB save failed, using memory blob:', e);
             const blobUrl = URL.createObjectURL(file);
             resolve(blobUrl);
           }
@@ -44,9 +41,7 @@ export const mockUploadFile = async (file, path, onProgress) => {
 
 export const mockDeleteFile = async (path) => {
   try {
-    const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-    delete existing[path];
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
+    await idbDeleteFile(path);
     return true;
   } catch {
     return false;

@@ -17,6 +17,7 @@ import {
   deleteObject 
 } from '../config/firebase';
 import { mockUploadFile, mockDeleteFile } from './mockCloudStorage';
+import { idbSaveCertificate, idbGetAllCertificates, idbDeleteCertificate } from './indexedDbService';
 
 const LOCAL_CERTS_KEY = 'skillvault_local_certificates';
 
@@ -136,9 +137,8 @@ export const createCertificateRecord = async (userId, data) => {
     await setDoc(certRef, record);
     return record;
   } else {
-    const existing = JSON.parse(localStorage.getItem(LOCAL_CERTS_KEY) || '[]');
-    existing.unshift(record);
-    localStorage.setItem(LOCAL_CERTS_KEY, JSON.stringify(existing));
+    // Save to IndexedDB (no 5MB quota limit)
+    await idbSaveCertificate(record);
     return record;
   }
 };
@@ -160,13 +160,10 @@ export const getUserCertificates = async (userId) => {
       return certs;
     } catch (e) {
       console.error('Failed to query Firestore certificates:', e);
-      // Fallback to local
-      const local = JSON.parse(localStorage.getItem(LOCAL_CERTS_KEY) || '[]');
-      return local.filter(c => c.userId === userId);
+      return await idbGetAllCertificates(userId);
     }
   } else {
-    const local = JSON.parse(localStorage.getItem(LOCAL_CERTS_KEY) || '[]');
-    return local.filter(c => c.userId === userId);
+    return await idbGetAllCertificates(userId);
   }
 };
 
@@ -187,12 +184,12 @@ export const getPublicCertificates = async (userId) => {
       return certs;
     } catch (e) {
       console.error('Failed to query public certificates:', e);
-      const local = JSON.parse(localStorage.getItem(LOCAL_CERTS_KEY) || '[]');
-      return local.filter(c => c.userId === userId && c.isPublished);
+      const all = await idbGetAllCertificates(userId);
+      return all.filter(c => c.isPublished);
     }
   } else {
-    const local = JSON.parse(localStorage.getItem(LOCAL_CERTS_KEY) || '[]');
-    return local.filter(c => c.userId === userId && c.isPublished);
+    const all = await idbGetAllCertificates(userId);
+    return all.filter(c => c.isPublished);
   }
 };
 
@@ -210,12 +207,12 @@ export const updateCertificateRecord = async (certificateId, updates) => {
     await updateDoc(certRef, updateData);
     return updateData;
   } else {
-    const local = JSON.parse(localStorage.getItem(LOCAL_CERTS_KEY) || '[]');
-    const index = local.findIndex(c => c.id === certificateId);
-    if (index !== -1) {
-      local[index] = { ...local[index], ...updateData };
-      localStorage.setItem(LOCAL_CERTS_KEY, JSON.stringify(local));
-      return local[index];
+    const all = await idbGetAllCertificates();
+    const existing = all.find(c => c.id === certificateId);
+    if (existing) {
+      const updated = { ...existing, ...updateData };
+      await idbSaveCertificate(updated);
+      return updated;
     }
     return null;
   }
@@ -239,9 +236,7 @@ export const deleteCertificateRecord = async (certificateId, storagePath) => {
     }
     return true;
   } else {
-    const local = JSON.parse(localStorage.getItem(LOCAL_CERTS_KEY) || '[]');
-    const filtered = local.filter(c => c.id !== certificateId);
-    localStorage.setItem(LOCAL_CERTS_KEY, JSON.stringify(filtered));
+    await idbDeleteCertificate(certificateId);
     if (storagePath) {
       await mockDeleteFile(storagePath);
     }
@@ -263,6 +258,6 @@ export const getCertificateById = async (certificateId) => {
       console.warn('Firestore doc lookup failed:', e);
     }
   }
-  const local = JSON.parse(localStorage.getItem(LOCAL_CERTS_KEY) || '[]');
-  return local.find(c => c.id === certificateId || c.credentialId === certificateId) || null;
+  const all = await idbGetAllCertificates();
+  return all.find(c => c.id === certificateId || c.credentialId === certificateId) || null;
 };
