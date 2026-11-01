@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { 
   X, 
   UploadCloud, 
@@ -8,7 +8,9 @@ import {
   Loader2, 
   Sparkles, 
   ExternalLink,
-  ShieldAlert
+  ShieldAlert,
+  Lock,
+  UserX
 } from 'lucide-react';
 import { validateCertificateFile, uploadCertificateFile, createCertificateRecord } from '../services/certificateService';
 import { runTesseractOCR } from '../services/ocrService';
@@ -28,6 +30,7 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
   const [stage, setStage] = useState('idle'); // 'idle' | 'uploading' | 'ocr' | 'review' | 'saving'
   const [ocrConfidence, setOcrConfidence] = useState(null);
   const [isLikelyCertificate, setIsLikelyCertificate] = useState(true);
+  const [detectedRecipient, setDetectedRecipient] = useState('');
   const [ocrWarnings, setOcrWarnings] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -44,6 +47,47 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
     isPublished: true,
     verificationStatus: 'OCR_PROCESSED'
   });
+
+  const accountHolderName = userProfile?.fullName || currentUser?.displayName || '';
+
+  // Cross-reference document ownership vs logged-in account
+  const ownershipValidation = useMemo(() => {
+    if (!accountHolderName) return { hasConflict: false };
+
+    const norm = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
+    const getTokens = (s) => norm(s).split(' ').filter(t => t.length >= 3);
+
+    const accountTokens = getTokens(accountHolderName);
+    const inputTokens = getTokens(formData.recipient);
+    const detectedTokens = getTokens(detectedRecipient);
+    const rawTextNorm = norm(formData.rawOcrText);
+
+    // Conflict Check 1: OCR detected a name from the document and it belongs to someone else
+    if (detectedRecipient && detectedTokens.length > 0 && accountTokens.length > 0) {
+      const matchFound = accountTokens.some(at => detectedTokens.includes(at));
+      if (!matchFound) {
+        return {
+          hasConflict: true,
+          detectedName: detectedRecipient,
+          reason: `Document was issued to "${detectedRecipient}", which does not match your account name ("${accountHolderName}").`
+        };
+      }
+    }
+
+    // Conflict Check 2: User changed recipient to their name, but their name is NOT in the document text
+    if (formData.recipient && rawTextNorm && inputTokens.length > 0 && detectedRecipient) {
+      const inputExistsInDoc = inputTokens.some(it => rawTextNorm.includes(it));
+      if (!inputExistsInDoc) {
+        return {
+          hasConflict: true,
+          detectedName: detectedRecipient,
+          reason: `The name "${formData.recipient}" does not appear anywhere in this document (Document indicates: "${detectedRecipient}").`
+        };
+      }
+    }
+
+    return { hasConflict: false };
+  }, [accountHolderName, formData.recipient, detectedRecipient, formData.rawOcrText]);
 
   if (!isOpen) return null;
 
@@ -126,6 +170,7 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
 
       setOcrConfidence(extracted.confidenceScore);
       setIsLikelyCertificate(extracted.isLikelyCertificate !== false);
+      setDetectedRecipient(extracted.recipient || '');
       setOcrWarnings(extracted.warnings || []);
 
       // If document is completely unrelated garbage (like random animal, landscape, meme)
@@ -185,6 +230,14 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
       return;
     }
 
+    // Identity Ownership Validation Guard
+    if (ownershipValidation.hasConflict) {
+      setErrorMessage(
+        `Upload Blocked: Credential Ownership Conflict! This document was issued to "${ownershipValidation.detectedName}", not "${accountHolderName}". SkillVault strictly forbids uploading or claiming other students' certificates.`
+      );
+      return;
+    }
+
     try {
       setStage('saving');
       const savedRecord = await createCertificateRecord(currentUser.uid, {
@@ -216,6 +269,7 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
     setStage('idle');
     setUploadProgress(0);
     setOcrConfidence(null);
+    setDetectedRecipient('');
     setOcrWarnings([]);
     setErrorMessage('');
   };
@@ -494,6 +548,33 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                 </div>
               )}
 
+              {/* Identity & Ownership Security Banner */}
+              {ownershipValidation.hasConflict && (
+                <div style={{
+                  padding: '14px 16px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'rgba(244, 63, 94, 0.12)',
+                  border: '1px solid rgba(244, 63, 94, 0.45)',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '12px',
+                  marginBottom: '20px'
+                }}>
+                  <ShieldAlert size={22} style={{ color: '#fb7185', flexShrink: 0, marginTop: '2px' }} />
+                  <div>
+                    <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#fb7185', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span>Credential Ownership Conflict Detected</span>
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: '#f8fafc', marginTop: '4px', lineHeight: 1.5 }}>
+                      This certificate was issued to <strong style={{ color: '#fb7185' }}>"{ownershipValidation.detectedName}"</strong>, but your logged-in profile name is <strong style={{ color: '#38bdf8' }}>"{accountHolderName}"</strong>.
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: '#fda4af', marginTop: '4px' }}>
+                      🛡️ <strong>Anti-Impersonation Guard:</strong> To maintain defensible academic integrity, you cannot upload or publish credentials belonging to another individual.
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Form Fields */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div className="form-group" style={{ gridColumn: 'span 2', marginBottom: '14px' }}>
@@ -524,19 +605,25 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                     <label className="form-label" style={{ marginBottom: 0 }}>
                       Recipient Name
-                      {formData.recipient && Boolean(formData.rawOcrText) && (
-                        <span style={{ color: '#34d399', fontSize: '0.74rem', marginLeft: '6px', fontWeight: 600 }}>
-                          ✓ Detected from Document
+                      {ownershipValidation.hasConflict ? (
+                        <span style={{ color: '#fb7185', fontSize: '0.74rem', marginLeft: '6px', fontWeight: 600 }}>
+                          ❌ Document Holder: {ownershipValidation.detectedName}
                         </span>
+                      ) : (
+                        detectedRecipient && formData.recipient && (
+                          <span style={{ color: '#34d399', fontSize: '0.74rem', marginLeft: '6px', fontWeight: 600 }}>
+                            ✓ Detected from Document
+                          </span>
+                        )
                       )}
                     </label>
-                    {!formData.recipient && (userProfile?.fullName || currentUser?.displayName) && (
+                    {!formData.recipient && accountHolderName && (
                       <button
                         type="button"
-                        onClick={() => setFormData({ ...formData, recipient: userProfile?.fullName || currentUser?.displayName || '' })}
+                        onClick={() => setFormData({ ...formData, recipient: accountHolderName })}
                         style={{ fontSize: '0.74rem', color: '#38bdf8', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer' }}
                       >
-                        Use account name ({userProfile?.fullName || currentUser?.displayName})
+                        Use account name ({accountHolderName})
                       </button>
                     )}
                   </div>
@@ -546,7 +633,15 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                     placeholder="Enter student name on certificate"
                     value={formData.recipient} 
                     onChange={(e) => setFormData({ ...formData, recipient: e.target.value })}
+                    style={{
+                      borderColor: ownershipValidation.hasConflict ? '#f43f5e' : undefined
+                    }}
                   />
+                  {ownershipValidation.hasConflict && (
+                    <div style={{ fontSize: '0.74rem', color: '#fb7185', marginTop: '4px' }}>
+                      Certificate was awarded to "{ownershipValidation.detectedName}". You cannot claim another student's document.
+                    </div>
+                  )}
                 </div>
 
                 <div className="form-group" style={{ marginBottom: '14px' }}>
@@ -605,7 +700,8 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
               <div style={{
                 padding: '14px',
                 borderRadius: 'var(--radius-md)',
-                background: 'var(--bg-surface-elevated)',
+                background: ownershipValidation.hasConflict ? 'rgba(244, 63, 94, 0.06)' : 'var(--bg-surface-elevated)',
+                border: ownershipValidation.hasConflict ? '1px dashed rgba(244, 63, 94, 0.35)' : '1px solid var(--border-subtle)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
@@ -613,18 +709,29 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                 marginBottom: '24px'
               }}>
                 <div>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                    Publish to Shareable Digital Portfolio
+                  <div style={{ 
+                    fontSize: '0.85rem', 
+                    fontWeight: 600, 
+                    color: ownershipValidation.hasConflict ? '#fb7185' : 'var(--text-primary)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    {ownershipValidation.hasConflict && <Lock size={14} />}
+                    <span>Publish to Shareable Digital Portfolio</span>
                   </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                    Visitors with your public portfolio link will be able to view this credential.
+                    {ownershipValidation.hasConflict 
+                      ? '🔒 Locked: Credentials issued to another individual cannot be published to your portfolio.'
+                      : 'Visitors with your public portfolio link will be able to view this credential.'}
                   </div>
                 </div>
                 <input 
                   type="checkbox" 
-                  checked={formData.isPublished}
+                  disabled={ownershipValidation.hasConflict}
+                  checked={ownershipValidation.hasConflict ? false : formData.isPublished}
                   onChange={(e) => setFormData({ ...formData, isPublished: e.target.checked })}
-                  style={{ width: '18px', height: '18px', accentColor: '#0ea5e9' }}
+                  style={{ width: '18px', height: '18px', accentColor: '#0ea5e9', cursor: ownershipValidation.hasConflict ? 'not-allowed' : 'pointer' }}
                 />
               </div>
 
@@ -670,12 +777,22 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                 <button 
                   type="submit" 
                   className="btn btn-primary"
-                  disabled={stage === 'saving'}
+                  disabled={stage === 'saving' || ownershipValidation.hasConflict}
+                  style={{
+                    opacity: ownershipValidation.hasConflict ? 0.5 : 1,
+                    cursor: ownershipValidation.hasConflict ? 'not-allowed' : 'pointer'
+                  }}
+                  title={ownershipValidation.hasConflict ? `Upload blocked: Certificate was issued to ${ownershipValidation.detectedName}` : undefined}
                 >
                   {stage === 'saving' ? (
                     <>
                       <Loader2 size={16} className="spin-animation" />
                       <span>Saving to Cloud...</span>
+                    </>
+                  ) : ownershipValidation.hasConflict ? (
+                    <>
+                      <ShieldAlert size={16} />
+                      <span>Upload Blocked (Identity Mismatch)</span>
                     </>
                   ) : (
                     <>
