@@ -40,7 +40,7 @@ export const DashboardPage = ({
   return (
     <div>
       {/* Welcome Banner */}
-      <div style={{
+      <div className="dashboard-banner-glow" style={{
         background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.8))',
         border: '1px solid var(--border-subtle)',
         borderRadius: 'var(--radius-xl)',
@@ -131,7 +131,7 @@ export const DashboardPage = ({
       {/* Mid Section: Analytics & Verification Breakdown */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px', marginBottom: '32px' }}>
         {/* Category Breakdown */}
-        <div className="card">
+        <div className="card dashboard-card-hover">
           <div className="card-header">
             <div>
               <h3 className="card-title">Skill Category Distribution</h3>
@@ -142,7 +142,7 @@ export const DashboardPage = ({
         </div>
 
         {/* Cloud Verification Pipeline */}
-        <div className="card">
+        <div className="card dashboard-card-hover">
           <div className="card-header">
             <div>
               <h3 className="card-title">Verification Credibility Pipeline</h3>
@@ -151,7 +151,7 @@ export const DashboardPage = ({
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div style={{
+            <div className="pipeline-item-hover" style={{
               padding: '14px',
               borderRadius: 'var(--radius-md)',
               background: 'var(--bg-surface-elevated)',
@@ -173,7 +173,7 @@ export const DashboardPage = ({
               </div>
             </div>
 
-            <div style={{
+            <div className="pipeline-item-hover" style={{
               padding: '14px',
               borderRadius: 'var(--radius-md)',
               background: 'var(--bg-surface-elevated)',
@@ -195,7 +195,7 @@ export const DashboardPage = ({
               </div>
             </div>
 
-            <div style={{
+            <div className="pipeline-item-hover" style={{
               padding: '14px',
               borderRadius: 'var(--radius-md)',
               background: 'var(--bg-surface-elevated)',

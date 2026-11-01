@@ -702,3 +702,61 @@ input, textarea, select {
   transform: translateY(-1px);
 }
 
+/* Dashboard Interactive Hover Effects */
+.dashboard-banner-glow {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.dashboard-banner-glow:hover {
+  border-color: rgba(56, 189, 248, 0.35) !important;
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.6), 0 0 30px rgba(14, 165, 233, 0.18);
+  transform: translateY(-2px);
+}
+
+.stat-card-hover {
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card-hover:hover {
+  transform: translateY(-5px);
+  border-color: rgba(var(--card-accent-rgb, 14, 165, 233), 0.55) !important;
+  box-shadow: 0 18px 36px -8px rgba(0, 0, 0, 0.7), 
+              0 0 28px rgba(var(--card-accent-rgb, 14, 165, 233), 0.28) !important;
+}
+
+.stat-card-hover:hover .stat-icon-wrapper {
+  transform: scale(1.18) rotate(4deg);
+  box-shadow: 0 0 18px rgba(var(--card-accent-rgb, 14, 165, 233), 0.4);
+}
+
+.stat-icon-wrapper {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dashboard-card-hover {
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dashboard-card-hover:hover {
+  border-color: rgba(56, 189, 248, 0.35) !important;
+  box-shadow: 0 14px 32px -8px rgba(0, 0, 0, 0.65), 0 0 28px rgba(14, 165, 233, 0.15);
+  transform: translateY(-3px);
+}
+
+.pipeline-item-hover {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: default;
+}
+
+.pipeline-item-hover:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(56, 189, 248, 0.45) !important;
+  transform: translateX(6px);
+  box-shadow: 0 6px 20px rgba(14, 165, 233, 0.16);
+}
+
+

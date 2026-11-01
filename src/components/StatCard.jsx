@@ -1,22 +1,34 @@
 import React from 'react';
 
 export const StatCard = ({ title, value, subtitle, icon: Icon, color = '#0ea5e9', trend }) => {
+  const rgb = hexToRgb(color);
   return (
-    <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+    <div 
+      className="card stat-card-hover" 
+      style={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        gap: '12px',
+        '--card-accent-rgb': rgb
+      }}
+    >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
           {title}
         </span>
-        <div style={{
-          width: '38px',
-          height: '38px',
-          borderRadius: 'var(--radius-md)',
-          background: `rgba(${color.startsWith('#') ? hexToRgb(color) : '14, 165, 233'}, 0.12)`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: color
-        }}>
+        <div 
+          className="stat-icon-wrapper"
+          style={{
+            width: '40px',
+            height: '40px',
+            borderRadius: 'var(--radius-md)',
+            background: `rgba(${rgb}, 0.12)`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: color
+          }}
+        >
           {Icon && <Icon size={20} />}
         </div>
       </div>
