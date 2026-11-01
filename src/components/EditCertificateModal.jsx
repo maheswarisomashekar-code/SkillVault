@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, CheckCircle2, Loader2, Edit3 } from 'lucide-react';
 import { updateCertificateRecord } from '../services/certificateService';
+import { normalizeToIsoDate } from '../services/ocrService';
 
 export const EditCertificateModal = ({ certificate, isOpen, onClose, onSaveSuccess }) => {
   if (!isOpen || !certificate) return null;
@@ -9,8 +10,9 @@ export const EditCertificateModal = ({ certificate, isOpen, onClose, onSaveSucce
   const [formData, setFormData] = useState({
     title: certificate.title || '',
     issuer: certificate.issuer || '',
+    recipient: certificate.recipient || '',
     category: certificate.category || 'course',
-    issueDate: certificate.issueDate || '',
+    issueDate: normalizeToIsoDate(certificate.issueDate) || certificate.issueDate || '',
     verificationUrl: certificate.verificationUrl || '',
     credentialId: certificate.credentialId || '',
     isPublished: certificate.isPublished !== undefined ? certificate.isPublished : true,
@@ -89,6 +91,17 @@ export const EditCertificateModal = ({ certificate, isOpen, onClose, onSaveSucce
                 required
                 value={formData.issuer}
                 onChange={(e) => setFormData({ ...formData, issuer: e.target.value })}
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Recipient / Student Name</label>
+              <input 
+                type="text" 
+                className="form-input" 
+                value={formData.recipient}
+                onChange={(e) => setFormData({ ...formData, recipient: e.target.value })}
+                placeholder="Student name on certificate"
               />
             </div>
 

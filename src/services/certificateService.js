@@ -248,16 +248,34 @@ export const deleteCertificateRecord = async (certificateId, storagePath) => {
  * Verify a credential lookup by ID (for public verification portal)
  */
 export const getCertificateById = async (certificateId) => {
+  if (!certificateId) return null;
+  const cleanId = certificateId.trim().toLowerCase();
+
   if (isFirebaseConfigured && db) {
     try {
-      const docSnap = await getDoc(doc(db, 'certificates', certificateId));
+      const docSnap = await getDoc(doc(db, 'certificates', certificateId.trim()));
       if (docSnap.exists()) {
         return docSnap.data();
+      }
+
+      // Also query by credentialId field
+      const q = query(
+        collection(db, 'certificates'),
+        where('credentialId', '==', certificateId.trim())
+      );
+      const querySnap = await getDocs(q);
+      if (!querySnap.empty) {
+        return querySnap.docs[0].data();
       }
     } catch (e) {
       console.warn('Firestore doc lookup failed:', e);
     }
   }
+
   const all = await idbGetAllCertificates();
-  return all.find(c => c.id === certificateId || c.credentialId === certificateId) || null;
+  return all.find(c => {
+    const idMatch = c.id && c.id.toLowerCase() === cleanId;
+    const credMatch = c.credentialId && c.credentialId.toLowerCase() === cleanId;
+    return idMatch || credMatch;
+  }) || null;
 };
