@@ -77,27 +77,34 @@ export const extractCertificateFields = (rawText) => {
 
   // 1. Detect Category
   const lowerText = fullText.toLowerCase();
-  if (lowerText.includes('internship') || lowerText.includes('intern')) {
+  if (lowerText.includes('internship') || lowerText.includes('intern') || lowerText.includes('industrial training') || lowerText.includes('trainee')) {
     category = 'internship';
-  } else if (lowerText.includes('hackathon') || lowerText.includes('hack') || lowerText.includes('codefest')) {
+  } else if (lowerText.includes('hackathon') || lowerText.includes('hack') || lowerText.includes('codefest') || lowerText.includes('ideathon') || lowerText.includes('coding contest') || lowerText.includes('first prize') || lowerText.includes('winner') || lowerText.includes('runner up')) {
     category = 'hackathon';
-  } else if (lowerText.includes('degree') || lowerText.includes('academic') || lowerText.includes('semester') || lowerText.includes('grade card') || lowerText.includes('cgpa')) {
-    category = 'academic';
-  } else if (lowerText.includes('workshop') || lowerText.includes('symposium') || lowerText.includes('bootcamp')) {
+  } else if (lowerText.includes('workshop') || lowerText.includes('bootcamp') || lowerText.includes('symposium') || lowerText.includes('seminar') || lowerText.includes('faculty development') || lowerText.includes('fdp')) {
     category = 'workshop';
-  } else if (lowerText.includes('course') || lowerText.includes('specialization') || lowerText.includes('completion') || lowerText.includes('masterclass')) {
+  } else if (lowerText.includes('degree') || lowerText.includes('academic') || lowerText.includes('semester') || lowerText.includes('grade card') || lowerText.includes('cgpa') || lowerText.includes('provisional certificate')) {
+    category = 'academic';
+  } else if (lowerText.includes('course') || lowerText.includes('specialization') || lowerText.includes('completion') || lowerText.includes('masterclass') || lowerText.includes('nptel') || lowerText.includes('coursera') || lowerText.includes('udemy')) {
     category = 'course';
   } else {
     category = 'other';
   }
 
-  // 2. Detect Issuing Organization
+  // 2. Detect Issuing Organization (Comprehensive Indian & Global Directory)
   const knownIssuers = [
-    'Coursera', 'Udemy', 'Google Cloud', 'Google', 'Amazon Web Services', 'AWS', 
-    'Microsoft', 'IBM', 'Oracle', 'Meta', 'Cisco', 'NPTEL', 'Swayam', 'edX', 
-    'HackerRank', 'LeetCode', 'CodeChef', 'LinkedIn Learning', 'FreeCodeCamp',
-    'Stanford University', 'MIT', 'Harvard University', 'IEEE', 'ACM', 'Kaggle',
-    'GeeksforGeeks', 'Scalar', 'Simplilearn', 'Great Learning', 'O.P. Jindal Global University'
+    // Indian Technical Education & Govt Bodies
+    'NPTEL', 'Swayam', 'IIT Bombay', 'IIT Madras', 'IIT Delhi', 'IIT Kharagpur', 
+    'IIT Kanpur', 'IIT Roorkee', 'IIT Guwahati', 'IIT Hyderabad', 'IISc Bangalore',
+    'AICTE', 'VTU', 'Visvesvaraya Technological University', 'Skill India', 'Govt. of India',
+    'Ministry of Education', 'O.P. Jindal Global University', 'Anna University',
+    // Global Cloud & Tech Leaders
+    'Google Cloud', 'Google', 'Amazon Web Services', 'AWS', 'Microsoft', 'IBM', 
+    'Oracle', 'Meta', 'Cisco', 'Salesforce', 'Red Hat', 'Intel', 'NVIDIA',
+    // Major MOOCs & EdTech Platforms
+    'Coursera', 'Udemy', 'edX', 'LinkedIn Learning', 'FreeCodeCamp', 'HackerRank', 
+    'LeetCode', 'CodeChef', 'GeeksforGeeks', 'Simplilearn', 'Great Learning', 'Scalar',
+    'Internshala', 'UpGrad', 'Infosys Springboard', 'TCS iON', 'Cognizant', 'Wipro'
   ];
 
   for (const known of knownIssuers) {
@@ -109,26 +116,62 @@ export const extractCertificateFields = (rawText) => {
   }
 
   if (!issuer) {
-    // Attempt to extract issuer from signature lines or "Offered by / Authorized by"
-    const issuerMatch = fullText.match(/(?:offered by|authorized by|issued by|organization|university|institute)\s+([A-Za-z0-9 &.,'-]{3,50})/i);
+    // Dynamic issuer extraction from formal introduction or authorization lines
+    const issuerMatch = fullText.match(/(?:authorized by|offered by|organized by|issued by|conducted by|presented by|university|institute of technology|academy|college of engineering)\s+([A-Za-z0-9 &.,'-]{3,50})/i);
     if (issuerMatch) {
       issuer = issuerMatch[1].trim();
+    } else {
+      // Check top 3 lines for institute names
+      for (let i = 0; i < Math.min(3, lines.length); i++) {
+        if (/university|institute|academy|college|technologies|corporation|solutions/i.test(lines[i])) {
+          issuer = lines[i];
+          break;
+        }
+      }
     }
   }
 
-  // 3. Detect Recipient Name
-  // Coursera & standard format: Name is placed prominently between Date and "has successfully completed"
-  // Example lines:
-  // Nov 1, 2026
-  // Maheswari S
-  // has successfully completed
+  // 3. Multi-Pattern Recipient Name Detector (Universally handles Indian & International templates)
+  // Pattern A: "This certificate is awarded to / presented to" -> Next line has Name (NPTEL, workshops, colleges)
+  // Pattern B: "has successfully completed / participated" -> Previous line has Name (Coursera, HackerRank, Udemy)
+  // Pattern C: "This is to certify that Mr./Ms. [Name]" on same or next line
+  // Pattern D: "certifies that [Name] has..."
+
   for (let i = 0; i < lines.length; i++) {
     const currentLine = lines[i];
-    if (/has successfully completed/i.test(currentLine)) {
-      // Look at previous line(s)
+
+    // Check Case A & C: Name comes AFTER the intro marker
+    if (/(?:this is to certify that|certify that|certificate is awarded to|is awarded to|proudly presented to|presented to|conferred upon|certifies that|is hereby awarded to)/i.test(currentLine)) {
+      // 1. Check if name is on the same line after marker
+      const sameLineMatch = currentLine.match(/(?:this is to certify that|certify that|is awarded to|presented to|certifies that)\s*[:\-]?\s*(?:Mr\.|Ms\.|Mrs\.|Dr\.)?\s*([A-Za-z][A-Za-z.\s]{2,40})(?:\s+(?:has|for|with|of|on|in|successfully)|$)/i);
+      if (sameLineMatch && sameLineMatch[1].trim().length >= 3) {
+        const candidate = sameLineMatch[1].trim();
+        if (!/^(has|for|with|online|the|course|certificate|completion)$/i.test(candidate)) {
+          recipient = candidate;
+          break;
+        }
+      }
+
+      // 2. Check next 1-2 lines for standalone student name
+      for (let next = i + 1; next <= Math.min(i + 3, lines.length - 1); next++) {
+        const candidate = lines[next].replace(/^(?:Mr\.|Ms\.|Mrs\.|Dr\.|Prof\.)\s*/i, '').trim();
+        // Skip noise phrases
+        if (/^(?:for|has|in recognition|who has|with a|online|successfully|from|during|bearing|usn|roll)/i.test(candidate)) continue;
+        if (candidate.length >= 3 && candidate.length <= 45 && /^[A-Za-z][A-Za-z.\s'-]{1,40}$/.test(candidate)) {
+          recipient = candidate;
+          break;
+        }
+      }
+      if (recipient) break;
+    }
+
+    // Check Case B: Name comes BEFORE the completion marker (e.g. Coursera, HackerRank)
+    if (/has successfully completed|has participated in|has completed the|has undergone/i.test(currentLine)) {
       for (let prev = i - 1; prev >= Math.max(0, i - 3); prev--) {
         const candidate = lines[prev].replace(/^(?:Mr\.|Ms\.|Mrs\.|Dr\.)\s*/i, '').trim();
-        if (candidate.length >= 3 && /^[A-Za-z][A-Za-z.\s]{1,40}$/.test(candidate) && !/^(course|certificate|university|date|nov|dec|jan|feb|mar|apr|may|jun|jul|aug|sep|oct)$/i.test(candidate)) {
+        // Skip headers
+        if (/^(?:course|certificate|university|date|elite|nov|dec|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|this)/i.test(candidate)) continue;
+        if (candidate.length >= 3 && candidate.length <= 45 && /^[A-Za-z][A-Za-z.\s'-]{1,40}$/.test(candidate)) {
           recipient = candidate;
           break;
         }
@@ -137,49 +180,69 @@ export const extractCertificateFields = (rawText) => {
     }
   }
 
-  // Fallback: Check after "This is to certify that" or "awarded to"
+  // Pattern E: Check for Name line near USN / Roll number (Common in Indian college certificates)
   if (!recipient) {
-    const introPatterns = /(?:this is to certify that|certify that|awarded to|presented to|proudly presented to|conferred upon|granted to|certifies that|is hereby awarded to)/i;
-    for (let i = 0; i < lines.length; i++) {
-      const currentLine = lines[i];
-      if (introPatterns.test(currentLine)) {
-        for (let nextIdx = i + 1; nextIdx <= Math.min(i + 3, lines.length - 1); nextIdx++) {
-          const candidateLine = lines[nextIdx].replace(/^(?:Mr\.|Ms\.|Mrs\.|Dr\.|Prof\.)\s*/i, '').trim();
-          if (/^(?:has|for|in recognition|who has|to certify|successfully|completion)/i.test(candidateLine)) {
-            continue;
-          }
-          if (/^[A-Za-z][A-Za-z.\s]{1,38}$/.test(candidateLine) && candidateLine.length >= 3) {
-            recipient = candidateLine;
-            break;
+    const usnLineIndex = lines.findIndex(l => /usn|roll no|reg no|registration no/i.test(l));
+    if (usnLineIndex !== -1) {
+      for (let offset of [-1, 1, -2, 2]) {
+        const idx = usnLineIndex + offset;
+        if (idx >= 0 && idx < lines.length) {
+          const candidate = lines[idx].replace(/^(?:Mr\.|Ms\.|Mrs\.)\s*/i, '').trim();
+          if (candidate.length >= 3 && candidate.length <= 40 && /^[A-Za-z][A-Za-z.\s]{1,40}$/.test(candidate)) {
+            if (!/^(college|department|engineering|computer|science|information|semester)/i.test(candidate)) {
+              recipient = candidate;
+              break;
+            }
           }
         }
-        if (recipient) break;
       }
     }
   }
 
-  // Clean recipient name
   if (recipient) {
     recipient = recipient.replace(/^[,.:;\s]+|[,.:;\s]+$/g, '').trim();
   }
 
-  // 4. Detect Certificate Title / Course Name
-  // Coursera format: Line immediately following "has successfully completed"
+  // 4. Universal Certificate Title / Subject Detector
   for (let i = 0; i < lines.length; i++) {
-    if (/has successfully completed/i.test(lines[i])) {
+    const currentLine = lines[i];
+
+    // Marker 1: Course completion
+    if (/(?:completing the course|completed the course|participated in the|attended the|completion in)/i.test(currentLine)) {
       if (i + 1 < lines.length) {
-        const nextLine = lines[i + 1].trim();
-        if (nextLine.length >= 4 && !/^(an online course|offered through|authorized by)/i.test(nextLine)) {
-          title = nextLine;
+        const candidateTitle = lines[i + 1].trim();
+        if (candidateTitle.length >= 4 && !/^(with a|online|consolidated|during|held on)/i.test(candidateTitle)) {
+          title = candidateTitle;
           break;
         }
       }
     }
+
+    // Marker 2: "has successfully completed" -> Next line has title
+    if (!title && /has successfully completed/i.test(currentLine)) {
+      if (i + 1 < lines.length) {
+        const candidateTitle = lines[i + 1].trim();
+        if (candidateTitle.length >= 4 && !/^(an online|offered|authorized|with a)/i.test(candidateTitle)) {
+          title = candidateTitle;
+          break;
+        }
+      }
+    }
+
+    // Marker 3: Internship domain
+    if (!title && /(?:internship in|intern as|training in)\s+([A-Za-z0-9 &.,'-]{4,60})/i.test(currentLine)) {
+      const internMatch = currentLine.match(/(?:internship in|intern as|training in)\s+([A-Za-z0-9 &.,'-]{4,60})/i);
+      if (internMatch) {
+        title = `${internMatch[1].trim()} Internship`;
+        break;
+      }
+    }
   }
 
+  // Fallback title regexes
   if (!title) {
     const titlePatterns = [
-      /(?:for successfully completing|successfully completed|completion of the|certificate of completion in|mastering|certificate in)\s+([A-Za-z0-9: &.,'-]{4,70})/i,
+      /(?:completing the course|completion in|certificate in|mastering|training in)\s+([A-Za-z0-9: &.,'-]{4,70})/i,
       /(?:certificate of achievement|certificate of completion|certificate of excellence|certificate of appreciation)\s*(?:in|for)?\s*([A-Za-z0-9: &.,'-]{0,60})/i
     ];
 
@@ -192,58 +255,57 @@ export const extractCertificateFields = (rawText) => {
     }
   }
 
-  // Fallback title from prominent keywords
-  if (!title) {
-    for (const line of lines) {
-      if (line.length > 5 && line.length < 60 && /course|bootcamp|cloud|python|java|web|learning|ai|machine|data|issues|policies/i.test(line)) {
-        if (!/^(an online course|offered through|this certificate)/i.test(line)) {
-          title = line;
-          break;
-        }
+  // 5. Universal Date Extractor
+  // Checks session format (JUL-SEP 2026), full dates (Nov 1, 2026), DD/MM/YYYY, YYYY-MM-DD
+  const sessionMatch = fullText.match(/\b(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\s*[-–]\s*(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\s+\d{4}\b/i);
+  if (sessionMatch) {
+    issueDate = sessionMatch[0];
+  }
+
+  if (!issueDate) {
+    const datePatterns = [
+      /\b(?:January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[.,]?\s+\d{1,2},?\s+\d{4}\b/i,
+      /\b\d{1,2}\s+(?:January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[.,]?\s+\d{4}\b/i,
+      /\b\d{1,2}[-/.]\d{1,2}[-/.]\d{4}\b/,
+      /\b\d{4}[-/.]\d{1,2}[-/.]\d{1,2}\b/
+    ];
+
+    for (const dPattern of datePatterns) {
+      const dMatch = fullText.match(dPattern);
+      if (dMatch) {
+        issueDate = dMatch[0];
+        break;
       }
     }
   }
 
-  // 5. Detect Date of Issue
-  const datePatterns = [
-    /\b(?:January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[.,]?\s+\d{1,2},?\s+\d{4}\b/i,
-    /\b\d{1,2}\s+(?:January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[.,]?\s+\d{4}\b/i,
-    /\b\d{4}[-/.]\d{1,2}[-/.]\d{1,2}\b/,
-    /\b\d{1,2}[-/.]\d{1,2}[-/.]\d{4}\b/
+  // 6. Universal Credential ID & URL Extractor
+  // Roll number, Certificate ID, License No, Credential ID
+  const idRegexes = [
+    /(?:Roll No|RollNo|Certificate No|Certificate ID|Credential ID|License No)[:\s#]+([A-Za-z0-9_-]{6,35})/i,
+    /(?:Verify at|verify\/)([A-Za-z0-9_-]{6,35})/i
   ];
 
-  for (const dPattern of datePatterns) {
-    const dMatch = fullText.match(dPattern);
-    if (dMatch) {
-      issueDate = dMatch[0];
+  for (const regex of idRegexes) {
+    const match = fullText.match(regex);
+    if (match) {
+      credentialId = match[1].trim();
       break;
     }
   }
 
-  // 6. Detect Verification URL and Credential ID
+  // URL extraction
   const urlMatch = fullText.match(/(https?:\/\/[^\s]+(?:verify|certificate|credential|check)[^\s]*)/i) || 
-                   fullText.match(/(https?:\/\/(?:coursera\.org\/verify|udemy\.com\/certificate|nptel\.ac\.in|badgr)[^\s]+)/i);
+                   fullText.match(/(https?:\/\/(?:coursera\.org\/verify|nptel\.ac\.in|swayam|udemy\.com|hackerrank\.com)[^\s]+)/i);
   if (urlMatch) {
     verificationUrl = urlMatch[0];
-    // Coursera verify URLs end with the credential ID: https://coursera.org/verify/R5IP4QQUCMWH
-    const courseraIdMatch = verificationUrl.match(/coursera\.org\/verify\/([A-Za-z0-9]+)/i);
-    if (courseraIdMatch) {
-      credentialId = courseraIdMatch[1];
-    }
   }
 
-  if (!credentialId) {
-    const idMatch = fullText.match(/(?:certificate\s*(?:no|id|number)?|credential\s*id|license\s*number)[:#\s]+([A-Za-z0-9-_]{6,32})/i);
-    if (idMatch) {
-      credentialId = idMatch[1].trim();
-    }
-  }
-
-  // 7. Confidence & Diagnostics
+  // 7. Confidence Score
   if (title) confidenceScore += 10;
   if (issuer) confidenceScore += 10;
   if (recipient) confidenceScore += 15;
-  if (verificationUrl) confidenceScore += 15;
+  if (credentialId || verificationUrl) confidenceScore += 15;
   if (issueDate) confidenceScore += 5;
 
   return {
