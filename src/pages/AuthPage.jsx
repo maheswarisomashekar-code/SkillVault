@@ -6,13 +6,12 @@ import {
   User, 
   ArrowRight, 
   ShieldCheck, 
-  Sparkles, 
-  CheckCircle, 
+  FileCheck2, 
   Cloud,
-  GraduationCap,
-  Server,
-  Database,
-  FileCheck2
+  CheckCircle2,
+  LockKeyhole,
+  Award,
+  Globe2
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -50,136 +49,302 @@ export const AuthPage = () => {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: 'radial-gradient(ellipse at 50% 20%, rgba(14, 165, 233, 0.12) 0%, transparent 60%), radial-gradient(ellipse at 50% 80%, rgba(99, 102, 241, 0.08) 0%, var(--bg-main) 70%)',
-      padding: '24px'
+      background: 'radial-gradient(circle at 15% 15%, rgba(14, 165, 233, 0.15) 0%, transparent 40%), radial-gradient(circle at 85% 85%, rgba(99, 102, 241, 0.15) 0%, var(--bg-main) 65%)',
+      padding: '32px 20px',
+      position: 'relative',
+      overflow: 'hidden'
     }}>
+      {/* Subtle Ambient Background Cloud Glows */}
       <div style={{
-        maxWidth: '440px',
+        position: 'absolute',
+        top: '10%',
+        left: '5%',
+        width: '320px',
+        height: '320px',
+        background: 'rgba(14, 165, 233, 0.08)',
+        filter: 'blur(100px)',
+        borderRadius: '50%',
+        pointerEvents: 'none'
+      }}></div>
+      <div style={{
+        position: 'absolute',
+        bottom: '10%',
+        right: '5%',
+        width: '340px',
+        height: '340px',
+        background: 'rgba(99, 102, 241, 0.08)',
+        filter: 'blur(110px)',
+        borderRadius: '50%',
+        pointerEvents: 'none'
+      }}></div>
+
+      {/* Main Two-Panel Card */}
+      <div style={{
+        maxWidth: '1040px',
         width: '100%',
-        background: 'var(--bg-surface)',
-        border: '1px solid var(--border-subtle)',
+        display: 'grid',
+        gridTemplateColumns: '1.05fr 0.95fr',
+        background: 'rgba(15, 23, 42, 0.85)',
+        backdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
         borderRadius: 'var(--radius-xl)',
-        padding: '40px 36px',
-        boxShadow: 'var(--shadow-lg)',
-        position: 'relative'
+        overflow: 'hidden',
+        boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.6)',
+        position: 'relative',
+        zIndex: 1
       }}>
-        {/* Brand Icon & Title */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+        {/* Left Side: Rich Project Visuals & Feature Highlights */}
+        <div style={{
+          background: 'linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.85))',
+          padding: '48px 42px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          borderRight: '1px solid var(--border-subtle)',
+          position: 'relative'
+        }}>
+          <div>
+            {/* Brand Header */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '28px' }}>
+              <div className="brand-icon-wrapper" style={{ width: '44px', height: '44px' }}>
+                <Layers size={22} />
+              </div>
+              <div>
+                <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.02em' }}>
+                  SkillVault
+                </span>
+                <div style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                  Cloud Credential Architecture
+                </div>
+              </div>
+            </div>
+
+            <h2 style={{
+              fontSize: '1.85rem',
+              fontWeight: 800,
+              color: '#f8fafc',
+              lineHeight: 1.25,
+              marginBottom: '14px',
+              letterSpacing: '-0.02em'
+            }}>
+              Authenticate, Verify, and Showcase Your Achievements.
+            </h2>
+
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '32px' }}>
+              A modern cloud platform for smart certificate ingestion, automated entity extraction via OCR, and verified digital portfolio publishing.
+            </p>
+
+            {/* Feature Highlights Grid */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{
+                padding: '14px 16px',
+                borderRadius: 'var(--radius-md)',
+                background: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid var(--border-subtle)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px'
+              }}>
+                <div style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: 'var(--radius-sm)',
+                  background: 'rgba(14, 165, 233, 0.15)',
+                  color: '#38bdf8',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <FileCheck2 size={18} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.88rem', fontWeight: 600, color: '#f8fafc' }}>Smart Multi-Format OCR</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Automated extraction from NPTEL, Coursera, PDFs, & scanned images</div>
+                </div>
+              </div>
+
+              <div style={{
+                padding: '14px 16px',
+                borderRadius: 'var(--radius-md)',
+                background: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid var(--border-subtle)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px'
+              }}>
+                <div style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: 'var(--radius-sm)',
+                  background: 'rgba(16, 185, 129, 0.15)',
+                  color: '#34d399',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <ShieldCheck size={18} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.88rem', fontWeight: 600, color: '#f8fafc' }}>Multi-Tier Verification</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Defensible validation with genuine credential lookup & issuer matching</div>
+                </div>
+              </div>
+
+              <div style={{
+                padding: '14px 16px',
+                borderRadius: 'var(--radius-md)',
+                background: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid var(--border-subtle)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px'
+              }}>
+                <div style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: 'var(--radius-sm)',
+                  background: 'rgba(99, 102, 241, 0.15)',
+                  color: '#a5b4fc',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <Globe2 size={18} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.88rem', fontWeight: 600, color: '#f8fafc' }}>Shareable Digital Showcase</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Unique live portfolio URL with granular student privacy controls</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div style={{
-            width: '52px',
-            height: '52px',
-            borderRadius: 'var(--radius-lg)',
-            background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
+            marginTop: '36px',
+            paddingTop: '20px',
+            borderTop: '1px solid var(--border-subtle)',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 16px',
-            color: '#ffffff',
-            boxShadow: '0 4px 20px var(--color-primary-glow)'
+            gap: '8px',
+            color: 'var(--text-muted)',
+            fontSize: '0.78rem'
           }}>
-            <Layers size={26} />
+            <LockKeyhole size={14} style={{ color: '#10b981' }} />
+            <span>Secured via Cloud Storage & Firestore multi-tenant isolation</span>
           </div>
-
-          <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
-            SkillVault
-          </h1>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
-            {isRegistering ? 'Create your student account to get started' : 'Sign in to access your credential portfolio'}
-          </p>
         </div>
 
-        {/* Error Notification */}
-        {(error || authError) && (
-          <div style={{
-            padding: '12px 14px',
-            borderRadius: 'var(--radius-md)',
-            background: 'rgba(244, 63, 94, 0.12)',
-            border: '1px solid rgba(244, 63, 94, 0.3)',
-            color: '#fb7185',
-            fontSize: '0.82rem',
-            marginBottom: '20px'
-          }}>
-            {error || authError}
+        {/* Right Side: Elegant Authentication Form */}
+        <div style={{
+          padding: '48px 40px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center'
+        }}>
+          <div style={{ marginBottom: '28px' }}>
+            <h3 style={{ fontSize: '1.45rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
+              {isRegistering ? 'Create Your Account' : 'Welcome Back'}
+            </h3>
+            <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+              {isRegistering 
+                ? 'Register with your email to start managing your credentials' 
+                : 'Enter your credentials to access your dashboard and portfolio'}
+            </p>
           </div>
-        )}
 
-        {/* Authentication Form */}
-        <form onSubmit={handleSubmit}>
-          {isRegistering && (
-            <div className="form-group" style={{ marginBottom: '18px' }}>
-              <label className="form-label">Full Name *</label>
-              <div style={{ position: 'relative' }}>
-                <input 
-                  type="text" 
-                  className="form-input" 
-                  style={{ paddingLeft: '40px' }}
-                  required
-                  placeholder="Enter your full name"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                />
-                <User size={16} style={{ position: 'absolute', left: '14px', top: '14px', color: 'var(--text-muted)' }} />
-              </div>
+          {/* Error Notification */}
+          {(error || authError) && (
+            <div style={{
+              padding: '12px 14px',
+              borderRadius: 'var(--radius-md)',
+              background: 'rgba(244, 63, 94, 0.12)',
+              border: '1px solid rgba(244, 63, 94, 0.3)',
+              color: '#fb7185',
+              fontSize: '0.82rem',
+              marginBottom: '20px'
+            }}>
+              {error || authError}
             </div>
           )}
 
-          <div className="form-group" style={{ marginBottom: '18px' }}>
-            <label className="form-label">Email Address *</label>
-            <div style={{ position: 'relative' }}>
-              <input 
-                type="email" 
-                className="form-input" 
-                style={{ paddingLeft: '40px' }}
-                required
-                placeholder="name@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <Mail size={16} style={{ position: 'absolute', left: '14px', top: '14px', color: 'var(--text-muted)' }} />
+          {/* Form */}
+          <form onSubmit={handleSubmit}>
+            {isRegistering && (
+              <div className="form-group" style={{ marginBottom: '18px' }}>
+                <label className="form-label">Full Name *</label>
+                <div style={{ position: 'relative' }}>
+                  <input 
+                    type="text" 
+                    className="form-input" 
+                    style={{ paddingLeft: '40px' }}
+                    required
+                    placeholder="e.g. Maheswari S"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                  />
+                  <User size={16} style={{ position: 'absolute', left: '14px', top: '14px', color: 'var(--text-muted)' }} />
+                </div>
+              </div>
+            )}
+
+            <div className="form-group" style={{ marginBottom: '18px' }}>
+              <label className="form-label">Email Address *</label>
+              <div style={{ position: 'relative' }}>
+                <input 
+                  type="email" 
+                  className="form-input" 
+                  style={{ paddingLeft: '40px' }}
+                  required
+                  placeholder="name@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+                <Mail size={16} style={{ position: 'absolute', left: '14px', top: '14px', color: 'var(--text-muted)' }} />
+              </div>
             </div>
-          </div>
 
-          <div className="form-group" style={{ marginBottom: '24px' }}>
-            <label className="form-label">Password *</label>
-            <div style={{ position: 'relative' }}>
-              <input 
-                type="password" 
-                className="form-input" 
-                style={{ paddingLeft: '40px' }}
-                required
-                minLength={6}
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <Lock size={16} style={{ position: 'absolute', left: '14px', top: '14px', color: 'var(--text-muted)' }} />
+            <div className="form-group" style={{ marginBottom: '24px' }}>
+              <label className="form-label">Password *</label>
+              <div style={{ position: 'relative' }}>
+                <input 
+                  type="password" 
+                  className="form-input" 
+                  style={{ paddingLeft: '40px' }}
+                  required
+                  minLength={6}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <Lock size={16} style={{ position: 'absolute', left: '14px', top: '14px', color: 'var(--text-muted)' }} />
+              </div>
             </div>
+
+            <button 
+              type="submit" 
+              className="btn btn-primary" 
+              style={{ width: '100%', padding: '12px' }}
+              disabled={loading}
+            >
+              <span>{isRegistering ? 'Create Account' : 'Sign In'}</span>
+              <ArrowRight size={16} />
+            </button>
+          </form>
+
+          {/* Toggle Register/Sign In */}
+          <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+            {isRegistering ? 'Already have an account?' : "Don't have an account yet?"}{' '}
+            <button 
+              type="button"
+              onClick={() => {
+                setIsRegistering(!isRegistering);
+                setError('');
+              }}
+              style={{ color: '#38bdf8', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer' }}
+            >
+              {isRegistering ? 'Sign In' : 'Register Here'}
+            </button>
           </div>
-
-          <button 
-            type="submit" 
-            className="btn btn-primary" 
-            style={{ width: '100%', padding: '12px' }}
-            disabled={loading}
-          >
-            <span>{isRegistering ? 'Create Account' : 'Sign In'}</span>
-            <ArrowRight size={16} />
-          </button>
-        </form>
-
-        {/* Toggle Mode */}
-        <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-          {isRegistering ? 'Already have an account?' : "Don't have an account yet?"}{' '}
-          <button 
-            type="button"
-            onClick={() => {
-              setIsRegistering(!isRegistering);
-              setError('');
-            }}
-            style={{ color: '#38bdf8', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer' }}
-          >
-            {isRegistering ? 'Sign In' : 'Register Here'}
-          </button>
         </div>
       </div>
     </div>
