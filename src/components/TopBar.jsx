@@ -1,8 +1,11 @@
 import React from 'react';
-import { Menu, Cloud, CloudCheck, UploadCloud, ExternalLink } from 'lucide-react';
+import { Menu, Cloud, CloudCheck, UploadCloud, ExternalLink, LogOut } from 'lucide-react';
 import { isFirebaseConfigured } from '../config/firebase';
+import { useAuth } from '../context/AuthContext';
 
 export const TopBar = ({ activeTab, setIsSidebarOpen, onOpenUpload, onOpenPortfolio }) => {
+  const { logout, userProfile, currentUser } = useAuth();
+
   const titles = {
     dashboard: 'Student Overview & Analytics',
     certificates: 'Certificate Repository',
@@ -57,6 +60,19 @@ export const TopBar = ({ activeTab, setIsSidebarOpen, onOpenUpload, onOpenPortfo
         >
           <UploadCloud size={15} />
           <span>Upload</span>
+        </button>
+
+        <button 
+          className="btn btn-secondary btn-sm"
+          onClick={logout}
+          title="Sign out of your account"
+          style={{
+            borderColor: 'rgba(244, 63, 94, 0.3)',
+            color: '#fb7185'
+          }}
+        >
+          <LogOut size={15} />
+          <span>Sign Out</span>
         </button>
       </div>
     </header>

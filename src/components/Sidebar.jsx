@@ -69,7 +69,7 @@ export const Sidebar = ({ activeTab, setActiveTab, isOpen, setIsOpen }) => {
       </div>
 
       <div className="sidebar-footer">
-        <div className="user-quick-profile">
+        <div className="user-quick-profile" style={{ marginBottom: '8px' }}>
           <div className="avatar-circle">
             {(userProfile?.fullName || currentUser?.displayName || 'S')[0].toUpperCase()}
           </div>
@@ -81,21 +81,23 @@ export const Sidebar = ({ activeTab, setActiveTab, isOpen, setIsOpen }) => {
               {userProfile?.usn || userProfile?.degree || 'ISE Dept'}
             </div>
           </div>
-          <button 
-            onClick={logout} 
-            title="Sign Out"
-            style={{ 
-              color: 'var(--text-muted)', 
-              padding: '6px', 
-              borderRadius: 'var(--radius-sm)',
-              transition: 'color var(--transition-fast)'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#fb7185'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
-          >
-            <LogOut size={16} />
-          </button>
         </div>
+
+        <button 
+          onClick={logout} 
+          className="btn btn-secondary btn-sm"
+          style={{ 
+            width: '100%', 
+            justifyContent: 'center',
+            borderColor: 'rgba(244, 63, 94, 0.3)',
+            color: '#fb7185',
+            background: 'rgba(244, 63, 94, 0.08)'
+          }}
+          title="Sign Out"
+        >
+          <LogOut size={15} />
+          <span>Sign Out</span>
+        </button>
       </div>
     </aside>
   );

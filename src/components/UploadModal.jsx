@@ -104,19 +104,21 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
       // Step 2: Trigger Genuine OCR Processing
       setStage('ocr');
       let extracted = null;
+      let ocrSucceeded = false;
 
       try {
         // Tesseract can process image directly or via URL
         extracted = await runTesseractOCR(filePreview || file);
+        ocrSucceeded = true;
       } catch (ocrErr) {
         console.warn('OCR processing encountered error; falling back to manual entry:', ocrErr);
         extracted = {
           title: file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, ' '),
-          issuer: 'Authorized Provider',
-          recipient: userProfile?.fullName || currentUser.displayName || '',
+          issuer: '',
+          recipient: '',
           issueDate: new Date().toISOString().split('T')[0],
           category: 'course',
-          confidenceScore: 50,
+          confidenceScore: 30,
           warnings: ['Document could not be parsed automatically. Please fill details manually.']
         };
       }
@@ -488,7 +490,7 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                     <label className="form-label" style={{ marginBottom: 0 }}>
                       Recipient Name
-                      {formData.recipient && (
+                      {formData.recipient && Boolean(formData.rawOcrText) && (
                         <span style={{ color: '#34d399', fontSize: '0.74rem', marginLeft: '6px', fontWeight: 600 }}>
                           ✓ Detected from Document
                         </span>
@@ -500,7 +502,7 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                         onClick={() => setFormData({ ...formData, recipient: userProfile?.fullName || currentUser?.displayName || '' })}
                         style={{ fontSize: '0.74rem', color: '#38bdf8', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer' }}
                       >
-                        Use account name
+                        Use account name ({userProfile?.fullName || currentUser?.displayName})
                       </button>
                     )}
                   </div>

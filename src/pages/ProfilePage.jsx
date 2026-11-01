@@ -20,6 +20,7 @@ export const ProfilePage = () => {
 
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [formError, setFormError] = useState('');
   const [newSkill, setNewSkill] = useState('');
 
   const [formData, setFormData] = useState({
@@ -56,27 +57,76 @@ export const ProfilePage = () => {
 
   const handleAddSkill = (e) => {
     e.preventDefault();
-    if (newSkill.trim() && !formData.skills.includes(newSkill.trim())) {
-      setFormData({
-        ...formData,
-        skills: [...formData.skills, newSkill.trim()]
-      });
-      setNewSkill('');
-    }
-  };
+    if (!newSkill.trim()) return;
 
-  const handleRemoveSkill = (skillToRemove) => {
+    // Split by comma if user enters comma-separated skills like "Python, Cloud, React"
+    const splitSkills = newSkill
+      .split(',')
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+
+    const updatedSkills = [...formData.skills];
+    splitSkills.forEach(skill => {
+      if (!updatedSkills.includes(skill)) {
+        updatedSkills.push(skill);
+      }
+    });
+
     setFormData({
       ...formData,
-      skills: formData.skills.filter(s => s !== skillToRemove)
+      skills: updatedSkills
     });
+    setNewSkill('');
+  };
+
+  const validateUrl = (url, expectedHost) => {
+    if (!url || !url.trim()) return { valid: true };
+    const trimmed = url.trim();
+
+    try {
+      const parsed = new URL(trimmed);
+      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+        return { valid: false, error: `Invalid protocol. URL must start with https://` };
+      }
+      if (expectedHost && !parsed.hostname.toLowerCase().includes(expectedHost)) {
+        return { valid: false, error: `Please enter a valid ${expectedHost} URL (e.g. https://${expectedHost}.com/username)` };
+      }
+      return { valid: true, sanitized: trimmed };
+    } catch {
+      return { valid: false, error: `Invalid web address format. Please enter a valid URL starting with https://` };
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSaving(true);
+    setFormError('');
     setSuccess(false);
 
+    // Validate USN
+    if (!formData.usn || !formData.usn.trim()) {
+      setFormError('Please enter your University Seat Number (USN).');
+      return;
+    }
+
+    // Validate GitHub URL
+    if (formData.github && formData.github.trim()) {
+      const githubCheck = validateUrl(formData.github, 'github');
+      if (!githubCheck.valid) {
+        setFormError(`GitHub URL Error: ${githubCheck.error}`);
+        return;
+      }
+    }
+
+    // Validate LinkedIn URL
+    if (formData.linkedin && formData.linkedin.trim()) {
+      const linkedinCheck = validateUrl(formData.linkedin, 'linkedin');
+      if (!linkedinCheck.valid) {
+        setFormError(`LinkedIn URL Error: ${linkedinCheck.error}`);
+        return;
+      }
+    }
+
+    setSaving(true);
     try {
       await saveUserProfile(currentUser.uid, formData);
       await refreshProfile();
@@ -84,6 +134,7 @@ export const ProfilePage = () => {
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
       console.error('Error saving profile:', err);
+      setFormError('Failed to save profile changes. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -118,6 +169,23 @@ export const ProfilePage = () => {
         </div>
       )}
 
+      {formError && (
+        <div style={{
+          padding: '14px 18px',
+          borderRadius: 'var(--radius-md)',
+          background: 'rgba(244, 63, 94, 0.12)',
+          border: '1px solid rgba(244, 63, 94, 0.3)',
+          color: '#fb7185',
+          fontSize: '0.85rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          marginBottom: '24px'
+        }}>
+          <span>⚠️ {formError}</span>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="card">
         {/* Basic Info */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}>
@@ -138,7 +206,7 @@ export const ProfilePage = () => {
               type="text" 
               className="form-input" 
               required
-              placeholder="e.g. 1IS22CS042"
+              placeholder="Enter your USN (e.g. 1MS22IS001)"
               value={formData.usn}
               onChange={(e) => setFormData({ ...formData, usn: e.target.value })}
             />
@@ -165,7 +233,7 @@ export const ProfilePage = () => {
               className="form-input" 
               value={formData.degree}
               onChange={(e) => setFormData({ ...formData, degree: e.target.value })}
-              placeholder="B.E. Information Science and Engineering"
+              placeholder="e.g. B.E. Information Science and Engineering"
             />
           </div>
 
@@ -176,7 +244,7 @@ export const ProfilePage = () => {
               className="form-input" 
               value={formData.institution}
               onChange={(e) => setFormData({ ...formData, institution: e.target.value })}
-              placeholder="Department of Information Science"
+              placeholder="e.g. Department of Information Science & Engineering"
             />
           </div>
         </div>
