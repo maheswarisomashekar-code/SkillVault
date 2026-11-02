@@ -359,7 +359,8 @@ export const extractCertificateFields = (rawText) => {
 
   if (!issueDate) {
     // Check explicit labeled date markers: "Date:", "Dated:", "Issue Date:", "Issued on:"
-    const labeledDateMatch = fullText.match(/(?:date of issue|issue date|date|dated|issued on|issued)[:\s]+([A-Za-z0-9,.\s/-]{4,25})/i);
+    // EXCLUDE registration/submission deadline labels
+    const labeledDateMatch = fullText.match(/(?:date of issue|issue date|cert(?:ificate)? date|awarded on|dated|issued on|issued)[:\s]+([A-Za-z0-9,.\s/-]{4,25})/i);
     if (labeledDateMatch) {
       const candidate = labeledDateMatch[1].trim();
       const normalized = normalizeToIsoDate(candidate);
@@ -369,7 +370,11 @@ export const extractCertificateFields = (rawText) => {
     }
   }
 
+  // Filter out lines that mention registration, deadline, closes, submission, window
   if (!issueDate) {
+    const candidateLines = lines.filter(l => !/(?:registration|deadline|closes|submission|window|apply\s+by|valid\s+till|ends)/i.test(l));
+    const safeText = candidateLines.join(' ');
+
     const datePatterns = [
       /\b(?:January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[.,]?\s+\d{1,2},?\s+\d{4}\b/i,
       /\b\d{1,2}\s+(?:January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[.,]?\s+\d{4}\b/i,
@@ -379,7 +384,7 @@ export const extractCertificateFields = (rawText) => {
     ];
 
     for (const dPattern of datePatterns) {
-      const dMatch = fullText.match(dPattern);
+      const dMatch = safeText.match(dPattern);
       if (dMatch) {
         issueDate = dMatch[0];
         break;
@@ -411,44 +416,100 @@ export const extractCertificateFields = (rawText) => {
     verificationUrl = urlMatch[0];
   }
 
-  // 7. Academic Credential Legitimacy Check & Confidence Score
+  // 7. Academic Credential Legitimacy & Anti-Brochure Heuristics
   const cleanedRawText = (rawText || '').trim();
   const wordCount = cleanedRawText.split(/\s+/).filter(Boolean).length;
 
-  // Key academic keywords expected in any valid credential, award, or internship letter
-  const credentialKeywords = [
-    'certificate', 'certify', 'awarded', 'completion', 'achievement', 
-    'successfully', 'completed', 'course', 'internship', 'hackathon', 
-    'workshop', 'training', 'grade', 'score', 'university', 'institute', 
-    'swayam', 'nptel', 'coursera', 'udemy', 'credits', 'roll no', 'reg no'
+  // Markers that strongly indicate an event announcement, flyer, pamphlet, rulesheet, or brochure
+  const eventAnnouncementPatterns = [
+    /registration\s+closes/i,
+    /registration\s+(?:deadline|window|starts|open|details|fees?)/i,
+    /register\s+(?:at|before|now|here|online)/i,
+    /submission\s+(?:window|deadline|closes|dates?)/i,
+    /last\s+date\s+(?:to|of|for)/i,
+    /about\s+the\s+(?:hackathon|event|workshop|competition|fest|symposium|conference)/i,
+    /why\s+(?:this|attend|join)\s+(?:hackathon|event|workshop|competition)/i,
+    /who\s+can\s+(?:participate|apply|attend)/i,
+    /eligibility\s*(?:criteria|:)/i,
+    /problem\s+statements?/i,
+    /prize\s+pool/i,
+    /cash\s+prizes?/i,
+    /prizes\s+worth/i,
+    /rounds?:\s*[1234]/i,
+    /rules\s+and\s+regulations/i,
+    /guidelines\s+for/i,
+    /call\s+for\s+(?:papers?|proposals?|participation)/i,
+    /poster\s+presentation/i,
+    /code\.\s*create\.\s*celebrate/i
   ];
 
-  const matchedKeywords = credentialKeywords.filter(kw => lowerText.includes(kw));
-  const isLikelyCertificate = matchedKeywords.length >= 2 || (wordCount >= 15 && (recipient || title || issuer));
+  const matchedAnnouncementMarkers = eventAnnouncementPatterns.filter(pattern => pattern.test(fullText));
+  const isEventAnnouncement = matchedAnnouncementMarkers.length >= 1;
 
-  if (!isLikelyCertificate) {
+  // Phrases that MUST exist on an authentic certificate awarded to an individual
+  const confermentPatterns = [
+    /this\s+is\s+to\s+certify\s+that/i,
+    /this\s+certificate\s+is\s+(?:proudly\s+)?(?:awarded|presented)\s+to/i,
+    /certificate\s+of\s+(?:completion|achievement|participation|merit|excellence|appreciation|recognition|attendance)/i,
+    /has\s+successfully\s+completed/i,
+    /has\s+participated\s+in/i,
+    /in\s+recognition\s+of/i,
+    /is\s+hereby\s+awarded\s+to/i,
+    /certifies\s+that/i,
+    /conferred\s+upon/i,
+    /has\s+secured\s+(?:first|second|third|1st|2nd|3rd|\d+th)\s+(?:place|rank|position)/i
+  ];
+
+  const hasConfermentProof = confermentPatterns.some(pattern => pattern.test(fullText));
+
+  let isLikelyCertificate = true;
+  let documentType = 'CERTIFICATE';
+
+  if (isEventAnnouncement && !hasConfermentProof) {
+    // Definitive Event Flyer / Brochure / Notice
+    isLikelyCertificate = false;
+    documentType = 'EVENT_ANNOUNCEMENT_OR_BROCHURE';
     confidenceScore = 15;
-    warnings.push('This image does not appear to be an academic certificate, transcript, or internship letter.');
+    warnings.push('Document appears to be an Event Announcement, Flyer, or Brochure (e.g. Hackathon or Workshop notice with registration deadlines), NOT an issued student certificate.');
+    warnings.push('Valid certificates must be issued to a named recipient and include proof of completion or award conferment.');
+  } else if (!hasConfermentProof && !recipient) {
+    // Generic text document or image with no certificate markers
+    isLikelyCertificate = false;
+    documentType = 'NON_CERTIFICATE_DOCUMENT';
+    confidenceScore = 20;
+    warnings.push('No certificate conferment text ("This is to certify that", "Certificate of Completion") or recipient name found.');
+  } else if (!hasConfermentProof) {
+    confidenceScore = 35;
+    warnings.push('Document lacks standard conferment phrases. Verification required.');
   } else {
-    confidenceScore = 40;
-    if (title) confidenceScore += 15;
-    if (issuer && issuer !== 'Authorized Provider') confidenceScore += 15;
-    if (recipient) confidenceScore += 15;
-    if (credentialId || verificationUrl) confidenceScore += 10;
-    if (issueDate) confidenceScore += 5;
+    confidenceScore = 60;
+    if (title) confidenceScore += 10;
+    if (issuer && issuer !== 'Authorized Provider') confidenceScore += 10;
+    if (recipient) confidenceScore += 10;
+    if (credentialId || verificationUrl) confidenceScore += 5;
+    if (isoIssueDate) confidenceScore += 5;
   }
 
+  // Never default title to "Certificate of Achievement" if it's not a certificate!
+  const finalTitle = isLikelyCertificate
+    ? (title || 'Certificate of Achievement')
+    : (title || (lines[0] ? lines[0].substring(0, 50) : 'Non-Certificate Document'));
+
+  // Never assign issueDate if it was merely a registration deadline
+  const finalIssueDate = (isEventAnnouncement && !hasConfermentProof) ? '' : (isoIssueDate || '');
+
   return {
-    title: title || (isLikelyCertificate ? 'Certificate of Achievement' : ''),
-    recipient: recipient || '',
+    title: finalTitle,
+    recipient: isLikelyCertificate ? (recipient || '') : '',
     issuer: issuer || (isLikelyCertificate ? 'Authorized Provider' : ''),
-    issueDate: isoIssueDate || '',
+    issueDate: finalIssueDate,
     category,
     credentialId,
     verificationUrl,
     rawText,
     confidenceScore: Math.min(confidenceScore, 98),
     isLikelyCertificate,
+    documentType,
     wordCount,
     warnings
   };
@@ -470,12 +531,12 @@ export const runTesseractOCR = async (fileOrUrl, onProgress) => {
     try {
       const { digitalText, firstPageImage } = await extractTextAndCanvasFromPdf(fileOrUrl);
       
-      // If PDF has embedded digital text (like Coursera PDFs), parse directly with 98% accuracy!
+      // If PDF has embedded digital text (like Coursera PDFs), parse directly with high accuracy!
       if (digitalText && digitalText.length > 50) {
         const parsed = extractCertificateFields(digitalText);
         return {
           ...parsed,
-          confidenceScore: 98,
+          confidenceScore: parsed.isLikelyCertificate ? 98 : parsed.confidenceScore,
           previewImage: firstPageImage
         };
       }

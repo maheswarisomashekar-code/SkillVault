@@ -30,6 +30,7 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
   const [stage, setStage] = useState('idle'); // 'idle' | 'uploading' | 'ocr' | 'review' | 'saving'
   const [ocrConfidence, setOcrConfidence] = useState(null);
   const [isLikelyCertificate, setIsLikelyCertificate] = useState(true);
+  const [detectedDocumentType, setDetectedDocumentType] = useState('CERTIFICATE');
   const [detectedRecipient, setDetectedRecipient] = useState('');
   const [ocrWarnings, setOcrWarnings] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
@@ -170,6 +171,7 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
 
       setOcrConfidence(extracted.confidenceScore);
       setIsLikelyCertificate(extracted.isLikelyCertificate !== false);
+      setDetectedDocumentType(extracted.documentType || 'CERTIFICATE');
       setDetectedRecipient(extracted.recipient || '');
       setOcrWarnings(extracted.warnings || []);
 
@@ -548,6 +550,45 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                 </div>
               )}
 
+              {/* Document Validity Check Banner */}
+              {!isLikelyCertificate && (
+                <div style={{
+                  padding: '14px 16px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'rgba(244, 63, 94, 0.14)',
+                  border: '1px solid rgba(244, 63, 94, 0.5)',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '12px',
+                  marginBottom: '20px'
+                }}>
+                  <AlertTriangle size={24} style={{ color: '#fb7185', flexShrink: 0, marginTop: '2px' }} />
+                  <div>
+                    <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#fb7185' }}>
+                      {detectedDocumentType === 'EVENT_ANNOUNCEMENT_OR_BROCHURE' 
+                        ? 'Event Flyer / Announcement Notice Detected — Not a Student Certificate' 
+                        : 'Invalid Document: Not a Verifiable Credential'}
+                    </div>
+                    <div style={{ fontSize: '0.8rem', color: '#f8fafc', marginTop: '4px', lineHeight: 1.5 }}>
+                      {detectedDocumentType === 'EVENT_ANNOUNCEMENT_OR_BROCHURE' ? (
+                        <>
+                          This document is an <strong>event brochure or circular</strong> with registration deadlines and problem statements, not an individual certificate awarded to you.
+                          <br />
+                          SkillVault only stores verified credentials with explicit completion or award conferment (e.g. <em>"This is to certify that [Name] has successfully completed..."</em>).
+                        </>
+                      ) : (
+                        <>
+                          This document contains no certificate conferment text, award statement, or verifiable completion proof.
+                        </>
+                      )}
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: '#fda4af', marginTop: '6px', fontWeight: 600 }}>
+                      ⛔ <strong>Upload Blocked:</strong> To prevent fraudulent records, non-certificate flyers and announcements cannot be saved.
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Identity & Ownership Security Banner */}
               {ownershipValidation.hasConflict && (
                 <div style={{
@@ -789,17 +830,22 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                 <button 
                   type="submit" 
                   className="btn btn-primary"
-                  disabled={stage === 'saving' || ownershipValidation.hasConflict}
+                  disabled={stage === 'saving' || ownershipValidation.hasConflict || !isLikelyCertificate}
                   style={{
-                    opacity: ownershipValidation.hasConflict ? 0.5 : 1,
-                    cursor: ownershipValidation.hasConflict ? 'not-allowed' : 'pointer'
+                    opacity: (ownershipValidation.hasConflict || !isLikelyCertificate) ? 0.5 : 1,
+                    cursor: (ownershipValidation.hasConflict || !isLikelyCertificate) ? 'not-allowed' : 'pointer'
                   }}
-                  title={ownershipValidation.hasConflict ? `Upload blocked: Certificate was issued to ${ownershipValidation.detectedName}` : undefined}
+                  title={!isLikelyCertificate ? 'Upload blocked: Document is an event flyer or non-certificate' : (ownershipValidation.hasConflict ? `Upload blocked: Certificate was issued to ${ownershipValidation.detectedName}` : undefined)}
                 >
                   {stage === 'saving' ? (
                     <>
                       <Loader2 size={16} className="spin-animation" />
                       <span>Saving to Cloud...</span>
+                    </>
+                  ) : !isLikelyCertificate ? (
+                    <>
+                      <AlertTriangle size={16} />
+                      <span>Upload Blocked (Not a Certificate)</span>
                     </>
                   ) : ownershipValidation.hasConflict ? (
                     <>
