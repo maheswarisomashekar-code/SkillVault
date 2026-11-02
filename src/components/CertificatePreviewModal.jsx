@@ -8,13 +8,15 @@ import {
   Hash, 
   FileText, 
   ShieldCheck, 
-  CheckCircle,
-  Copy,
-  Clock
+  CheckCircle, 
+  Copy, 
+  Clock,
+  Download
 } from 'lucide-react';
 import { CategoryBadge } from './CategoryBadge';
 import { VerificationBadge } from './VerificationBadge';
 import { updateCertificateRecord } from '../services/certificateService';
+import { downloadCertificateFile, openCertificateInNewTab } from '../utils/fileDownloader';
 
 export const CertificatePreviewModal = ({ certificate, isOpen, onClose, onUpdate }) => {
   const [copied, setCopied] = useState(false);
@@ -86,28 +88,51 @@ export const CertificatePreviewModal = ({ certificate, isOpen, onClose, onUpdate
           }}>
             {certificate.fileUrl ? (
               certificate.fileType === 'application/pdf' ? (
-                <div style={{ padding: '40px 20px', textAlign: 'center' }}>
-                  <FileText size={48} style={{ color: '#0ea5e9', margin: '0 auto 12px' }} />
-                  <div style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                    PDF Document: {certificate.fileName || 'Certificate.pdf'}
+                <div style={{ padding: '36px 20px', textAlign: 'center' }}>
+                  <FileText size={52} style={{ color: '#0ea5e9', margin: '0 auto 12px' }} />
+                  <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>
+                    {certificate.fileName || `${certificate.title}.pdf`}
                   </div>
-                  <a 
-                    href={certificate.fileUrl} 
-                    target="_blank" 
-                    rel="noreferrer"
-                    className="btn btn-outline btn-sm"
-                    style={{ marginTop: '14px' }}
-                  >
-                    <ExternalLink size={14} />
-                    <span>Open Original PDF in New Tab</span>
-                  </a>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '18px' }}>
+                    Verified PDF Credential • Ready for immediate download or tab preview
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                    <button 
+                      type="button"
+                      onClick={() => downloadCertificateFile(certificate.fileUrl, certificate.fileName || `${certificate.title}.pdf`)}
+                      className="btn btn-primary btn-sm"
+                    >
+                      <Download size={15} />
+                      <span>Download Certificate File</span>
+                    </button>
+
+                    <button 
+                      type="button"
+                      onClick={() => openCertificateInNewTab(certificate.fileUrl, certificate.fileName || `${certificate.title}.pdf`)}
+                      className="btn btn-outline btn-sm"
+                    >
+                      <ExternalLink size={15} />
+                      <span>Open in Browser Tab</span>
+                    </button>
+                  </div>
                 </div>
               ) : (
-                <img 
-                  src={certificate.fileUrl} 
-                  alt={certificate.title}
-                  style={{ maxWidth: '100%', maxHeight: '360px', objectFit: 'contain', borderRadius: 'var(--radius-sm)' }}
-                />
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+                  <img 
+                    src={certificate.fileUrl} 
+                    alt={certificate.title}
+                    style={{ maxWidth: '100%', maxHeight: '320px', objectFit: 'contain', borderRadius: 'var(--radius-sm)', marginBottom: '12px' }}
+                  />
+                  <button 
+                    type="button"
+                    onClick={() => downloadCertificateFile(certificate.fileUrl, certificate.fileName || `${certificate.title}.png`)}
+                    className="btn btn-secondary btn-sm"
+                  >
+                    <Download size={14} />
+                    <span>Download Image</span>
+                  </button>
+                </div>
               )
             ) : (
               <div style={{ padding: '40px', color: 'var(--text-muted)' }}>

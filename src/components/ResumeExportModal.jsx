@@ -30,7 +30,65 @@ export const ResumeExportModal = ({
   if (!isOpen || !profile) return null;
 
   const handlePrint = () => {
-    window.print();
+    const resumeEl = document.getElementById('printable-ats-resume');
+    if (!resumeEl) {
+      window.print();
+      return;
+    }
+
+    const printFrame = document.createElement('iframe');
+    printFrame.style.position = 'fixed';
+    printFrame.style.right = '0';
+    printFrame.style.bottom = '0';
+    printFrame.style.width = '0';
+    printFrame.style.height = '0';
+    printFrame.style.border = '0';
+    document.body.appendChild(printFrame);
+
+    const doc = printFrame.contentWindow.document;
+    doc.open();
+    doc.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${(profile?.fullName || 'Student')}_CV_SkillVault</title>
+          <style>
+            @page {
+              size: letter portrait;
+              margin: 12mm 14mm;
+            }
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+              color: #1e293b;
+              background: #ffffff;
+              margin: 0;
+              padding: 0;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+            * {
+              box-sizing: border-box;
+            }
+          </style>
+        </head>
+        <body>
+          ${resumeEl.innerHTML}
+        </body>
+      </html>
+    `);
+    doc.close();
+
+    printFrame.contentWindow.focus();
+    setTimeout(() => {
+      printFrame.contentWindow.print();
+      setTimeout(() => {
+        try {
+          document.body.removeChild(printFrame);
+        } catch (e) {
+          // ignore
+        }
+      }, 2500);
+    }, 300);
   };
 
   const publishedCerts = certificates.filter(c => c.isPublished !== false);

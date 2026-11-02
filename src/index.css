@@ -763,32 +763,64 @@ input, textarea, select {
    ATS Resume Print Styling
    ========================================================================== */
 @media print {
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
   body * {
     visibility: hidden;
   }
 
   .no-print,
-  .modal-overlay,
   .app-sidebar,
   .app-topbar,
   header,
-  footer {
+  footer,
+  aside,
+  button {
     display: none !important;
+  }
+
+  /* Keep modal wrapper visible so its printable content is accessible */
+  .modal-overlay {
+    position: static !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  .modal-content {
+    position: static !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+    visibility: visible !important;
   }
 
   #printable-ats-resume,
   #printable-ats-resume * {
-    visibility: visible;
+    visibility: visible !important;
   }
 
   #printable-ats-resume {
-    position: absolute;
-    left: 0;
-    top: 0;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
-    padding: 20px 30px !important;
+    padding: 0 10mm !important;
     box-shadow: none !important;
     border-radius: 0 !important;
     background: #ffffff !important;
@@ -796,7 +828,7 @@ input, textarea, select {
   }
 
   @page {
-    margin: 12mm 15mm;
+    margin: 10mm 12mm;
     size: letter portrait;
   }
 }
