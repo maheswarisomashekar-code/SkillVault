@@ -31,64 +31,164 @@ export const ResumeExportModal = ({
 
   const handlePrint = () => {
     const resumeEl = document.getElementById('printable-ats-resume');
-    if (!resumeEl) {
-      window.print();
-      return;
+    if (!resumeEl) return;
+
+    const resumeHtml = resumeEl.outerHTML;
+    const candidateName = (profile?.fullName || 'Student').replace(/[^a-zA-Z0-9]/g, '_');
+
+    // 1. Try opening clean standalone print window
+    const printWin = window.open('', '_blank', 'width=880,height=920');
+
+    const fullDocumentHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>${candidateName}_CV_SkillVault</title>
+  <style>
+    @page {
+      size: letter portrait;
+      margin: 10mm 12mm;
     }
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    html, body {
+      background: #ffffff !important;
+      color: #0f172a !important;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      font-size: 10.5pt;
+      line-height: 1.45;
+    }
+    .print-bar {
+      background: #0f172a;
+      color: #ffffff;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #334155;
+      font-family: sans-serif;
+    }
+    .print-btn {
+      background: #0284c7;
+      color: #ffffff;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .print-btn:hover {
+      background: #0369a1;
+    }
+    .resume-canvas {
+      width: 100%;
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 24px 28px;
+      background: #ffffff !important;
+      color: #0f172a !important;
+    }
+    @media print {
+      .print-bar {
+        display: none !important;
+      }
+      .resume-canvas {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      body {
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="print-bar">
+    <div style="font-weight: 700; font-size: 13px;">📄 SkillVault • Verified ATS Resume</div>
+    <button class="print-btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  </div>
+  <div class="resume-canvas">
+    ${resumeHtml}
+  </div>
+  <script>
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        window.focus();
+        window.print();
+      }, 300);
+    });
+  </script>
+</body>
+</html>`;
 
-    const printFrame = document.createElement('iframe');
-    printFrame.style.position = 'fixed';
-    printFrame.style.right = '0';
-    printFrame.style.bottom = '0';
-    printFrame.style.width = '0';
-    printFrame.style.height = '0';
-    printFrame.style.border = '0';
-    document.body.appendChild(printFrame);
+    if (printWin) {
+      printWin.document.open();
+      printWin.document.write(fullDocumentHtml);
+      printWin.document.close();
+    } else {
+      // Fallback if popup blocker intercepted: use a full-dimension hidden iframe
+      const printFrame = document.createElement('iframe');
+      printFrame.style.position = 'fixed';
+      printFrame.style.top = '-10000px';
+      printFrame.style.left = '-10000px';
+      printFrame.style.width = '850px';
+      printFrame.style.height = '1100px';
+      document.body.appendChild(printFrame);
 
-    const doc = printFrame.contentWindow.document;
-    doc.open();
-    doc.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>${(profile?.fullName || 'Student')}_CV_SkillVault</title>
-          <style>
-            @page {
-              size: letter portrait;
-              margin: 12mm 14mm;
-            }
-            body {
-              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-              color: #1e293b;
-              background: #ffffff;
-              margin: 0;
-              padding: 0;
-              -webkit-print-color-adjust: exact;
-              print-color-adjust: exact;
-            }
-            * {
-              box-sizing: border-box;
-            }
-          </style>
-        </head>
-        <body>
-          ${resumeEl.innerHTML}
-        </body>
-      </html>
-    `);
-    doc.close();
+      const doc = printFrame.contentWindow.document;
+      doc.open();
+      doc.write(fullDocumentHtml);
+      doc.close();
 
-    printFrame.contentWindow.focus();
-    setTimeout(() => {
-      printFrame.contentWindow.print();
       setTimeout(() => {
-        try {
-          document.body.removeChild(printFrame);
-        } catch (e) {
-          // ignore
-        }
-      }, 2500);
-    }, 300);
+        printFrame.contentWindow.focus();
+        printFrame.contentWindow.print();
+        setTimeout(() => {
+          try {
+            document.body.removeChild(printFrame);
+          } catch (e) {}
+        }, 3000);
+      }, 500);
+    }
+  };
+
+  const handleDownloadHtml = () => {
+    const resumeEl = document.getElementById('printable-ats-resume');
+    if (!resumeEl) return;
+
+    const candidateName = (profile?.fullName || 'Student').replace(/[^a-zA-Z0-9]/g, '_');
+    const fullHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>${candidateName}_CV_SkillVault</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #ffffff; color: #0f172a; max-width: 820px; margin: 20px auto; padding: 24px; }
+    * { box-sizing: border-box; }
+  </style>
+</head>
+<body>
+  ${resumeEl.outerHTML}
+</body>
+</html>`;
+
+    const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8' });
+    const blobUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = `${candidateName}_ATS_Resume.html`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
   };
 
   const publishedCerts = certificates.filter(c => c.isPublished !== false);
@@ -136,17 +236,27 @@ export const ResumeExportModal = ({
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
             <button 
               type="button" 
-              className="btn btn-primary" 
+              className="btn btn-secondary btn-sm" 
+              onClick={handleDownloadHtml}
+              title="Download standalone ATS resume file"
+            >
+              <Download size={15} />
+              <span>Download File</span>
+            </button>
+
+            <button 
+              type="button" 
+              className="btn btn-primary btn-sm" 
               onClick={handlePrint}
               style={{
                 boxShadow: '0 0 16px rgba(14, 165, 233, 0.4)',
                 background: 'linear-gradient(135deg, #0284c7, #0ea5e9)'
               }}
             >
-              <Printer size={16} />
+              <Printer size={15} />
               <span>Print / Save as PDF</span>
             </button>
             <button onClick={onClose} style={{ color: 'var(--text-muted)', padding: '6px' }}>
