@@ -97,6 +97,18 @@ export const CertificateCard = ({ certificate, onPreview, onEdit, onDelete }) =>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
         <CategoryBadge category={certificate.category} />
         <VerificationBadge status={certificate.verificationStatus} />
+        <span style={{
+          fontSize: '0.68rem',
+          padding: '2px 6px',
+          borderRadius: '4px',
+          background: 'rgba(56, 189, 248, 0.12)',
+          color: '#38bdf8',
+          border: '1px solid rgba(56, 189, 248, 0.25)',
+          fontFamily: 'monospace',
+          fontWeight: 600
+        }}>
+          SHA-256
+        </span>
       </div>
 
       {/* Title & Metadata */}

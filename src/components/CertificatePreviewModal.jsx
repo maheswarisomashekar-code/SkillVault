@@ -177,7 +177,7 @@ export const CertificatePreviewModal = ({ certificate, isOpen, onClose, onUpdate
             </div>
           </div>
 
-          {/* Verification section */}
+          {/* Verification & Cryptographic Ledger section */}
           <div style={{
             padding: '16px',
             borderRadius: 'var(--radius-md)',
@@ -187,16 +187,34 @@ export const CertificatePreviewModal = ({ certificate, isOpen, onClose, onUpdate
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
               <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                Cloud Verification Status
+                Cloud Verification & Cryptographic Ledger
               </span>
               <VerificationBadge status={certificate.verificationStatus} />
             </div>
 
-            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '14px' }}>
+            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '12px' }}>
               {certificate.verificationStatus === 'VERIFIED'
-                ? 'This credential has been verified against issuer records.'
-                : 'OCR successfully read the document. Independent issuer check required for full verification.'}
+                ? 'This credential has been verified against issuer records and sealed into the tamper-proof ledger.'
+                : 'OCR successfully read the document. Cryptographically signed with SHA-256 digest.'}
             </p>
+
+            {/* SHA-256 pill */}
+            {certificate.sha256Hash && (
+              <div style={{
+                background: 'rgba(0, 0, 0, 0.4)',
+                padding: '8px 12px',
+                borderRadius: 'var(--radius-sm)',
+                fontFamily: 'monospace',
+                fontSize: '0.72rem',
+                color: '#38bdf8',
+                marginBottom: '12px',
+                border: '1px solid rgba(56, 189, 248, 0.2)',
+                wordBreak: 'break-all'
+              }}>
+                <span style={{ color: 'var(--text-muted)' }}>SHA-256 Digest: </span>
+                {certificate.sha256Hash}
+              </div>
+            )}
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
               {certificate.verificationUrl && (

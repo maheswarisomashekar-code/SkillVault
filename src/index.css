@@ -759,4 +759,47 @@ input, textarea, select {
   box-shadow: 0 6px 20px rgba(14, 165, 233, 0.16);
 }
 
+/* ==========================================================================
+   ATS Resume Print Styling
+   ========================================================================== */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .no-print,
+  .modal-overlay,
+  .app-sidebar,
+  .app-topbar,
+  header,
+  footer {
+    display: none !important;
+  }
+
+  #printable-ats-resume,
+  #printable-ats-resume * {
+    visibility: visible;
+  }
+
+  #printable-ats-resume {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 20px 30px !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+
+  @page {
+    margin: 12mm 15mm;
+    size: letter portrait;
+  }
+}
+
+
 

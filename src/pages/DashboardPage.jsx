@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Award, 
   ShieldCheck, 
@@ -9,12 +9,17 @@ import {
   Layers, 
   ArrowRight,
   TrendingUp,
-  Sparkles
+  Sparkles,
+  Target,
+  FileText
 } from 'lucide-react';
 import { StatCard } from '../components/StatCard';
 import { SkillDistributionChart } from '../components/SkillDistributionChart';
 import { CertificateCard } from '../components/CertificateCard';
 import { useAuth } from '../context/AuthContext';
+import { getStudentProjects, getStudentExperiences } from '../services/projectService';
+import { ResumeExportModal } from '../components/ResumeExportModal';
+import { RoleAnalyzerModal } from '../components/RoleAnalyzerModal';
 
 export const DashboardPage = ({ 
   certificates = [], 
@@ -25,6 +30,24 @@ export const DashboardPage = ({
   onDeleteCertificate 
 }) => {
   const { userProfile, currentUser } = useAuth();
+
+  // Modals state
+  const [isResumeModalOpen, setIsResumeModalOpen] = useState(false);
+  const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
+  const [projects, setProjects] = useState([]);
+  const [experiences, setExperiences] = useState([]);
+
+  useEffect(() => {
+    if (currentUser?.uid) {
+      Promise.all([
+        getStudentProjects(currentUser.uid),
+        getStudentExperiences(currentUser.uid)
+      ]).then(([projs, exps]) => {
+        setProjects(projs || []);
+        setExperiences(exps || []);
+      }).catch(err => console.error('Failed to load dashboard aux data:', err));
+    }
+  }, [currentUser]);
 
   // Compute live statistics
   const totalCerts = certificates.length;
@@ -84,15 +107,78 @@ export const DashboardPage = ({
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '12px', zIndex: 1 }}>
+        <div style={{ display: 'flex', gap: '10px', zIndex: 1, flexWrap: 'wrap' }}>
+          <button className="btn btn-secondary" onClick={() => setIsRoleModalOpen(true)}>
+            <Target size={15} style={{ color: '#818cf8' }} />
+            <span>Role Readiness</span>
+          </button>
+          <button className="btn btn-secondary" onClick={() => setIsResumeModalOpen(true)}>
+            <FileText size={15} style={{ color: '#38bdf8' }} />
+            <span>Export ATS CV</span>
+          </button>
           <button className="btn btn-secondary" onClick={() => onNavigate('portfolio')}>
-            <Globe size={16} />
-            <span>View Public Portfolio</span>
+            <Globe size={15} />
+            <span>Public Portfolio</span>
           </button>
           <button className="btn btn-primary" onClick={onOpenUpload}>
-            <UploadCloud size={16} />
+            <UploadCloud size={15} />
             <span>Upload Certificate</span>
           </button>
+        </div>
+      </div>
+
+      {/* Target Role Readiness Quick Bar */}
+      <div 
+        onClick={() => setIsRoleModalOpen(true)}
+        className="dashboard-card-hover"
+        style={{
+          background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(14, 165, 233, 0.12))',
+          border: '1px solid rgba(99, 102, 241, 0.3)',
+          borderRadius: 'var(--radius-lg)',
+          padding: '14px 20px',
+          marginBottom: '28px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          cursor: 'pointer',
+          flexWrap: 'wrap',
+          gap: '12px'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            background: 'rgba(99, 102, 241, 0.2)',
+            color: '#818cf8',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <Target size={16} />
+          </div>
+          <div>
+            <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+              Target Role & Cloud Readiness: <span style={{ color: '#38bdf8' }}>Cloud Solutions Architect</span>
+            </div>
+            <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>
+              Cross-checked against verified credentials, engineering projects & technical skills
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span style={{
+            fontSize: '0.74rem',
+            padding: '3px 10px',
+            borderRadius: '9999px',
+            background: 'rgba(16, 185, 129, 0.15)',
+            color: '#34d399',
+            fontWeight: 700
+          }}>
+            Check AI Skill Gaps →
+          </span>
         </div>
       </div>
 
@@ -272,6 +358,25 @@ export const DashboardPage = ({
           </div>
         )}
       </div>
+
+      {/* ATS Resume Export Modal */}
+      <ResumeExportModal 
+        isOpen={isResumeModalOpen}
+        onClose={() => setIsResumeModalOpen(false)}
+        profile={userProfile || { fullName: currentUser?.displayName, email: currentUser?.email }}
+        certificates={certificates}
+        projects={projects}
+        experiences={experiences}
+      />
+
+      {/* Target Role Readiness Modal */}
+      <RoleAnalyzerModal 
+        isOpen={isRoleModalOpen}
+        onClose={() => setIsRoleModalOpen(false)}
+        profile={userProfile || { fullName: currentUser?.displayName, email: currentUser?.email }}
+        certificates={certificates}
+        projects={projects}
+      />
     </div>
   );
 };

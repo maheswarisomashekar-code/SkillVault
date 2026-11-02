@@ -18,7 +18,9 @@ import {
   Edit3,
   Layers,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  Target,
+  FileText
 } from 'lucide-react';
 import { GithubIcon } from '../components/BrandIcons';
 import { useAuth } from '../context/AuthContext';
@@ -34,12 +36,18 @@ import {
 } from '../services/projectService';
 import { ProjectModal } from '../components/ProjectModal';
 import { ExperienceModal } from '../components/ExperienceModal';
+import { ResumeExportModal } from '../components/ResumeExportModal';
+import { RoleAnalyzerModal } from '../components/RoleAnalyzerModal';
 
 export const PortfolioManagerPage = ({ certificates = [], onCertificateUpdate, onPreviewPublicPortfolio }) => {
   const { currentUser, userProfile, refreshProfile } = useAuth();
   const [copied, setCopied] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [activeSection, setActiveSection] = useState('projects'); // 'projects' | 'certificates' | 'experience'
+
+  // Modals
+  const [isResumeModalOpen, setIsResumeModalOpen] = useState(false);
+  const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
 
   // Projects state
   const [projects, setProjects] = useState([]);
@@ -210,6 +218,22 @@ export const PortfolioManagerPage = ({ certificates = [], onCertificateUpdate, o
             >
               {isPublic ? <EyeOff size={14} /> : <Eye size={14} />}
               <span>{isPublic ? 'Disable Public Sharing' : 'Enable Public Link'}</span>
+            </button>
+
+            <button 
+              className="btn btn-secondary btn-sm"
+              onClick={() => setIsRoleModalOpen(true)}
+            >
+              <Target size={14} style={{ color: '#818cf8' }} />
+              <span>Target Role Analyzer</span>
+            </button>
+
+            <button 
+              className="btn btn-secondary btn-sm"
+              onClick={() => setIsResumeModalOpen(true)}
+            >
+              <FileText size={14} style={{ color: '#38bdf8' }} />
+              <span>Export ATS CV (PDF)</span>
             </button>
 
             {isPublic && (
@@ -715,6 +739,25 @@ export const PortfolioManagerPage = ({ certificates = [], onCertificateUpdate, o
         onClose={() => setIsExpModalOpen(false)}
         onSave={handleSaveExperience}
         experience={editingExp}
+      />
+
+      {/* ATS Resume Export Modal */}
+      <ResumeExportModal 
+        isOpen={isResumeModalOpen}
+        onClose={() => setIsResumeModalOpen(false)}
+        profile={userProfile || { fullName: currentUser?.displayName, email: currentUser?.email }}
+        certificates={certificates}
+        projects={projects}
+        experiences={experiences}
+      />
+
+      {/* Target Role Readiness Modal */}
+      <RoleAnalyzerModal 
+        isOpen={isRoleModalOpen}
+        onClose={() => setIsRoleModalOpen(false)}
+        profile={userProfile || { fullName: currentUser?.displayName, email: currentUser?.email }}
+        certificates={certificates}
+        projects={projects}
       />
     </div>
   );

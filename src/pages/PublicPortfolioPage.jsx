@@ -26,6 +26,8 @@ import { getStudentProjects, getStudentExperiences } from '../services/projectSe
 import { CategoryBadge } from '../components/CategoryBadge';
 import { VerificationBadge } from '../components/VerificationBadge';
 import { CertificatePreviewModal } from '../components/CertificatePreviewModal';
+import { ResumeExportModal } from '../components/ResumeExportModal';
+import { RoleAnalyzerModal } from '../components/RoleAnalyzerModal';
 
 export const PublicPortfolioPage = ({ portfolioId, onBackToApp }) => {
   const [profile, setProfile] = useState(null);
@@ -36,6 +38,10 @@ export const PublicPortfolioPage = ({ portfolioId, onBackToApp }) => {
   const [portfolioTab, setPortfolioTab] = useState('all'); // 'all' | 'projects' | 'certificates' | 'experience'
   const [selectedCertCategory, setSelectedCertCategory] = useState('all');
   const [previewCert, setPreviewCert] = useState(null);
+
+  // New features modals
+  const [isResumeModalOpen, setIsResumeModalOpen] = useState(false);
+  const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
 
   useEffect(() => {
     const loadPortfolioData = async () => {
@@ -232,8 +238,30 @@ export const PublicPortfolioPage = ({ portfolioId, onBackToApp }) => {
               </div>
             </div>
 
-            {/* Social Links */}
-            <div style={{ display: 'flex', gap: '10px' }}>
+            {/* Actions & Social Links */}
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              <button 
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={() => setIsRoleModalOpen(true)}
+              >
+                <Sparkles size={14} style={{ color: '#818cf8' }} />
+                <span>Role Readiness</span>
+              </button>
+
+              <button 
+                type="button"
+                className="btn btn-primary btn-sm"
+                onClick={() => setIsResumeModalOpen(true)}
+                style={{
+                  boxShadow: '0 0 16px rgba(14, 165, 233, 0.35)',
+                  background: 'linear-gradient(135deg, #0284c7, #0ea5e9)'
+                }}
+              >
+                <FileText size={14} />
+                <span>Download ATS CV (PDF)</span>
+              </button>
+
               {profile?.github && (
                 <a 
                   href={profile.github} 
@@ -683,9 +711,21 @@ export const PublicPortfolioPage = ({ portfolioId, onBackToApp }) => {
                       )}
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
                       <CategoryBadge category={cert.category} />
                       <VerificationBadge status={cert.verificationStatus} />
+                      <span style={{
+                        fontSize: '0.68rem',
+                        padding: '2px 6px',
+                        borderRadius: '4px',
+                        background: 'rgba(56, 189, 248, 0.12)',
+                        color: '#38bdf8',
+                        border: '1px solid rgba(56, 189, 248, 0.25)',
+                        fontFamily: 'monospace',
+                        fontWeight: 600
+                      }}>
+                        SHA-256 Sealed
+                      </span>
                     </div>
 
                     <h3 style={{
@@ -832,6 +872,25 @@ export const PublicPortfolioPage = ({ portfolioId, onBackToApp }) => {
           onClose={() => setPreviewCert(null)}
         />
       )}
+
+      {/* ATS Resume Export Modal */}
+      <ResumeExportModal 
+        isOpen={isResumeModalOpen}
+        onClose={() => setIsResumeModalOpen(false)}
+        profile={profile}
+        certificates={certificates}
+        projects={projects}
+        experiences={experiences}
+      />
+
+      {/* Target Role Readiness Modal */}
+      <RoleAnalyzerModal 
+        isOpen={isRoleModalOpen}
+        onClose={() => setIsRoleModalOpen(false)}
+        profile={profile}
+        certificates={certificates}
+        projects={projects}
+      />
     </div>
   );
 };

@@ -18,6 +18,7 @@ import {
 } from '../config/firebase';
 import { mockUploadFile, mockDeleteFile } from './mockCloudStorage';
 import { idbSaveCertificate, idbGetAllCertificates, idbDeleteCertificate } from './indexedDbService';
+import { computeCertificateHash, generateLedgerBlock } from './cryptoService';
 
 const LOCAL_CERTS_KEY = 'skillvault_local_certificates';
 
@@ -108,6 +109,11 @@ export const uploadCertificateFile = async (file, userId, onProgress) => {
  */
 export const createCertificateRecord = async (userId, data) => {
   const certificateId = data.id || `cert_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  
+  // Compute SHA-256 digest & ledger block
+  const computedHash = data.sha256Hash || (await computeCertificateHash(data));
+  const ledgerInfo = generateLedgerBlock(computedHash);
+
   const record = {
     id: certificateId,
     userId,
@@ -128,6 +134,9 @@ export const createCertificateRecord = async (userId, data) => {
     confidenceScore: data.confidenceScore || 70,
     verificationStatus: data.verificationStatus || 'OCR_PROCESSED',
     isPublished: data.isPublished !== undefined ? data.isPublished : true,
+    sha256Hash: computedHash,
+    ledgerBlockId: data.ledgerBlockId || ledgerInfo.ledgerBlockId,
+    ledgerTimestamp: ledgerInfo.recordedAt,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
@@ -273,9 +282,16 @@ export const getCertificateById = async (certificateId) => {
   }
 
   const all = await idbGetAllCertificates();
-  return all.find(c => {
+  const cert = all.find(c => {
     const idMatch = c.id && c.id.toLowerCase() === cleanId;
     const credMatch = c.credentialId && c.credentialId.toLowerCase() === cleanId;
     return idMatch || credMatch;
   }) || null;
+
+  if (cert && !cert.sha256Hash) {
+    cert.sha256Hash = await computeCertificateHash(cert);
+    const ledger = generateLedgerBlock(cert.sha256Hash);
+    cert.ledgerBlockId = cert.ledgerBlockId || ledger.ledgerBlockId;
+  }
+  return cert;
 };
