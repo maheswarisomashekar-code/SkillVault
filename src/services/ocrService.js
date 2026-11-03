@@ -249,9 +249,13 @@ export const extractCertificateFields = (rawText) => {
 
       // 2. Check next 1-2 lines for standalone student name
       for (let next = i + 1; next <= Math.min(i + 3, lines.length - 1); next++) {
-        const candidate = lines[next].replace(/^(?:Mr\.|Ms\.|Mrs\.|Dr\.|Prof\.)\s*/i, '').trim();
+        let candidate = lines[next]
+          .replace(/^(?:Mr\.|Ms\.|Mrs\.|Dr\.|Prof\.)\s*/i, '')
+          .replace(/[^A-Za-z.\s'-]/g, '') // Strip OCR noise like $, %, #
+          .trim();
+
         // Skip noise phrases
-        if (/^(?:for|has|in recognition|who has|with a|online|successfully|from|during|bearing|usn|roll)/i.test(candidate)) continue;
+        if (/^(?:for|has|in recognition|who has|with a|online|successfully|from|during|bearing|usn|roll|sor)/i.test(candidate)) continue;
         if (candidate.length >= 3 && candidate.length <= 45 && /^[A-Za-z][A-Za-z.\s'-]{1,40}$/.test(candidate)) {
           recipient = candidate;
           break;
@@ -261,9 +265,13 @@ export const extractCertificateFields = (rawText) => {
     }
 
     // Check Case B: Name comes BEFORE the completion marker (e.g. Coursera, HackerRank)
-    if (/has successfully completed|has participated in|has completed the|has undergone/i.test(currentLine)) {
+    if (/(?:has|for)?\s*succes*fully\s+completed|has\s+participated\s+in|has\s+completed\s+the|has\s+undergone/i.test(currentLine)) {
       for (let prev = i - 1; prev >= Math.max(0, i - 3); prev--) {
-        const candidate = lines[prev].replace(/^(?:Mr\.|Ms\.|Mrs\.|Dr\.)\s*/i, '').trim();
+        let candidate = lines[prev]
+          .replace(/^(?:Mr\.|Ms\.|Mrs\.|Dr\.)\s*/i, '')
+          .replace(/[^A-Za-z.\s'-]/g, '')
+          .trim();
+
         // Skip headers
         if (/^(?:course|certificate|university|date|elite|nov|dec|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|this)/i.test(candidate)) continue;
         if (candidate.length >= 3 && candidate.length <= 45 && /^[A-Za-z][A-Za-z.\s'-]{1,40}$/.test(candidate)) {
@@ -302,11 +310,12 @@ export const extractCertificateFields = (rawText) => {
   for (let i = 0; i < lines.length; i++) {
     const currentLine = lines[i];
 
-    // Marker 1: Course completion
-    if (/(?:completing the course|completed the course|participated in the|attended the|completion in)/i.test(currentLine)) {
+    // Marker 1: Course completion (supports NPTEL, Coursera, Udemy, with OCR typo tolerance)
+    if (/(?:completing|completed|completion|participat(?:ing|ed))\s+(?:the\s+)?(?:course|couse|program|workshop|training)?/i.test(currentLine) ||
+        /(?:for|has|in)\s+succes*fully/i.test(currentLine)) {
       if (i + 1 < lines.length) {
-        const candidateTitle = lines[i + 1].trim();
-        if (candidateTitle.length >= 4 && !/^(with a|online|consolidated|during|held on)/i.test(candidateTitle)) {
+        let candidateTitle = lines[i + 1].replace(/\s+[A-Za-z]{1,2}$/, '').trim();
+        if (candidateTitle.length >= 4 && !/^(with a|online|consolidated|during|held on|ith a)/i.test(candidateTitle)) {
           title = candidateTitle;
           break;
         }
@@ -446,18 +455,27 @@ export const extractCertificateFields = (rawText) => {
   const matchedAnnouncementMarkers = eventAnnouncementPatterns.filter(pattern => pattern.test(fullText));
   const isEventAnnouncement = matchedAnnouncementMarkers.length >= 1;
 
-  // Phrases that MUST exist on an authentic certificate awarded to an individual
+  // Phrases that indicate authentic certificate / credential conferment
   const confermentPatterns = [
     /this\s+is\s+to\s+certify\s+that/i,
-    /this\s+certificate\s+is\s+(?:proudly\s+)?(?:awarded|presented)\s+to/i,
+    /(?:this\s+)?certificate\s+(?:is\s+)?(?:proudly\s+)?(?:awarded|presented)\s+to/i,
     /certificate\s+of\s+(?:completion|achievement|participation|merit|excellence|appreciation|recognition|attendance)/i,
+    /(?:online\s+)?certification/i,
+    /(?:for|has|in)\s+succes*fully\s+completing/i,
     /has\s+successfully\s+completed/i,
     /has\s+participated\s+in/i,
     /in\s+recognition\s+of/i,
     /is\s+hereby\s+awarded\s+to/i,
     /certifies\s+that/i,
     /conferred\s+upon/i,
-    /has\s+secured\s+(?:first|second|third|1st|2nd|3rd|\d+th)\s+(?:place|rank|position)/i
+    /has\s+secured\s+(?:first|second|third|1st|2nd|3rd|\d+th)\s+(?:place|rank|position)/i,
+    /nptel|swayam|skill\s+india|coursera|udemy|hackerrank|datacamp|credly/i,
+    /consolidated\s+sc?ore/i,
+    /proctored\s+exam/i,
+    /candidates\s+certified/i,
+    /roll\s*no[:\s]/i,
+    /credits?\s+(?:recommended|earned)/i,
+    /dean\s+educational\s+outreach|coordinator|head\s+of\s+department/i
   ];
 
   const hasConfermentProof = confermentPatterns.some(pattern => pattern.test(fullText));
@@ -500,8 +518,8 @@ export const extractCertificateFields = (rawText) => {
 
   return {
     title: finalTitle,
-    recipient: isLikelyCertificate ? (recipient || '') : '',
-    issuer: issuer || (isLikelyCertificate ? 'Authorized Provider' : ''),
+    recipient: recipient || '',
+    issuer: issuer || 'Independent',
     issueDate: finalIssueDate,
     category,
     credentialId,

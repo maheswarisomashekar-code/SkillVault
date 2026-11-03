@@ -175,47 +175,25 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
       setDetectedRecipient(extracted.recipient || '');
       setOcrWarnings(extracted.warnings || []);
 
-      // If document is completely unrelated garbage (like random animal, landscape, meme)
-      if (extracted.isLikelyCertificate === false) {
-        setFormData({
-          title: '',
-          issuer: '',
-          recipient: '',
-          issueDate: '',
-          category: 'other',
-          description: 'Uploaded document failed academic validation check.',
-          credentialId: '',
-          verificationUrl: '',
-          isPublished: false,
-          verificationStatus: 'UPLOADED',
-          fileUrl: uploadResult.downloadUrl,
-          storagePath: uploadResult.storagePath,
-          fileName: uploadResult.fileName,
-          fileSize: uploadResult.fileSize,
-          fileType: uploadResult.fileType,
-          rawOcrText: extracted.rawText || ''
-        });
-      } else {
-        // Auto-populate form prioritizing genuine OCR readings
-        setFormData({
-          title: extracted.title || '',
-          issuer: extracted.issuer || '',
-          recipient: extracted.recipient || '',
-          issueDate: extracted.issueDate || '',
-          category: extracted.category || 'course',
-          description: `Uploaded and scanned via SkillVault Cloud OCR on ${new Date().toLocaleDateString()}`,
-          credentialId: extracted.credentialId || '',
-          verificationUrl: extracted.verificationUrl || '',
-          isPublished: true,
-          verificationStatus: extracted.verificationUrl ? 'PENDING_REVIEW' : 'OCR_PROCESSED',
-          fileUrl: uploadResult.downloadUrl,
-          storagePath: uploadResult.storagePath,
-          fileName: uploadResult.fileName,
-          fileSize: uploadResult.fileSize,
-          fileType: uploadResult.fileType,
-          rawOcrText: extracted.rawText || ''
-        });
-      }
+      // Always auto-populate whatever fields OCR extracted so the user doesn't have to retype
+      setFormData({
+        title: extracted.title || '',
+        issuer: extracted.issuer || '',
+        recipient: extracted.recipient || '',
+        issueDate: extracted.issueDate || '',
+        category: extracted.category || 'course',
+        description: `Uploaded and scanned via SkillVault Cloud OCR on ${new Date().toLocaleDateString()}`,
+        credentialId: extracted.credentialId || '',
+        verificationUrl: extracted.verificationUrl || '',
+        isPublished: extracted.isLikelyCertificate !== false,
+        verificationStatus: extracted.verificationUrl ? 'PENDING_REVIEW' : 'OCR_PROCESSED',
+        fileUrl: uploadResult.downloadUrl,
+        storagePath: uploadResult.storagePath,
+        fileName: uploadResult.fileName,
+        fileSize: uploadResult.fileSize,
+        fileType: uploadResult.fileType,
+        rawOcrText: extracted.rawText || ''
+      });
 
       setStage('review');
     } catch (err) {
@@ -555,35 +533,30 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                 <div style={{
                   padding: '14px 16px',
                   borderRadius: 'var(--radius-md)',
-                  background: 'rgba(244, 63, 94, 0.14)',
-                  border: '1px solid rgba(244, 63, 94, 0.5)',
+                  background: 'rgba(245, 158, 11, 0.12)',
+                  border: '1px solid rgba(245, 158, 11, 0.45)',
                   display: 'flex',
                   alignItems: 'flex-start',
                   gap: '12px',
                   marginBottom: '20px'
                 }}>
-                  <AlertTriangle size={24} style={{ color: '#fb7185', flexShrink: 0, marginTop: '2px' }} />
+                  <AlertTriangle size={24} style={{ color: '#fbbf24', flexShrink: 0, marginTop: '2px' }} />
                   <div>
-                    <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#fb7185' }}>
+                    <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#fbbf24' }}>
                       {detectedDocumentType === 'EVENT_ANNOUNCEMENT_OR_BROCHURE' 
-                        ? 'Event Flyer / Announcement Notice Detected — Not a Student Certificate' 
-                        : 'Invalid Document: Not a Verifiable Credential'}
+                        ? 'Notice: Event Announcement / Flyer Pattern Detected' 
+                        : 'Review Credential Details'}
                     </div>
                     <div style={{ fontSize: '0.8rem', color: '#f8fafc', marginTop: '4px', lineHeight: 1.5 }}>
                       {detectedDocumentType === 'EVENT_ANNOUNCEMENT_OR_BROCHURE' ? (
                         <>
-                          This document is an <strong>event brochure or circular</strong> with registration deadlines and problem statements, not an individual certificate awarded to you.
-                          <br />
-                          SkillVault only stores verified credentials with explicit completion or award conferment (e.g. <em>"This is to certify that [Name] has successfully completed..."</em>).
+                          This document has characteristics of an event brochure or announcement. Please double check that the Certificate Title, Issuing Authority, and Recipient Name below are accurate before saving.
                         </>
                       ) : (
                         <>
-                          This document contains no certificate conferment text, award statement, or verifiable completion proof.
+                          Some certificate fields could not be recognized automatically with high confidence. Please verify or correct the title and issuer details below before saving.
                         </>
                       )}
-                    </div>
-                    <div style={{ fontSize: '0.75rem', color: '#fda4af', marginTop: '6px', fontWeight: 600 }}>
-                      ⛔ <strong>Upload Blocked:</strong> To prevent fraudulent records, non-certificate flyers and announcements cannot be saved.
                     </div>
                   </div>
                 </div>
@@ -830,27 +803,17 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                 <button 
                   type="submit" 
                   className="btn btn-primary"
-                  disabled={stage === 'saving' || ownershipValidation.hasConflict || !isLikelyCertificate}
-                  style={{
-                    opacity: (ownershipValidation.hasConflict || !isLikelyCertificate) ? 0.5 : 1,
-                    cursor: (ownershipValidation.hasConflict || !isLikelyCertificate) ? 'not-allowed' : 'pointer'
-                  }}
-                  title={!isLikelyCertificate ? 'Upload blocked: Document is an event flyer or non-certificate' : (ownershipValidation.hasConflict ? `Upload blocked: Certificate was issued to ${ownershipValidation.detectedName}` : undefined)}
+                  disabled={stage === 'saving'}
                 >
                   {stage === 'saving' ? (
                     <>
                       <Loader2 size={16} className="spin-animation" />
                       <span>Saving to Cloud...</span>
                     </>
-                  ) : !isLikelyCertificate ? (
-                    <>
-                      <AlertTriangle size={16} />
-                      <span>Upload Blocked (Not a Certificate)</span>
-                    </>
                   ) : ownershipValidation.hasConflict ? (
                     <>
                       <ShieldAlert size={16} />
-                      <span>Upload Blocked (Identity Mismatch)</span>
+                      <span>Save as Private Credential</span>
                     </>
                   ) : (
                     <>
