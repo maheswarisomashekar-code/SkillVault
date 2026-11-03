@@ -46,8 +46,8 @@ export const ResumeExportModal = ({
   <title>${candidateName}_CV_SkillVault</title>
   <style>
     @page {
-      size: letter portrait;
-      margin: 10mm 12mm;
+      size: A4 portrait;
+      margin: 8mm 10mm;
     }
     * {
       box-sizing: border-box;
@@ -60,8 +60,8 @@ export const ResumeExportModal = ({
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       margin: 0;
       padding: 0;
-      font-size: 10.5pt;
-      line-height: 1.45;
+      font-size: 10pt;
+      line-height: 1.4;
     }
     .print-bar {
       background: #0f172a;
@@ -94,14 +94,22 @@ export const ResumeExportModal = ({
       background: #ffffff !important;
       color: #0f172a !important;
     }
+    a {
+      color: #0284c7;
+      text-decoration: underline;
+    }
     @media print {
       .print-bar {
         display: none !important;
       }
-      .resume-canvas {
+      .resume-canvas, #printable-ats-resume {
         max-width: 100% !important;
+        width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: #ffffff !important;
       }
       body {
         margin: 0 !important;
@@ -119,12 +127,18 @@ export const ResumeExportModal = ({
     ${resumeHtml}
   </div>
   <script>
-    window.addEventListener('load', function() {
+    function triggerPrint() {
+      window.focus();
       setTimeout(function() {
-        window.focus();
         window.print();
       }, 300);
-    });
+    }
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      triggerPrint();
+    } else {
+      window.addEventListener('DOMContentLoaded', triggerPrint);
+      window.addEventListener('load', triggerPrint);
+    }
   </script>
 </body>
 </html>`;
@@ -192,8 +206,8 @@ export const ResumeExportModal = ({
   };
 
   const publishedCerts = certificates.filter(c => c.isPublished !== false);
-  const publicProjects = projects.filter(p => p.isPublic !== false);
-  const publicExperiences = experiences.filter(e => e.isPublic !== false);
+  const publicProjects = projects.filter(p => p.isPublic !== false && p.isPublished !== false);
+  const publicExperiences = experiences.filter(e => e.isPublic !== false && e.isPublished !== false);
 
   const portfolioUrl = `${window.location.origin}/?portfolio=${profile.id || profile.email || 'student'}`;
 
@@ -308,11 +322,25 @@ export const ResumeExportModal = ({
                 </div>
 
                 <div style={{ textAlign: 'right', fontSize: '9pt', color: '#334155', display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                  {profile.email && <div>✉️ {profile.email}</div>}
-                  {profile.githubUsername && <div>🐙 github.com/{profile.githubUsername}</div>}
-                  {profile.linkedinUrl && <div>💼 linkedin.com/in/{profile.linkedinUrl.replace(/.*linkedin\.com\/in\//, '')}</div>}
+                  {profile.email && <div>✉️ <a href={`mailto:${profile.email}`} style={{ color: '#334155', textDecoration: 'none' }}>{profile.email}</a></div>}
+                  {profile.githubUsername && (
+                    <div>
+                      🐙 <a href={`https://github.com/${profile.githubUsername}`} target="_blank" rel="noopener noreferrer" style={{ color: '#0284c7', textDecoration: 'none', fontWeight: 600 }}>
+                        github.com/{profile.githubUsername}
+                      </a>
+                    </div>
+                  )}
+                  {profile.linkedinUrl && (
+                    <div>
+                      💼 <a href={profile.linkedinUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#0284c7', textDecoration: 'none', fontWeight: 600 }}>
+                        linkedin.com/in/{profile.linkedinUrl.replace(/.*linkedin\.com\/in\//, '')}
+                      </a>
+                    </div>
+                  )}
                   <div style={{ color: '#0284c7', fontWeight: 600 }}>
-                    🛡️ Verified Cloud Portfolio: {portfolioUrl}
+                    🛡️ <a href={portfolioUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#0284c7', textDecoration: 'none' }}>
+                      Verified Cloud Portfolio ↗
+                    </a>
                   </div>
                 </div>
               </div>
@@ -363,32 +391,94 @@ export const ResumeExportModal = ({
                 <h2 style={{ fontSize: '12pt', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#0f172a', borderBottom: '1px solid #cbd5e1', paddingBottom: '3px', marginBottom: '10px' }}>
                   Engineering Projects & Cloud Deployments
                 </h2>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {publicProjects.map((proj) => (
-                    <div key={proj.id} style={{ breakInside: 'avoid' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                        <div style={{ fontSize: '11pt', fontWeight: 700, color: '#0f172a' }}>
-                          {proj.title} {proj.role ? <span style={{ fontWeight: 500, color: '#64748b', fontSize: '9.5pt' }}>({proj.role})</span> : ''}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  {publicProjects.map((proj) => {
+                    const repoLink = proj.repoUrl || proj.githubUrl || proj.gitUrl || '';
+                    const demoLink = proj.liveDemoUrl || proj.demoUrl || proj.previewUrl || '';
+
+                    const formatExternalLink = (url) => {
+                      if (!url) return '';
+                      const trimmed = url.trim();
+                      if (/^https?:\/\//i.test(trimmed)) return trimmed;
+                      return `https://${trimmed}`;
+                    };
+
+                    const formatRepoSlug = (url) => {
+                      if (!url) return '';
+                      return url.trim()
+                        .replace(/^https?:\/\/(www\.)?github\.com\//i, '')
+                        .replace(/\/$/, '');
+                    };
+
+                    return (
+                      <div key={proj.id} style={{ breakInside: 'avoid' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: '6px' }}>
+                          <div style={{ fontSize: '11pt', fontWeight: 700, color: '#0f172a' }}>
+                            {proj.title} {proj.role ? <span style={{ fontWeight: 500, color: '#64748b', fontSize: '9.5pt' }}>({proj.role})</span> : ''}
+                          </div>
+                          
+                          <div style={{ fontSize: '8.5pt', display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                            {repoLink && (
+                              <a 
+                                href={formatExternalLink(repoLink)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ 
+                                  color: '#0284c7', 
+                                  textDecoration: 'none', 
+                                  fontWeight: 600, 
+                                  display: 'inline-flex', 
+                                  alignItems: 'center', 
+                                  gap: '3px',
+                                  padding: '2px 7px',
+                                  background: '#f0f9ff',
+                                  border: '1px solid #bae6fd',
+                                  borderRadius: '4px'
+                                }}
+                              >
+                                <span>🔗 GitHub:</span>
+                                <span style={{ textDecoration: 'underline' }}>{formatRepoSlug(repoLink)}</span>
+                              </a>
+                            )}
+                            {demoLink && (
+                              <a 
+                                href={formatExternalLink(demoLink)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ 
+                                  color: '#059669', 
+                                  textDecoration: 'none', 
+                                  fontWeight: 600, 
+                                  display: 'inline-flex', 
+                                  alignItems: 'center', 
+                                  gap: '3px',
+                                  padding: '2px 7px',
+                                  background: '#ecfdf5',
+                                  border: '1px solid #a7f3d0',
+                                  borderRadius: '4px'
+                                }}
+                              >
+                                <span>🚀 Live Demo</span>
+                                <span style={{ fontSize: '9.5pt' }}>↗</span>
+                              </a>
+                            )}
+                          </div>
                         </div>
-                        <div style={{ fontSize: '8.5pt', color: '#0284c7' }}>
-                          {proj.demoUrl && <span>[Live Demo] </span>}
-                          {proj.githubUrl && <span>[GitHub]</span>}
-                        </div>
+
+                        {proj.description && (
+                          <p style={{ margin: '4px 0 4px', fontSize: '9.5pt', color: '#334155', lineHeight: 1.45 }}>
+                            {proj.description}
+                          </p>
+                        )}
+
+                        {proj.techStack && proj.techStack.length > 0 && (
+                          <div style={{ fontSize: '8.5pt', color: '#475569', marginTop: '3px' }}>
+                            <strong style={{ color: '#1e293b' }}>Technologies:</strong> {proj.techStack.join(', ')}
+                          </div>
+                        )}
                       </div>
-
-                      {proj.description && (
-                        <p style={{ margin: '3px 0 4px', fontSize: '9.5pt', color: '#334155', lineHeight: 1.45 }}>
-                          {proj.description}
-                        </p>
-                      )}
-
-                      {proj.techStack && proj.techStack.length > 0 && (
-                        <div style={{ fontSize: '8.5pt', color: '#475569' }}>
-                          <strong>Technologies:</strong> {proj.techStack.join(', ')}
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </section>
             )}
@@ -437,7 +527,10 @@ export const ResumeExportModal = ({
                         </div>
                         <div style={{ fontSize: '8.5pt', color: '#475569' }}>
                           {cert.issuer} {cert.credentialId ? `• License: ${cert.credentialId}` : ''} 
-                          {cert.sha256Hash ? ` • SHA-256 Verified` : ''}
+                          {cert.sha256Hash ? ` • SHA-256 Ledger Verified` : ''}
+                          {cert.verificationUrl && (
+                            <span> • <a href={cert.verificationUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#0284c7', textDecoration: 'underline' }}>Verify Link ↗</a></span>
+                          )}
                         </div>
                       </div>
                       <div style={{ textAlign: 'right', fontSize: '8.5pt', color: '#64748b', whiteSpace: 'nowrap' }}>
