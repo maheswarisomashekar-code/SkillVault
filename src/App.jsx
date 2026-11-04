@@ -5,6 +5,8 @@ import { TopBar } from './components/TopBar';
 import { UploadModal } from './components/UploadModal';
 import { CertificatePreviewModal } from './components/CertificatePreviewModal';
 import { EditCertificateModal } from './components/EditCertificateModal';
+import { CourseVivaQuizModal } from './components/CourseVivaQuizModal';
+import { SkillUniverse3D } from './components/SkillUniverse3D';
 
 import { AuthPage } from './pages/AuthPage';
 import { DashboardPage } from './pages/DashboardPage';
@@ -18,7 +20,7 @@ import { getUserCertificates, deleteCertificateRecord } from './services/certifi
 import { seedInitialSampleData } from './services/sampleData';
 
 function MainAppContent() {
-  const { currentUser, loading } = useAuth();
+  const { currentUser, userProfile, loading } = useAuth();
 
   // Navigation & Modal States
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -30,6 +32,7 @@ function MainAppContent() {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [previewCert, setPreviewCert] = useState(null);
   const [editCert, setEditCert] = useState(null);
+  const [vivaCert, setVivaCert] = useState(null);
 
   // Hash-based Public Portfolio detection
   const [publicPortfolioId, setPublicPortfolioId] = useState(null);
@@ -84,6 +87,12 @@ function MainAppContent() {
   const handleEditSuccess = (updatedCert) => {
     setCertificates((prev) =>
       prev.map((c) => (c.id === updatedCert.id ? updatedCert : c))
+    );
+  };
+
+  const handleVivaSuccess = (updatedCert) => {
+    setCertificates((prev) =>
+      prev.map((c) => (c.id === updatedCert.id ? { ...c, ...updatedCert } : c))
     );
   };
 
@@ -160,7 +169,43 @@ function MainAppContent() {
               onPreviewCertificate={setPreviewCert}
               onEditCertificate={setEditCert}
               onDeleteCertificate={handleDeleteCertificate}
+              onTakeViva={(cert) => setVivaCert(cert)}
             />
+          )}
+
+          {activeTab === 'universe' && (
+            <div>
+              <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
+                      🌌 3D Skill Universe & Dynamic Constellation
+                    </h2>
+                    <span style={{
+                      background: 'rgba(56, 189, 248, 0.15)',
+                      color: '#38bdf8',
+                      padding: '2px 8px',
+                      borderRadius: '4px',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      border: '1px solid rgba(56, 189, 248, 0.3)'
+                    }}>
+                      PROJECTOR MODE
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '4px 0 0' }}>
+                    Interactive physics-driven simulation linking verified credentials, cloud architecture, and technical nodes.
+                  </p>
+                </div>
+              </div>
+
+              <SkillUniverse3D 
+                certificates={certificates}
+                projects={[]}
+                userProfile={userProfile}
+                onLaunchViva={(cert) => setVivaCert(cert)}
+              />
+            </div>
           )}
 
           {activeTab === 'certificates' && (
@@ -170,6 +215,7 @@ function MainAppContent() {
               onPreviewCertificate={setPreviewCert}
               onEditCertificate={setEditCert}
               onDeleteCertificate={handleDeleteCertificate}
+              onTakeViva={(cert) => setVivaCert(cert)}
             />
           )}
 
@@ -229,6 +275,7 @@ function MainAppContent() {
         isOpen={Boolean(previewCert)}
         onClose={() => setPreviewCert(null)}
         onUpdate={handleEditSuccess}
+        onTakeViva={(cert) => setVivaCert(cert)}
       />
 
       {/* Edit Metadata Modal */}
@@ -237,6 +284,14 @@ function MainAppContent() {
         isOpen={Boolean(editCert)}
         onClose={() => setEditCert(null)}
         onSaveSuccess={handleEditSuccess}
+      />
+
+      {/* Course Mastery & Viva Quiz Modal */}
+      <CourseVivaQuizModal 
+        isOpen={Boolean(vivaCert)}
+        certificate={vivaCert}
+        onClose={() => setVivaCert(null)}
+        onVivaSuccess={handleVivaSuccess}
       />
     </div>
   );

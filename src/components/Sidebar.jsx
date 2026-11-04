@@ -8,6 +8,7 @@ import {
   ShieldCheck, 
   LogOut, 
   Layers, 
+  Orbit,
   X
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -17,6 +18,7 @@ export const Sidebar = ({ activeTab, setActiveTab, isOpen, setIsOpen }) => {
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'universe', label: '3D Skill Universe', icon: Orbit },
     { id: 'certificates', label: 'My Credentials', icon: Award },
     { id: 'upload', label: 'Smart Upload & OCR', icon: UploadCloud },
     { id: 'portfolio', label: 'Shareable Portfolio', icon: Globe },

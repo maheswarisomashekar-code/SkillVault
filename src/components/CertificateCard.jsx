@@ -8,12 +8,13 @@ import {
   ExternalLink, 
   Globe, 
   Lock,
-  FileText
+  FileText,
+  BookOpen
 } from 'lucide-react';
 import { CategoryBadge } from './CategoryBadge';
 import { VerificationBadge } from './VerificationBadge';
 
-export const CertificateCard = ({ certificate, onPreview, onEdit, onDelete }) => {
+export const CertificateCard = ({ certificate, onPreview, onEdit, onDelete, onTakeViva }) => {
   return (
     <div className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
       {/* Top Media / Thumbnail Preview */}
@@ -109,6 +110,22 @@ export const CertificateCard = ({ certificate, onPreview, onEdit, onDelete }) =>
         }}>
           SHA-256
         </span>
+        {certificate.vivaScore !== undefined && (
+          <span style={{
+            fontSize: '0.68rem',
+            padding: '2px 6px',
+            borderRadius: '4px',
+            background: 'rgba(16, 185, 129, 0.15)',
+            color: '#34d399',
+            border: '1px solid rgba(16, 185, 129, 0.3)',
+            fontWeight: 700,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '3px'
+          }}>
+            <span>🏆 Viva: {certificate.vivaScore}%</span>
+          </span>
+        )}
       </div>
 
       {/* Title & Metadata */}
@@ -167,6 +184,27 @@ export const CertificateCard = ({ certificate, onPreview, onEdit, onDelete }) =>
           >
             <Edit3 size={14} />
           </button>
+          {onTakeViva && (
+            <button 
+              className="btn btn-sm"
+              onClick={() => onTakeViva(certificate)}
+              style={{
+                background: certificate.vivaScore ? 'rgba(16, 185, 129, 0.12)' : 'linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(99, 102, 241, 0.2))',
+                color: certificate.vivaScore ? '#34d399' : '#38bdf8',
+                border: `1px solid ${certificate.vivaScore ? 'rgba(16, 185, 129, 0.35)' : 'rgba(56, 189, 248, 0.35)'}`,
+                padding: '4px 8px',
+                fontSize: '0.74rem',
+                fontWeight: 600,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+              title="Launch AI course viva quiz"
+            >
+              <BookOpen size={13} />
+              <span>{certificate.vivaScore ? 'Retake Viva' : 'Viva Exam'}</span>
+            </button>
+          )}
         </div>
 
         <button 

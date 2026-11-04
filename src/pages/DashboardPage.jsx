@@ -11,7 +11,8 @@ import {
   TrendingUp,
   Sparkles,
   Target,
-  FileText
+  FileText,
+  Orbit
 } from 'lucide-react';
 import { StatCard } from '../components/StatCard';
 import { SkillDistributionChart } from '../components/SkillDistributionChart';
@@ -27,7 +28,8 @@ export const DashboardPage = ({
   onOpenUpload, 
   onPreviewCertificate, 
   onEditCertificate, 
-  onDeleteCertificate 
+  onDeleteCertificate,
+  onTakeViva
 }) => {
   const { userProfile, currentUser } = useAuth();
 
@@ -124,6 +126,79 @@ export const DashboardPage = ({
             <UploadCloud size={15} />
             <span>Upload Certificate</span>
           </button>
+        </div>
+      </div>
+
+      {/* 3D Skill Universe Projector Banner */}
+      <div 
+        onClick={() => onNavigate('universe')}
+        className="dashboard-card-hover"
+        style={{
+          background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.15) 0%, rgba(168, 85, 247, 0.15) 50%, rgba(16, 185, 129, 0.1) 100%)',
+          border: '1px solid rgba(56, 189, 248, 0.35)',
+          borderRadius: 'var(--radius-lg)',
+          padding: '16px 20px',
+          marginBottom: '14px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          cursor: 'pointer',
+          flexWrap: 'wrap',
+          gap: '14px',
+          boxShadow: '0 8px 25px rgba(14, 165, 233, 0.1)'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            borderRadius: '10px',
+            background: 'linear-gradient(135deg, #0ea5e9, #a855f7)',
+            color: '#ffffff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 0 15px rgba(14, 165, 233, 0.4)'
+          }}>
+            <Orbit size={20} />
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '0.92rem', fontWeight: 800, color: '#f8fafc' }}>
+                Interactive 3D Skill Universe & Dynamic Constellation
+              </span>
+              <span style={{ 
+                fontSize: '0.68rem', 
+                background: 'rgba(56, 189, 248, 0.2)', 
+                color: '#38bdf8', 
+                padding: '2px 8px', 
+                borderRadius: '4px', 
+                fontWeight: 700 
+              }}>
+                PROJECTOR MODE
+              </span>
+            </div>
+            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+              Live interactive particle physics graph connecting credentials, cloud architecture, and technical nodes
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{
+            fontSize: '0.8rem',
+            padding: '6px 14px',
+            borderRadius: '8px',
+            background: '#0ea5e9',
+            color: '#ffffff',
+            fontWeight: 700,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px'
+          }}>
+            <Sparkles size={14} />
+            <span>Launch 3D Universe →</span>
+          </span>
         </div>
       </div>
 
@@ -337,6 +412,7 @@ export const DashboardPage = ({
                 onPreview={onPreviewCertificate}
                 onEdit={onEditCertificate}
                 onDelete={onDeleteCertificate}
+                onTakeViva={onTakeViva}
               />
             ))}
           </div>

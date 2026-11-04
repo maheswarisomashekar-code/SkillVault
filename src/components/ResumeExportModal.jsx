@@ -528,6 +528,9 @@ export const ResumeExportModal = ({
                         <div style={{ fontSize: '8.5pt', color: '#475569' }}>
                           {cert.issuer} {cert.credentialId ? `• License: ${cert.credentialId}` : ''} 
                           {cert.sha256Hash ? ` • SHA-256 Ledger Verified` : ''}
+                          {cert.vivaScore !== undefined && (
+                            <span style={{ color: '#059669', fontWeight: 600 }}> • 🏆 Viva: {cert.vivaScore}%</span>
+                          )}
                           {cert.verificationUrl && (
                             <span> • <a href={cert.verificationUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#0284c7', textDecoration: 'underline' }}>Verify Link ↗</a></span>
                           )}

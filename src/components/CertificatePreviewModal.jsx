@@ -11,14 +11,15 @@ import {
   CheckCircle, 
   Copy, 
   Clock,
-  Download
+  Download,
+  BookOpen
 } from 'lucide-react';
 import { CategoryBadge } from './CategoryBadge';
 import { VerificationBadge } from './VerificationBadge';
 import { updateCertificateRecord } from '../services/certificateService';
 import { downloadCertificateFile, openCertificateInNewTab } from '../utils/fileDownloader';
 
-export const CertificatePreviewModal = ({ certificate, isOpen, onClose, onUpdate }) => {
+export const CertificatePreviewModal = ({ certificate, isOpen, onClose, onUpdate, onTakeViva }) => {
   const [copied, setCopied] = useState(false);
   const [verifying, setVerifying] = useState(false);
 
@@ -57,9 +58,22 @@ export const CertificatePreviewModal = ({ certificate, isOpen, onClose, onUpdate
           justifyContent: 'space-between'
         }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
               <CategoryBadge category={certificate.category} />
               <VerificationBadge status={certificate.verificationStatus} />
+              {certificate.vivaScore !== undefined && (
+                <span style={{
+                  fontSize: '0.72rem',
+                  padding: '2px 8px',
+                  borderRadius: '4px',
+                  background: 'rgba(16, 185, 129, 0.15)',
+                  color: '#34d399',
+                  border: '1px solid rgba(16, 185, 129, 0.3)',
+                  fontWeight: 700
+                }}>
+                  🏆 Viva Score: {certificate.vivaScore}% (Passed)
+                </span>
+              )}
             </div>
             <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>
               {certificate.title}
@@ -115,6 +129,26 @@ export const CertificatePreviewModal = ({ certificate, isOpen, onClose, onUpdate
                       <ExternalLink size={15} />
                       <span>Open in Browser Tab</span>
                     </button>
+
+                    {onTakeViva && (
+                      <button 
+                        type="button"
+                        onClick={() => {
+                          onClose();
+                          onTakeViva(certificate);
+                        }}
+                        className="btn btn-secondary btn-sm"
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(99, 102, 241, 0.2))',
+                          borderColor: 'rgba(56, 189, 248, 0.4)',
+                          color: '#38bdf8',
+                          fontWeight: 600
+                        }}
+                      >
+                        <BookOpen size={15} />
+                        <span>{certificate.vivaScore !== undefined ? 'Retake Viva Exam' : '🎓 Take Course Viva Exam'}</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               ) : (

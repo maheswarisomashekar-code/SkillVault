@@ -14,7 +14,8 @@ export const CertificatesPage = ({
   onOpenUpload, 
   onPreviewCertificate, 
   onEditCertificate, 
-  onDeleteCertificate 
+  onDeleteCertificate,
+  onTakeViva
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -171,6 +172,7 @@ export const CertificatesPage = ({
               onPreview={onPreviewCertificate}
               onEdit={onEditCertificate}
               onDelete={onDeleteCertificate}
+              onTakeViva={onTakeViva}
             />
           ))}
         </div>
