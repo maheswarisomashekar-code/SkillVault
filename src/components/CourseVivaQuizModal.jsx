@@ -24,15 +24,25 @@ export const CourseVivaQuizModal = ({ isOpen, onClose, certificate, onVivaSucces
   const [quizFinished, setQuizFinished] = useState(false);
   const [saving, setSaving] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [questionCount, setQuestionCount] = useState(5);
+
+  const loadFreshQuestions = (count = questionCount) => {
+    if (!certificate) return;
+    const qList = getQuestionsForCertificate(certificate, count);
+    setQuestions(qList);
+    setCurrentIndex(0);
+    setSelectedAnswers({});
+    setShowExplanation(false);
+    setQuizFinished(false);
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+    }
+  };
 
   useEffect(() => {
     if (certificate && isOpen) {
-      const qList = getQuestionsForCertificate(certificate);
-      setQuestions(qList);
-      setCurrentIndex(0);
-      setSelectedAnswers({});
-      setShowExplanation(false);
-      setQuizFinished(false);
+      loadFreshQuestions(5);
     }
     return () => {
       if (window.speechSynthesis) {
@@ -84,10 +94,7 @@ export const CourseVivaQuizModal = ({ isOpen, onClose, certificate, onVivaSucces
   };
 
   const handleRetry = () => {
-    setCurrentIndex(0);
-    setSelectedAnswers({});
-    setShowExplanation(false);
-    setQuizFinished(false);
+    loadFreshQuestions(questionCount);
   };
 
   const handleSaveVivaResult = async () => {
@@ -185,15 +192,28 @@ export const CourseVivaQuizModal = ({ isOpen, onClose, certificate, onVivaSucces
               <BookOpen size={20} />
             </div>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <span style={{ fontSize: '0.72rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#38bdf8', fontWeight: 700 }}>
                   Course Mastery & Viva Exam
                 </span>
+                {currentQ?.topicLabel && (
+                  <span style={{ 
+                    background: 'rgba(56, 189, 248, 0.15)', 
+                    border: '1px solid rgba(56, 189, 248, 0.3)', 
+                    padding: '2px 8px', 
+                    borderRadius: '4px', 
+                    fontSize: '0.7rem', 
+                    color: '#38bdf8', 
+                    fontWeight: 600 
+                  }}>
+                    🏷️ {currentQ.topicLabel}
+                  </span>
+                )}
                 <span style={{ background: 'rgba(255, 255, 255, 0.1)', padding: '1px 7px', borderRadius: '4px', fontSize: '0.7rem', color: '#cbd5e1' }}>
                   {certificate.issuer || 'Academic'}
                 </span>
               </div>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#ffffff', margin: '2px 0 0' }}>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#ffffff', margin: '3px 0 0' }}>
                 {certificate.title}
               </h3>
             </div>
@@ -243,27 +263,51 @@ export const CourseVivaQuizModal = ({ isOpen, onClose, certificate, onVivaSucces
                   </div>
                 </div>
 
-                <button 
-                  onClick={handleSpeakQuestion}
-                  type="button"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    fontSize: '0.78rem',
-                    color: isSpeaking ? '#38bdf8' : '#94a3b8',
-                    background: isSpeaking ? 'rgba(56, 189, 248, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-                    border: `1px solid ${isSpeaking ? '#38bdf8' : 'rgba(255, 255, 255, 0.1)'}`,
-                    borderRadius: '6px',
-                    padding: '4px 10px',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease'
-                  }}
-                  title="Read question aloud using AI voice"
-                >
-                  <Volume2 size={14} />
-                  <span>{isSpeaking ? 'Speaking...' : '🎙️ Read Aloud'}</span>
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <button 
+                    onClick={() => loadFreshQuestions()}
+                    type="button"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                      fontSize: '0.78rem',
+                      color: '#cbd5e1',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      borderRadius: '6px',
+                      padding: '4px 10px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    title="Generate a completely new randomized set of viva questions from the pool"
+                  >
+                    <RotateCcw size={12} />
+                    <span>New Questions</span>
+                  </button>
+
+                  <button 
+                    onClick={handleSpeakQuestion}
+                    type="button"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      fontSize: '0.78rem',
+                      color: isSpeaking ? '#38bdf8' : '#94a3b8',
+                      background: isSpeaking ? 'rgba(56, 189, 248, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                      border: `1px solid ${isSpeaking ? '#38bdf8' : 'rgba(255, 255, 255, 0.1)'}`,
+                      borderRadius: '6px',
+                      padding: '4px 10px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    title="Read question aloud using AI voice"
+                  >
+                    <Volume2 size={14} />
+                    <span>{isSpeaking ? 'Speaking...' : '🎙️ Read Aloud'}</span>
+                  </button>
+                </div>
               </div>
 
               {/* Question Box */}
