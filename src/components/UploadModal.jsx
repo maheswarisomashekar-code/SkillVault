@@ -17,7 +17,7 @@ import { runTesseractOCR } from '../services/ocrService';
 import { useAuth } from '../context/AuthContext';
 import confetti from 'canvas-confetti';
 
-export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
+export const UploadModal = ({ isOpen, onClose, onUploadSuccess, existingCertificates = [] }) => {
   const { currentUser, userProfile } = useAuth();
   const fileInputRef = useRef(null);
 
@@ -89,6 +89,27 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
 
     return { hasConflict: false };
   }, [accountHolderName, formData.recipient, detectedRecipient, formData.rawOcrText]);
+
+  // Duplicate detection against existing vault records
+  const duplicateValidation = useMemo(() => {
+    if (!formData.title || !formData.issuer) return { isDuplicate: false, existingCert: null };
+    const title = formData.title.trim().toLowerCase();
+    const issuer = formData.issuer.trim().toLowerCase();
+    const credId = (formData.credentialId || '').trim().toLowerCase();
+
+    const match = (existingCertificates || []).find(c => {
+      // 1. Same credential ID
+      if (credId && c.credentialId && c.credentialId.trim().toLowerCase() === credId) return true;
+      // 2. Same title and issuer
+      if (title && issuer && c.title?.trim().toLowerCase() === title && c.issuer?.trim().toLowerCase() === issuer) return true;
+      return false;
+    });
+
+    return {
+      isDuplicate: Boolean(match),
+      existingCert: match
+    };
+  }, [formData.title, formData.issuer, formData.credentialId, existingCertificates]);
 
   if (!isOpen) return null;
 
@@ -207,6 +228,14 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
     e.preventDefault();
     if (!formData.title || !formData.issuer) {
       setErrorMessage('Please provide certificate title and issuing organization.');
+      return;
+    }
+
+    // Duplicate Credential Guard
+    if (duplicateValidation.isDuplicate) {
+      setErrorMessage(
+        `Duplicate Blocked: This credential ("${duplicateValidation.existingCert?.title}") is already saved in your vault. Duplicate uploads are rejected to preserve clean records.`
+      );
       return;
     }
 
@@ -589,6 +618,33 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                 </div>
               )}
 
+              {/* Duplicate Credential Alert Banner */}
+              {duplicateValidation.isDuplicate && (
+                <div style={{
+                  padding: '14px 16px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'rgba(245, 158, 11, 0.14)',
+                  border: '1px solid rgba(245, 158, 11, 0.5)',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '12px',
+                  marginBottom: '20px'
+                }}>
+                  <AlertTriangle size={22} style={{ color: '#fbbf24', flexShrink: 0, marginTop: '2px' }} />
+                  <div>
+                    <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#fbbf24' }}>
+                      Duplicate Credential Detected in Vault
+                    </div>
+                    <div style={{ fontSize: '0.8rem', color: '#f8fafc', marginTop: '4px', lineHeight: 1.5 }}>
+                      A certificate with this title (<strong style={{ color: '#38bdf8' }}>"{duplicateValidation.existingCert?.title}"</strong>) from <strong style={{ color: '#38bdf8' }}>"{duplicateValidation.existingCert?.issuer}"</strong> is already saved in your vault.
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: '#fcd34d', marginTop: '4px' }}>
+                      ⚠️ <strong>Deduplication Lock:</strong> Uploading the same certificate multiple times is blocked to keep your records clutter-free.
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Form Fields */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div className="form-group" style={{ gridColumn: 'span 2', marginBottom: '14px' }}>
@@ -803,12 +859,18 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                 <button 
                   type="submit" 
                   className="btn btn-primary"
-                  disabled={stage === 'saving'}
+                  disabled={stage === 'saving' || duplicateValidation.isDuplicate}
+                  style={duplicateValidation.isDuplicate ? { opacity: 0.6, cursor: 'not-allowed', background: '#475569' } : {}}
                 >
                   {stage === 'saving' ? (
                     <>
                       <Loader2 size={16} className="spin-animation" />
                       <span>Saving to Cloud...</span>
+                    </>
+                  ) : duplicateValidation.isDuplicate ? (
+                    <>
+                      <AlertTriangle size={16} />
+                      <span>Already in Vault (Duplicate)</span>
                     </>
                   ) : ownershipValidation.hasConflict ? (
                     <>

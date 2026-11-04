@@ -107,12 +107,44 @@ export const uploadCertificateFile = async (file, userId, onProgress) => {
 /**
  * Save certificate metadata in Cloud Firestore (or local simulation)
  */
+/**
+ * Checks if a matching certificate already exists in the user's vault to prevent duplicates
+ */
+export const findDuplicateCertificate = async (userId, data) => {
+  try {
+    const all = await getUserCertificates(userId);
+    const title = (data.title || '').trim().toLowerCase();
+    const issuer = (data.issuer || '').trim().toLowerCase();
+    const credId = (data.credentialId || '').trim().toLowerCase();
+    const targetHash = data.sha256Hash;
+
+    return all.find(c => {
+      // 1. Same SHA-256 digest
+      if (targetHash && c.sha256Hash && c.sha256Hash === targetHash) return true;
+      // 2. Same credential ID
+      if (credId && c.credentialId && c.credentialId.trim().toLowerCase() === credId) return true;
+      // 3. Same title and issuer
+      if (title && issuer && c.title?.trim().toLowerCase() === title && c.issuer?.trim().toLowerCase() === issuer) return true;
+      return false;
+    });
+  } catch (e) {
+    console.warn('Error checking for duplicate certificate:', e);
+    return null;
+  }
+};
+
 export const createCertificateRecord = async (userId, data) => {
-  const certificateId = data.id || `cert_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-  
   // Compute SHA-256 digest & ledger block
   const computedHash = data.sha256Hash || (await computeCertificateHash(data));
   const ledgerInfo = generateLedgerBlock(computedHash);
+
+  // Check for duplicate credential before creating a new record
+  const duplicate = await findDuplicateCertificate(userId, { ...data, sha256Hash: computedHash });
+  if (duplicate) {
+    throw new Error(`Duplicate Credential: A certificate titled "${duplicate.title}" from "${duplicate.issuer}" is already saved in your vault.`);
+  }
+
+  const certificateId = data.id || `cert_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
   const record = {
     id: certificateId,

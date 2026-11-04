@@ -267,6 +267,7 @@ function MainAppContent() {
         isOpen={isUploadOpen}
         onClose={() => setIsUploadOpen(false)}
         onUploadSuccess={handleUploadSuccess}
+        existingCertificates={certificates}
       />
 
       {/* Preview Modal */}
