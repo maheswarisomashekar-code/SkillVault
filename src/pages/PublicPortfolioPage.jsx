@@ -261,31 +261,6 @@ export const PublicPortfolioPage = ({ portfolioId, onBackToApp }) => {
                 <FileText size={14} />
                 <span>Download ATS CV (PDF)</span>
               </button>
-
-              {profile?.github && (
-                <a 
-                  href={profile.github} 
-                  target="_blank" 
-                  rel="noreferrer"
-                  className="btn btn-secondary btn-sm"
-                  title="GitHub Profile"
-                >
-                  <GithubIcon size={15} />
-                  <span>GitHub</span>
-                </a>
-              )}
-              {profile?.linkedin && (
-                <a 
-                  href={profile.linkedin} 
-                  target="_blank" 
-                  rel="noreferrer"
-                  className="btn btn-secondary btn-sm"
-                  title="LinkedIn Profile"
-                >
-                  <LinkedinIcon size={15} />
-                  <span>LinkedIn</span>
-                </a>
-              )}
             </div>
           </div>
 
