@@ -532,6 +532,204 @@ const TOPIC_QUESTION_BANKS = {
       correctIndex: 1,
       explanation: 'Parameterized queries treat user input strictly as literal data rather than executable SQL code, preventing attackers from altering database query logic.'
     }
+  ],
+
+  environmental_policy_sustainability: [
+    {
+      id: 'env_1',
+      question: 'What is the primary regulatory objective of conducting a baseline Environmental Impact Assessment (EIA) prior to major infrastructure or industrial project approval?',
+      options: [
+        'To systematically predict potential ecological harm, evaluate alternatives, and mandate enforceable mitigation measures before environmental clearance is granted',
+        'To fast-track project construction by bypassing public hearings and municipal oversight',
+        'To eliminate the requirement for air and water pollution monitoring post-commissioning',
+        'To automatically convert protected forest reserves into commercial manufacturing zones'
+      ],
+      correctIndex: 0,
+      explanation: 'An Environmental Impact Assessment (EIA) is a statutory planning and decision-making instrument that identifies, predicts, and evaluates the bio-physical and socio-economic effects of proposed development activities prior to major decisions being taken.'
+    },
+    {
+      id: 'env_2',
+      question: 'In environmental jurisprudence and public policy, what does the fundamental "Polluter Pays Principle" require?',
+      options: [
+        'Polluting industries are exempt from financial liabilities if their annual revenue exceeds $10 million',
+        'The financial cost of pollution prevention, environmental control, ecological remediation, and compensation to affected communities must be borne fully by the polluter',
+        'Local municipal citizens must pay higher taxes to clean up industrial hazardous chemical spills',
+        'Governments must reimburse industrial polluters for purchasing replacement machinery'
+      ],
+      correctIndex: 1,
+      explanation: 'The Polluter Pays Principle asserts that the enterprise creating environmental degradation and social externalities must internalize all cleanup, restoration, and compensation costs rather than passing them onto the public or future generations.'
+    },
+    {
+      id: 'env_3',
+      question: 'How does the "Precautionary Principle" guide environmental governance when definitive scientific certainty regarding ecological risks is lacking?',
+      options: [
+        'Lack of full scientific certainty shall not be used as a reason for postponing cost-effective measures to prevent serious or irreversible environmental degradation',
+        'Industrial projects must proceed without regulation until definitive species extinction is empirically proven decades later',
+        'All environmental safety regulations are suspended until international consensus is 100% unanimous',
+        'Scientific uncertainty invalidates public consultation rights'
+      ],
+      correctIndex: 0,
+      explanation: 'Principle 15 of the Rio Declaration (and landmark Indian environmental rulings) establishes that where threats of serious or irreversible damage exist, regulatory authorities must act proactively rather than waiting for conclusive post-disaster proof.'
+    },
+    {
+      id: 'env_4',
+      question: 'In climate change policy, what is the crucial operational distinction between "Climate Mitigation" and "Climate Adaptation"?',
+      options: [
+        'Mitigation reduces or prevents greenhouse gas emissions at their source (e.g., renewable energy, reforestation), whereas Adaptation adjusts socio-ecological systems and infrastructure to cope with unavoidable climate impacts (e.g., flood barriers, drought-resistant agriculture)',
+        'Mitigation deals exclusively with outer-space research, while Adaptation focuses on domestic tax rates',
+        'Mitigation is voluntary for all countries, while Adaptation is only applied to automotive companies',
+        'There is no distinction; both terms refer strictly to carbon offset purchasing'
+      ],
+      correctIndex: 0,
+      explanation: 'Mitigation targets the causal drivers of climate change by curtailing anthropogenic greenhouse gas emissions and expanding carbon sinks. Adaptation builds resilience against unavoidable climate disruptions that are already locked into planetary systems.'
+    },
+    {
+      id: 'env_5',
+      question: 'Why is the 1987 Montreal Protocol widely cited by environmental scholars as the most effective multilateral environmental agreement ever enacted?',
+      options: [
+        'It universally phased out over 98% of ozone-depleting substances (such as CFCs and halons) through legally binding, equitable timetables and multilateral funding, allowing the stratospheric ozone layer to recover',
+        'It banned all internal combustion automobiles globally within 12 months',
+        'It dissolved all national environmental ministries into a single global authority',
+        'It eliminated all plastics from commercial manufacturing by 1995'
+      ],
+      correctIndex: 0,
+      explanation: 'The Montreal Protocol combined universal ratification, rigorous scientific advisory panels, binding phase-out schedules, and financial assistance for developing nations, successfully reversing stratospheric ozone depletion.'
+    },
+    {
+      id: 'env_6',
+      question: 'Under the 2015 Paris Agreement on climate change, how does the "Nationally Determined Contributions" (NDCs) governance framework function?',
+      options: [
+        'Countries pledge domestic climate action targets and are subject to mandatory 5-year ratchet cycles to progressively increase decarbonization ambition toward holding temperature rise well below 2°C (targeting 1.5°C)',
+        'The United Nations imposes uniform carbon taxes on all citizens worldwide without national parliamentary consent',
+        'Every nation is given an identical numerical emissions cap regardless of population or economy',
+        'Developing countries are prohibited from utilizing any domestic electrical grids'
+      ],
+      correctIndex: 0,
+      explanation: 'The Paris Agreement operates on a hybrid architecture: bottom-up national pledges (NDCs) coupled with top-down transparency rules and recurring 5-year ambition ratchets to limit global warming.'
+    },
+    {
+      id: 'env_7',
+      question: 'How does the "Circular Economy" model transcend the traditional linear "Take-Make-Dispose" industrial paradigm?',
+      options: [
+        'By burning all post-consumer municipal waste in open incinerators to generate slag',
+        'By designing products for longevity, disassembly, reuse, and remanufacturing, keeping materials circulating at peak value and regenerating natural systems',
+        'By accelerating planned obsolescence so consumers replace electronic hardware every 6 months',
+        'By shifting all manufacturing factories exclusively to offshore international waters'
+      ],
+      correctIndex: 1,
+      explanation: 'A circular economy decouples economic prosperity from finite resource consumption through biological and technical nutrient cycles, eliminating waste through intentional design and material regeneration.'
+    },
+    {
+      id: 'env_8',
+      question: 'What is the primary economic rationale for implementing Market-Based Instruments (such as Cap-and-Trade carbon markets or carbon taxes) over pure Command-and-Control mandates?',
+      options: [
+        'They put a clear price on carbon externalities, incentivizing private sector innovation to achieve overall emissions reductions at the lowest collective economic cost',
+        'They allow corporations to emit infinite toxic chemicals with zero financial penalties',
+        'They eliminate the need for regulatory emissions monitoring or verification standards',
+        'They make renewable energy technologies more expensive than fossil fuels'
+      ],
+      correctIndex: 0,
+      explanation: 'Market-based instruments harness economic price signals to internalize environmental degradation costs, allowing firms with low marginal abatement costs to reduce emissions first and trade credits efficiently.'
+    },
+    {
+      id: 'env_9',
+      question: 'What is the core analytical purpose of performing a "Life Cycle Assessment" (LCA) on consumer or industrial products?',
+      options: [
+        'To quantify total environmental footprints (energy, carbon, water, eutrophication) across all stages from raw material extraction to end-of-life disposal ("cradle-to-grave")',
+        'To calculate only the retail store price and shipping discount for online shoppers',
+        'To evaluate corporate executives\' annual stock option bonuses',
+        'To speed up the physical decomposition of toxic plastics in riverbeds'
+      ],
+      correctIndex: 0,
+      explanation: 'LCA (governed by ISO 14040/44) provides a comprehensive, multi-criteria assessment of environmental impacts across the full product lifespan, preventing unintended burden-shifting across lifecycle stages.'
+    },
+    {
+      id: 'env_10',
+      question: 'In global climate politics, what does the principle of "Common But Differentiated Responsibilities and Respective Capabilities" (CBDR-RC) signify?',
+      options: [
+        'While climate change is a common planetary crisis, developed nations must bear greater leadership and financial responsibility due to their historical cumulative emissions and economic capacity',
+        'Developing countries must pay annual emissions penalties directly to industrialized Western economies',
+        'All nations carry the exact same numerical emissions obligations regardless of poverty levels or historical industrialization',
+        'Only small island nations are required to enact renewable energy laws'
+      ],
+      correctIndex: 0,
+      explanation: 'CBDR-RC (enshrined in the UNFCCC) balances universal shared responsibility with historical equity, recognizing that industrialized nations produced most cumulative emissions and must provide climate finance and technology transfer.'
+    },
+    {
+      id: 'env_11',
+      question: 'What are "Ecosystem Services" in environmental resource economics, and why are they critical for sustainable policy development?',
+      options: [
+        'Direct and indirect benefits provided by natural ecosystems (e.g., mangrove flood buffering, forest carbon sequestration, wetland water purification, insect pollination) that sustain human life and economic stability',
+        'Commercial consulting services offered by private environmental auditing firms',
+        'Government subsidy programs for diesel generators',
+        'Software applications for calculating cryptocurrency mining yields'
+      ],
+      correctIndex: 0,
+      explanation: 'Ecosystem services categorize nature\'s indispensable life-support functions (provisioning, regulating, cultural, supporting). Integrating natural capital valuation prevents short-sighted resource depletion in policy planning.'
+    },
+    {
+      id: 'env_12',
+      question: 'In public environmental policy, what is the central mission of the "Environmental Justice" movement?',
+      options: [
+        'Ensuring that environmental hazards, toxic waste facilities, and pollution burdens are not disproportionately sited in marginalized, low-income, or minority communities',
+        'Guaranteeing that corporate polluters have immunity from municipal lawsuits',
+        'Restricting clean drinking water access strictly to urban high-rise commercial buildings',
+        'Preventing indigenous communities from managing their traditional forest lands'
+      ],
+      correctIndex: 0,
+      explanation: 'Environmental Justice addresses environmental racism and inequity, demanding fair treatment and meaningful involvement of all people regardless of race, color, or income in environmental regulations and land-use decisions.'
+    }
+  ],
+
+  general_academic_ethics: [
+    {
+      id: 'acad_1',
+      question: 'In academic research and rigorous professional practice, why is empirical falsifiability (as articulated by Karl Popper) a cornerstone of sound investigation?',
+      options: [
+        'A scientific hypothesis must make testable predictions that can potentially be refuted by contrary empirical observation, distinguishing it from dogma',
+        'Research papers should never cite experimental data that contradicts the author\'s preconceived thesis',
+        'Hypotheses must only be validated through online public opinion polling',
+        'All scientific models must be accepted without experimental verification'
+      ],
+      correctIndex: 0,
+      explanation: 'Falsifiability guarantees that scientific claims are grounded in verifiable, reproducible evidence that can be independently scrutinized and tested by the broader academic community.'
+    },
+    {
+      id: 'acad_2',
+      question: 'What constitutes the highest standard of academic integrity and attribution when synthesizing published literature into a scholarly analysis?',
+      options: [
+        'Carefully paraphrasing or quoting original sources with clear, transparent bibliographic citations and acknowledging conceptual debts without plagiarism',
+        'Submitting AI-generated text without reading or validating the underlying research papers',
+        'Translating a foreign publication into English and claiming sole original authorship',
+        'Removing citations to make the bibliography appear shorter and cleaner'
+      ],
+      correctIndex: 0,
+      explanation: 'Rigorous scholarly attribution ensures academic transparency, prevents plagiarism, gives rightful credit to prior intellectual contributors, and establishes a clear evidentiary trail.'
+    },
+    {
+      id: 'acad_3',
+      question: 'Why is the institutional Peer Review process critical before academic or policy research is recognized as verified knowledge?',
+      options: [
+        'It subjects methodologies, data integrity, statistical validity, and analytical conclusions to rigorous independent evaluation by qualified subject-matter experts',
+        'It guarantees that research manuscripts are published within 30 minutes of submission',
+        'It automatically transfers intellectual property patents to commercial sponsors',
+        'It prevents students from accessing international research journals'
+      ],
+      correctIndex: 0,
+      explanation: 'Peer review acts as an essential quality control filter, catching methodological flaws, biased interpretations, and statistical errors before research enters academic and policy records.'
+    },
+    {
+      id: 'acad_4',
+      question: 'In socio-technical and institutional studies, what ethical mandate does "Informed Consent" impose upon researchers?',
+      options: [
+        'Participants must be fully briefed on the purpose, procedures, potential risks, and data usage of the study, and participate voluntarily with the right to withdraw at any time',
+        'Researchers may covertly record participants\' biometric and financial data without disclosure',
+        'Participants must sign non-disclosure agreements prohibiting them from speaking to journalists',
+        'Informed consent is only required when research projects receive venture capital funding'
+      ],
+      correctIndex: 0,
+      explanation: 'Informed consent is the foundational ethical requirement protecting individual autonomy, human dignity, and voluntary agency in academic, scientific, and medical research.'
+    }
   ]
 };
 
@@ -551,7 +749,7 @@ function shuffleArray(arr) {
  * Detects the specific topic tags from certificate metadata
  */
 export const detectCertificateTopics = (certificate) => {
-  if (!certificate) return { primaryTopic: 'cloud_computing', topicLabel: 'Cloud Computing & Security', poolKeys: ['cloud_computing'] };
+  if (!certificate) return { primaryTopic: 'general_academic_ethics', topicLabel: 'Academic Inquiry & Professional Ethics', poolKeys: ['general_academic_ethics'] };
 
   const title = (certificate.title || '').toLowerCase();
   const issuer = (certificate.issuer || '').toLowerCase();
@@ -559,7 +757,35 @@ export const detectCertificateTopics = (certificate) => {
   const rawText = (certificate.rawOcrText || '').toLowerCase();
   const combined = `${title} ${issuer} ${category} ${rawText}`;
 
-  // 1. Kannada / Regional Innovation Hackathons
+  // 1. Environmental Issues, Policies, Sustainability & Climate Action
+  if (
+    combined.includes('environment') || 
+    combined.includes('policy') || 
+    combined.includes('policies') || 
+    combined.includes('sustainability') || 
+    combined.includes('sustainable') || 
+    combined.includes('climate') || 
+    combined.includes('ecology') || 
+    combined.includes('ecological') || 
+    combined.includes('green') || 
+    combined.includes('jindal') || 
+    combined.includes('earth') || 
+    combined.includes('pollution') || 
+    combined.includes('conservation') || 
+    combined.includes('renewable') || 
+    combined.includes('esg') || 
+    combined.includes('biodiversity') || 
+    combined.includes('carbon') ||
+    combined.includes('public policy')
+  ) {
+    return {
+      primaryTopic: 'environmental_policy_sustainability',
+      topicLabel: 'Environmental Issues, Policies & Sustainable Practice',
+      poolKeys: ['environmental_policy_sustainability']
+    };
+  }
+
+  // 2. Kannada / Regional Innovation Hackathons
   if (combined.includes('kannada') || (combined.includes('hackathon') && (combined.includes('innovation') || combined.includes('nie') || combined.includes('hackerrank')))) {
     return {
       primaryTopic: 'kannada_innovation',
@@ -568,7 +794,7 @@ export const detectCertificateTopics = (certificate) => {
     };
   }
 
-  // 2. NPTEL / Swayam / Design & Technology
+  // 3. NPTEL / Swayam / Design & Technology
   if (combined.includes('design') || combined.includes('technology and innovation') || combined.includes('nptel') || combined.includes('swayam') || combined.includes('iit')) {
     return {
       primaryTopic: 'nptel_design_innovation',
@@ -577,7 +803,7 @@ export const detectCertificateTopics = (certificate) => {
     };
   }
 
-  // 3. General Hackathons / Rapid Prototyping
+  // 4. General Hackathons / Rapid Prototyping
   if (category === 'hackathon' || combined.includes('hackathon') || combined.includes('hack') || combined.includes('competition')) {
     return {
       primaryTopic: 'hackathon_engineering',
@@ -586,7 +812,7 @@ export const detectCertificateTopics = (certificate) => {
     };
   }
 
-  // 4. AI, Machine Learning, Computer Vision, OCR
+  // 5. AI, Machine Learning, Computer Vision, OCR
   if (combined.includes('ai') || combined.includes('artificial intelligence') || combined.includes('machine learning') || combined.includes('ocr') || combined.includes('deep learning') || combined.includes('neural')) {
     return {
       primaryTopic: 'ai_ml_ocr',
@@ -595,7 +821,7 @@ export const detectCertificateTopics = (certificate) => {
     };
   }
 
-  // 5. Python & Data Science
+  // 6. Python & Data Science
   if (combined.includes('python') || combined.includes('data science') || combined.includes('pandas') || combined.includes('analytics')) {
     return {
       primaryTopic: 'python_datascience',
@@ -604,7 +830,7 @@ export const detectCertificateTopics = (certificate) => {
     };
   }
 
-  // 6. Cybersecurity, Cryptography, Blockchain
+  // 7. Cybersecurity, Cryptography, Blockchain
   if (combined.includes('security') || combined.includes('blockchain') || combined.includes('crypto') || combined.includes('ledger') || combined.includes('cyber')) {
     return {
       primaryTopic: 'cybersecurity_blockchain',
@@ -613,7 +839,7 @@ export const detectCertificateTopics = (certificate) => {
     };
   }
 
-  // 7. Full-Stack Web Development, React, Node
+  // 8. Full-Stack Web Development, React, Node
   if (combined.includes('web') || combined.includes('react') || combined.includes('node') || combined.includes('javascript') || combined.includes('fullstack') || combined.includes('frontend')) {
     return {
       primaryTopic: 'fullstack_web',
@@ -622,11 +848,35 @@ export const detectCertificateTopics = (certificate) => {
     };
   }
 
-  // 8. Default to Cloud Architecture & DevOps
+  // 9. Cloud Architecture & DevOps (Genuinely matches cloud credentials only!)
+  if (
+    combined.includes('cloud') || 
+    combined.includes('aws') || 
+    combined.includes('azure') || 
+    combined.includes('gcp') || 
+    combined.includes('devops') || 
+    combined.includes('serverless') || 
+    combined.includes('kubernetes') || 
+    combined.includes('docker') || 
+    combined.includes('virtualization') || 
+    combined.includes('infrastructure') || 
+    combined.includes('microservices') || 
+    combined.includes('s3') || 
+    combined.includes('ec2') || 
+    combined.includes('iam')
+  ) {
+    return {
+      primaryTopic: 'cloud_computing',
+      topicLabel: 'Cloud Architecture & High Availability',
+      poolKeys: ['cloud_computing', 'cybersecurity_blockchain']
+    };
+  }
+
+  // 10. Default for General Academic Courses (Never blindly default to AWS!)
   return {
-    primaryTopic: 'cloud_computing',
-    topicLabel: 'Cloud Architecture & High Availability',
-    poolKeys: ['cloud_computing', 'cybersecurity_blockchain']
+    primaryTopic: 'general_academic_ethics',
+    topicLabel: certificate.title ? `${certificate.title} — Academic Proficiency` : 'Academic Inquiry & Professional Ethics',
+    poolKeys: ['general_academic_ethics']
   };
 };
 
