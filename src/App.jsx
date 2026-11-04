@@ -17,6 +17,7 @@ import { VerificationValidatorPage } from './pages/VerificationValidatorPage';
 import { ProfilePage } from './pages/ProfilePage';
 
 import { getUserCertificates, deleteCertificateRecord } from './services/certificateService';
+import { getStudentProjects } from './services/projectService';
 import { seedInitialSampleData } from './services/sampleData';
 
 function MainAppContent() {
@@ -26,6 +27,7 @@ function MainAppContent() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [certificates, setCertificates] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [loadingCerts, setLoadingCerts] = useState(false);
 
   // Modals
@@ -73,6 +75,7 @@ function MainAppContent() {
     try {
       const data = await getUserCertificates(currentUser.uid);
       setCertificates(data);
+      getStudentProjects(currentUser.uid).then(p => setProjects(p || [])).catch(() => {});
     } catch (e) {
       console.error('Failed to load certificates:', e);
     } finally {
@@ -201,7 +204,7 @@ function MainAppContent() {
 
               <SkillUniverse3D 
                 certificates={certificates}
-                projects={[]}
+                projects={projects}
                 userProfile={userProfile}
                 onLaunchViva={(cert) => setVivaCert(cert)}
               />
