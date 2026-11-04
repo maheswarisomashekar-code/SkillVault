@@ -681,6 +681,207 @@ const TOPIC_QUESTION_BANKS = {
     }
   ],
 
+  economics_finance_analysis: [
+    {
+      id: 'econ_1',
+      question: 'In economic analysis and microeconomic theory, what is the operational definition of "Opportunity Cost"?',
+      options: [
+        'The value of the next best alternative foregone when making a choice under resource scarcity',
+        'The direct monetary price paid on an invoice for physical equipment',
+        'The maximum loan interest rate charged by commercial central banks',
+        'The accounting depreciation of fixed physical assets over a five-year fiscal period'
+      ],
+      correctIndex: 0,
+      explanation: 'Opportunity cost reflects the fundamental economic problem of scarcity: choosing to allocate capital, time, or labor to one endeavor inevitably sacrifices the potential net benefit of the best alternative forgone.'
+    },
+    {
+      id: 'econ_2',
+      question: 'In macroeconomic policy, how do Central Banks use "Monetary Policy" to combat accelerating demand-pull inflation?',
+      options: [
+        'By increasing benchmark policy interest rates and tightening open-market operations to cool aggregate demand and credit growth',
+        'By printing unlimited fiat currency to subsidize consumer spending',
+        'By ordering commercial factories to freeze raw material production',
+        'By lowering bank reserve requirements to zero'
+      ],
+      correctIndex: 0,
+      explanation: 'Central banks raise interest rates (e.g. Fed Funds Rate or RBI Repo Rate) to increase borrowing costs for businesses and households, dampening speculative credit expansion and restraining inflationary pressures.'
+    },
+    {
+      id: 'econ_3',
+      question: 'In econometric regression analysis, what violation of Ordinary Least Squares (OLS) assumptions does "Heteroskedasticity" describe?',
+      options: [
+        'The variance of the error terms (residuals) is non-constant across different values of the independent predictor variables',
+        'The dependent variable is perfectly correlated with the constant intercept term',
+        'All data points in the sample follow a deterministic circular path',
+        'The sample size of the dataset is smaller than the number of explanatory coefficients'
+      ],
+      correctIndex: 0,
+      explanation: 'Heteroskedasticity occurs when residual error variances differ across observations, invalidating standard hypothesis t-tests and F-tests unless robust standard errors (White or Huber-White errors) are applied.'
+    },
+    {
+      id: 'econ_4',
+      question: 'In financial project appraisal and capital budgeting, why is "Net Present Value" (NPV) preferred over the simple "Payback Period" method?',
+      options: [
+        'NPV explicitly incorporates the Time Value of Money and discounts all future net cash flows over the entire economic lifespan of the investment',
+        'NPV ignores inflation and interest rates completely',
+        'NPV only measures profits generated during the initial 6 months of a venture',
+        'NPV guarantees that a business will never face market competition'
+      ],
+      correctIndex: 0,
+      explanation: 'Net Present Value accounts for the opportunity cost of capital by discounting future expected cash inflows back to today\'s value using a weighted average cost of capital (WACC), offering a comprehensive measure of wealth addition.'
+    },
+    {
+      id: 'econ_5',
+      question: 'In welfare economics, what is a "Deadweight Loss" and when does it occur in market systems?',
+      options: [
+        'A loss of total economic surplus (consumer surplus + producer surplus) resulting from market inefficiencies such as monopolies, price ceilings, or distortionary taxes',
+        'The physical destruction of surplus agricultural commodities due to poor warehouse storage',
+        'The legal bankruptcy fee paid to commercial courts during corporate liquidation',
+        'The total cost of shipping industrial cargo across international waters'
+      ],
+      correctIndex: 0,
+      explanation: 'Deadweight loss represents uncaptured economic gains from trade where society produces less (or more) than the socially optimal equilibrium quantity, reducing net societal welfare.'
+    },
+    {
+      id: 'econ_6',
+      question: 'What is the strategic significance of a "Nash Equilibrium" in non-cooperative Game Theory and industrial organization?',
+      options: [
+        'A stable state where no player has an incentive to unilaterally deviate from their chosen strategy, given the strategy choices of all other rival players',
+        'A collusion agreement where all rival firms form an illegal price cartel',
+        'A situation where one company monopolizes 100% of national market share',
+        'A mathematical proof that competitive markets always eliminate income inequality'
+      ],
+      correctIndex: 0,
+      explanation: 'In a Nash Equilibrium, each player\'s strategy is optimal given the strategies chosen by opponents; thus, no individual actor can improve their own payoff by changing actions unilaterally.'
+    },
+    {
+      id: 'econ_7',
+      question: 'When analyzing consumer demand, what does a "Price Elasticity of Demand" (PED) coefficient with an absolute value greater than 1 (|PED| > 1) indicate?',
+      options: [
+        'Demand is price elastic: the percentage change in quantity demanded is greater than the percentage change in price',
+        'Demand is perfectly inelastic: consumers purchase the exact same quantity regardless of price surges',
+        'The product is a Giffen good whose consumption increases as price rises',
+        'The firm has achieved zero marginal cost of production'
+      ],
+      correctIndex: 0,
+      explanation: 'Elastic demand (|PED| > 1) signifies that buyers are sensitive to price variations; a price increase leads to a disproportionately larger decline in unit volume demanded, reducing total revenue.'
+    },
+    {
+      id: 'econ_8',
+      question: 'In public economics, how does a "Pigouvian Tax" correct for negative production externalities (such as industrial carbon emissions or air pollution)?',
+      options: [
+        'By setting a per-unit tax equal to the marginal external damage, aligning private marginal costs with social marginal costs',
+        'By offering open-ended government grants to polluting factories',
+        'By banning all commercial sales of the finished product',
+        'By taxing only the consumers of basic agricultural food products'
+      ],
+      correctIndex: 0,
+      explanation: 'Named after Arthur Pigou, a Pigouvian tax forces economic actors to internalize negative spillover damages inflicted on third parties, shifting output down to the socially efficient equilibrium.'
+    },
+    {
+      id: 'econ_9',
+      question: 'In econometrics, what is the problem of "Endogeneity" and why does it bias OLS estimators?',
+      options: [
+        'An explanatory variable is correlated with the error term (due to omitted variable bias, measurement error, or reverse causality)',
+        'The database contains too many decimal places in monetary values',
+        'The dependent variable is strictly positive and bounded by zero',
+        'Data was collected across multiple quarters rather than a single month'
+      ],
+      correctIndex: 0,
+      explanation: 'When regressors correlate with unobserved error terms (endogeneity), OLS estimates become inconsistent and biased, requiring instrumental variables (2SLS) or natural experiments for causal inference.'
+    },
+    {
+      id: 'econ_10',
+      question: 'What does the "Gini Coefficient" measure in macro-development economics?',
+      options: [
+        'The degree of income or wealth inequality within a population, ranging from 0 (perfect equality) to 1 (perfect inequality)',
+        'The annual growth rate of gross industrial manufacturing output',
+        'The proportion of national debt held by foreign international creditors',
+        'The inflation rate of essential food commodities'
+      ],
+      correctIndex: 0,
+      explanation: 'Derived from the Lorenz curve, the Gini coefficient quantifies dispersion: a score of 0 represents equal distribution across all citizens, while 1 indicates complete concentration in a single entity.'
+    }
+  ],
+
+  business_management_strategy: [
+    {
+      id: 'biz_1',
+      question: 'In strategic management, what is the core purpose of applying Porter\'s Five Forces Framework to an industry?',
+      options: [
+        'To analyze industry structure, competitive intensity, and underlying drivers of sustainable profitability',
+        'To calculate annual payroll taxes for domestic corporate employees',
+        'To design the graphic branding and logo typography of a newly launched consumer product',
+        'To evaluate individual employee performance during quarterly reviews'
+      ],
+      correctIndex: 0,
+      explanation: 'Michael Porter\'s Five Forces assesses supplier power, buyer power, threat of new entrants, threat of substitutes, and competitive rivalry to understand profit margins and industry attractiveness.'
+    },
+    {
+      id: 'biz_2',
+      question: 'In corporate financial analysis, what fundamental balance does the "Working Capital Ratio" (Current Assets / Current Liabilities) evaluate?',
+      options: [
+        'A firm\'s short-term liquidity and ability to cover immediate financial obligations due within 12 months',
+        'The total market valuation of all issued stock options',
+        'The percentage of revenue reinvested in experimental research and development',
+        'The physical warehouse capacity required for seasonal inventory storage'
+      ],
+      correctIndex: 0,
+      explanation: 'Working capital evaluates operational solvency: a healthy current ratio (typically 1.2 to 2.0) ensures a company can settle near-term vendor debts without distress.'
+    },
+    {
+      id: 'biz_3',
+      question: 'In project management, what is the primary operational distinction between Agile (Scrum/Kanban) and Waterfall methodologies?',
+      options: [
+        'Agile emphasizes iterative sprints, cross-functional collaboration, and rapid adaptability to evolving requirements; Waterfall follows linear, sequential phase gating',
+        'Waterfall has zero documentation while Agile requires 500-page upfront requirements specs',
+        'Agile is only permitted for civil engineering construction projects',
+        'Waterfall projects are always completed 50% faster than Agile projects'
+      ],
+      correctIndex: 0,
+      explanation: 'Agile delivers working increments in short sprints with continuous feedback, whereas Waterfall plans all phases linearly (Requirements -> Design -> Build -> Test -> Deploy).'
+    }
+  ],
+
+  mathematics_statistics: [
+    {
+      id: 'math_1',
+      question: 'In statistical hypothesis testing, what is the critical difference between a Type I Error and a Type II Error?',
+      options: [
+        'Type I error is rejecting a true null hypothesis (false positive); Type II error is failing to reject a false null hypothesis (false negative)',
+        'Type I error occurs only in Python; Type II error occurs only in R',
+        'Type I error represents arithmetic division by zero; Type II error represents missing data rows',
+        'There is no distinction; both indicate biased data collection'
+      ],
+      correctIndex: 0,
+      explanation: 'Type I error ($\alpha$) is a false alarm (detecting an effect that does not exist), while Type II error ($\beta$) is a missed discovery (failing to detect a genuine effect).'
+    },
+    {
+      id: 'math_2',
+      question: 'What fundamental theorem in statistics guarantees that the distribution of sample means approaches normality as sample size increases, regardless of the underlying population distribution?',
+      options: [
+        'The Central Limit Theorem (CLT)',
+        'The Pythagorean Theorem',
+        'Euler\'s Identity',
+        'The Law of Diminishing Marginal Returns'
+      ],
+      correctIndex: 0,
+      explanation: 'The Central Limit Theorem ensures that for reasonably large sample sizes ($n \ge 30$), sample averages are approximately normally distributed, underpinning parametric hypothesis testing.'
+    },
+    {
+      id: 'math_3',
+      question: 'In linear algebra and multivariate analysis, what do Eigenvalues and Eigenvectors physically represent in matrix transformations (such as PCA)?',
+      options: [
+        'Eigenvectors represent invariant directions along which a linear transformation acts strictly by stretching or shrinking; Eigenvalues represent the scaling factor along those directions',
+        'They represent the row count and column count of an arbitrary rectangular matrix',
+        'They are encryption keys used to scramble database records',
+        'They represent the trigonometric angles of three-dimensional graphics'
+      ],
+      correctIndex: 0,
+      explanation: 'In PCA and spectral analysis, eigenvectors define the principal axes of maximum variance, and eigenvalues quantify the amount of variance explained along each axis.'
+    }
+  ],
+
   general_academic_ethics: [
     {
       id: 'acad_1',
@@ -731,6 +932,77 @@ const TOPIC_QUESTION_BANKS = {
       explanation: 'Informed consent is the foundational ethical requirement protecting individual autonomy, human dignity, and voluntary agency in academic, scientific, and medical research.'
     }
   ]
+};
+
+/**
+ * Generates dynamic, title-adaptive viva questions for brand-new or unseen course topics.
+ * Ensures the student is ALWAYS examined on their specific certificate topic rather than fallback AWS questions!
+ */
+export const generateDynamicTitleQuestions = (certificateTitle = 'Specialized Domain Study') => {
+  const cleanTitle = certificateTitle.trim() || 'Academic Credential';
+
+  return [
+    {
+      id: `dyn_methodology_${Date.now()}_1`,
+      question: `In the formal study and practical application of "${cleanTitle}", why is establishing causal empirical validity distinguished from mere statistical correlation?`,
+      options: [
+        `Causality demonstrates an authentic, verifiable mechanism where changes in one variable directly produce outcomes in another, preventing misleading assumptions`,
+        `Correlation and causality are mathematically identical in all professional environments`,
+        `Establishing causality is only required when applying for private commercial funding`,
+        `Observational data in "${cleanTitle}" can be published without validating underlying assumptions`
+      ],
+      correctIndex: 0,
+      explanation: `Rigorous investigation in ${cleanTitle} demands confirming that identified patterns represent genuine functional relationships rather than spurious associations or confounding variables.`
+    },
+    {
+      id: `dyn_risk_${Date.now()}_2`,
+      question: `When designing analytical models or executing operational decisions in "${cleanTitle}", what is the primary role of Sensitivity & Scenario Analysis?`,
+      options: [
+        `To stress-test conclusions against parametric variations and evaluate how outcome reliability shifts under uncertainty`,
+        `To artificially manipulate calculation results so that projects always appear 100% risk-free`,
+        `To delete outlying data points that do not align with historical averages`,
+        `To convert all qualitative documentation into encrypted binary files`
+      ],
+      correctIndex: 0,
+      explanation: `Sensitivity analysis in ${cleanTitle} evaluates robustness by identifying key risk vulnerabilities and testing how critical outputs react to volatility in underlying baseline assumptions.`
+    },
+    {
+      id: `dyn_optimization_${Date.now()}_3`,
+      question: `How does the principle of "Constrained Optimization" apply when implementing strategic frameworks in "${cleanTitle}"?`,
+      options: [
+        `Achieving the maximum possible performance, impact, or efficiency while operating within real-world budgetary, physical, and regulatory boundaries`,
+        `Assuming that financial capital and computational resources are infinite in real-world practice`,
+        `Bypassing legal compliance standards to accelerate short-term outputs`,
+        `Eliminating quality assurance protocols to minimize operational expenses`
+      ],
+      correctIndex: 0,
+      explanation: `Constrained optimization defines practical problem-solving in ${cleanTitle}: delivering high-quality, sustainable solutions while balancing strict resource, temporal, and governance trade-offs.`
+    },
+    {
+      id: `dyn_ethics_${Date.now()}_4`,
+      question: `What fundamental ethical responsibility governs credentialed practitioners and researchers working in "${cleanTitle}"?`,
+      options: [
+        `Maintaining transparent attribution, upholding analytical integrity, disclosing potential conflicts of interest, and preventing data misrepresentation`,
+        `Promising unconditional positive outcomes regardless of experimental evidence or data reality`,
+        `Concealing methodological limitations from peer reviewers and institutional stakeholders`,
+        `Exempting senior leadership from compliance reviews and professional codes of conduct`
+      ],
+      correctIndex: 0,
+      explanation: `Professional credibility in ${cleanTitle} requires rigorous fidelity to empirical truth, open transparency regarding assumptions, and strict adherence to institutional ethical standards.`
+    },
+    {
+      id: `dyn_lifecycle_${Date.now()}_5`,
+      question: `When managing the complete lifecycle of projects or investigations in "${cleanTitle}", why is iterative feedback and systematic evaluation critical?`,
+      options: [
+        `It facilitates continuous refinement, detects deviations early, and aligns ongoing execution with overarching strategic and stakeholder objectives`,
+        `It guarantees that initial project timelines will never require revision or adjustment`,
+        `It removes the need for formal milestone documentation or auditing`,
+        `Iterative feedback is only utilized when projects encounter critical system failures`
+      ],
+      correctIndex: 0,
+      explanation: `Continuous evaluation within ${cleanTitle} ensures agility and resilience, allowing teams to incorporate evidence-based refinements throughout implementation.`
+    }
+  ];
 };
 
 /**
@@ -785,7 +1057,68 @@ export const detectCertificateTopics = (certificate) => {
     };
   }
 
-  // 2. Kannada / Regional Innovation Hackathons
+  // 2. Economics, Econometrics, Finance & Banking
+  if (
+    combined.includes('economic') || 
+    combined.includes('economics') || 
+    combined.includes('econometric') || 
+    combined.includes('finance') || 
+    combined.includes('financial') || 
+    combined.includes('microeconomic') || 
+    combined.includes('macroeconomic') || 
+    combined.includes('banking') || 
+    combined.includes('fiscal') || 
+    combined.includes('monetary') || 
+    combined.includes('investment') || 
+    combined.includes('capital market') ||
+    combined.includes('accounting')
+  ) {
+    return {
+      primaryTopic: 'economics_finance_analysis',
+      topicLabel: 'Economics, Financial Analysis & Econometrics',
+      poolKeys: ['economics_finance_analysis']
+    };
+  }
+
+  // 3. Business Management, Strategy, Marketing & Operations
+  if (
+    combined.includes('business') || 
+    combined.includes('management') || 
+    combined.includes('marketing') || 
+    combined.includes('strategy') || 
+    combined.includes('leadership') || 
+    combined.includes('operations') || 
+    combined.includes('supply chain') || 
+    combined.includes('entrepreneurship') || 
+    combined.includes('commerce') || 
+    combined.includes('mba')
+  ) {
+    return {
+      primaryTopic: 'business_management_strategy',
+      topicLabel: 'Strategic Business Management & Operations',
+      poolKeys: ['business_management_strategy', 'economics_finance_analysis']
+    };
+  }
+
+  // 4. Mathematics, Applied Statistics & Quantitative Methods
+  if (
+    combined.includes('mathematics') || 
+    combined.includes('math') || 
+    combined.includes('statistics') || 
+    combined.includes('statistical') || 
+    combined.includes('calculus') || 
+    combined.includes('linear algebra') || 
+    combined.includes('probability') || 
+    combined.includes('quantitative')
+  ) {
+    return {
+      primaryTopic: 'mathematics_statistics',
+      topicLabel: 'Mathematical Sciences & Applied Statistics',
+      poolKeys: ['mathematics_statistics', 'python_datascience']
+    };
+  }
+
+  // 5. Kannada / Regional Innovation Hackathons
   if (combined.includes('kannada') || (combined.includes('hackathon') && (combined.includes('innovation') || combined.includes('nie') || combined.includes('hackerrank')))) {
     return {
       primaryTopic: 'kannada_innovation',
@@ -794,7 +1127,7 @@ export const detectCertificateTopics = (certificate) => {
     };
   }
 
-  // 3. NPTEL / Swayam / Design & Technology
+  // 6. NPTEL / Swayam / Design & Technology
   if (combined.includes('design') || combined.includes('technology and innovation') || combined.includes('nptel') || combined.includes('swayam') || combined.includes('iit')) {
     return {
       primaryTopic: 'nptel_design_innovation',
@@ -803,7 +1136,7 @@ export const detectCertificateTopics = (certificate) => {
     };
   }
 
-  // 4. General Hackathons / Rapid Prototyping
+  // 7. General Hackathons / Rapid Prototyping
   if (category === 'hackathon' || combined.includes('hackathon') || combined.includes('hack') || combined.includes('competition')) {
     return {
       primaryTopic: 'hackathon_engineering',
@@ -812,7 +1145,7 @@ export const detectCertificateTopics = (certificate) => {
     };
   }
 
-  // 5. AI, Machine Learning, Computer Vision, OCR
+  // 8. AI, Machine Learning, Computer Vision, OCR
   if (combined.includes('ai') || combined.includes('artificial intelligence') || combined.includes('machine learning') || combined.includes('ocr') || combined.includes('deep learning') || combined.includes('neural')) {
     return {
       primaryTopic: 'ai_ml_ocr',
@@ -821,7 +1154,7 @@ export const detectCertificateTopics = (certificate) => {
     };
   }
 
-  // 6. Python & Data Science
+  // 9. Python & Data Science
   if (combined.includes('python') || combined.includes('data science') || combined.includes('pandas') || combined.includes('analytics')) {
     return {
       primaryTopic: 'python_datascience',
@@ -830,7 +1163,7 @@ export const detectCertificateTopics = (certificate) => {
     };
   }
 
-  // 7. Cybersecurity, Cryptography, Blockchain
+  // 10. Cybersecurity, Cryptography, Blockchain
   if (combined.includes('security') || combined.includes('blockchain') || combined.includes('crypto') || combined.includes('ledger') || combined.includes('cyber')) {
     return {
       primaryTopic: 'cybersecurity_blockchain',
@@ -839,7 +1172,7 @@ export const detectCertificateTopics = (certificate) => {
     };
   }
 
-  // 8. Full-Stack Web Development, React, Node
+  // 11. Full-Stack Web Development, React, Node
   if (combined.includes('web') || combined.includes('react') || combined.includes('node') || combined.includes('javascript') || combined.includes('fullstack') || combined.includes('frontend')) {
     return {
       primaryTopic: 'fullstack_web',
@@ -848,7 +1181,7 @@ export const detectCertificateTopics = (certificate) => {
     };
   }
 
-  // 9. Cloud Architecture & DevOps (Genuinely matches cloud credentials only!)
+  // 12. Cloud Architecture & DevOps (Genuinely matches cloud credentials only!)
   if (
     combined.includes('cloud') || 
     combined.includes('aws') || 
@@ -872,11 +1205,15 @@ export const detectCertificateTopics = (certificate) => {
     };
   }
 
-  // 10. Default for General Academic Courses (Never blindly default to AWS!)
+  // 13. Dynamic Adaptive Domain for Any Other New/Arbitrary Course Topics
+  const displayTitle = certificate.title && certificate.title !== 'Certificate of Achievement'
+    ? certificate.title
+    : (rawText ? rawText.substring(0, 45).replace(/[\n\r]+/g, ' ') : 'Specialized Academic Domain');
+
   return {
-    primaryTopic: 'general_academic_ethics',
-    topicLabel: certificate.title ? `${certificate.title} — Academic Proficiency` : 'Academic Inquiry & Professional Ethics',
-    poolKeys: ['general_academic_ethics']
+    primaryTopic: 'adaptive_dynamic_domain',
+    topicLabel: `${displayTitle} — Domain Proficiency`,
+    poolKeys: ['adaptive_dynamic_domain', 'general_academic_ethics']
   };
 };
 
@@ -890,14 +1227,17 @@ export const getQuestionsForCertificate = (certificate, count = 5) => {
   // Combine questions from all relevant pools
   let combinedPool = [];
   poolKeys.forEach(key => {
-    if (TOPIC_QUESTION_BANKS[key]) {
+    if (key === 'adaptive_dynamic_domain') {
+      const dynamicQuestions = generateDynamicTitleQuestions(certificate?.title || topicLabel);
+      combinedPool = combinedPool.concat(dynamicQuestions);
+    } else if (TOPIC_QUESTION_BANKS[key]) {
       combinedPool = combinedPool.concat(TOPIC_QUESTION_BANKS[key]);
     }
   });
 
-  // Fallback to cloud if empty
+  // Fallback to title-adaptive questions if empty
   if (combinedPool.length === 0) {
-    combinedPool = TOPIC_QUESTION_BANKS.cloud_computing;
+    combinedPool = generateDynamicTitleQuestions(certificate?.title || 'Academic Domain');
   }
 
   // Randomize question pool
