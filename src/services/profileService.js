@@ -10,9 +10,9 @@ import {
 const LOCAL_PROFILES_KEY = 'skillvault_local_profiles';
 
 const DEMO_EVALUATOR_PROFILE = {
-  fullName: 'Arjun Sharma',
-  email: 'arjun.ise@student.edu',
-  usn: '1IS22CS042',
+  fullName: 'Maheswari S',
+  email: 'maheswari.ise@student.edu',
+  usn: '4NICS20',
   institution: 'Department of Information Science & Engineering',
   degree: 'Bachelor of Engineering (ISE)',
   semester: '5th Semester',

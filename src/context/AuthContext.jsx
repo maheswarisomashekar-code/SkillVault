@@ -14,8 +14,8 @@ const AuthContext = createContext(null);
 
 const DEMO_USER = {
   uid: 'student_cloud_demo_01',
-  email: 'arjun.student@ise.edu',
-  displayName: 'Arjun Sharma',
+  email: 'maheswari.student@ise.edu',
+  displayName: 'Maheswari S',
   photoURL: null
 };
 
