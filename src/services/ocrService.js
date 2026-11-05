@@ -639,8 +639,6 @@ export const extractCertificateFields = (rawText) => {
     recipient: recipient || '',
     issuer: issuer || 'Independent',
     issueDate: finalIssueDate,
-    expiryDate: expiryDate || '',
-    enableExpiryReminder: Boolean(expiryDate),
     ocrEngine: 'Tesseract.js (In-Browser Web Worker)',
     category,
     credentialId,

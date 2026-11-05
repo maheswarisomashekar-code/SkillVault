@@ -205,20 +205,6 @@ export const CertificatePreviewModal = ({ certificate, isOpen, onClose, onUpdate
 
             <div style={{ background: 'var(--bg-surface-elevated)', padding: '14px', borderRadius: 'var(--radius-md)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', fontSize: '0.78rem', marginBottom: '4px' }}>
-                <Clock size={14} />
-                <span>Expiration & Alert</span>
-              </div>
-              <div style={{ fontWeight: 600, color: certificate.expiryDate ? '#fbbf24' : 'var(--text-primary)', fontSize: '0.92rem' }}>
-                {certificate.expiryDate ? (
-                  <span>{certificate.expiryDate} • 7d SES Alert</span>
-                ) : (
-                  <span style={{ color: '#34d399' }}>Lifetime Valid</span>
-                )}
-              </div>
-            </div>
-
-            <div style={{ background: 'var(--bg-surface-elevated)', padding: '14px', borderRadius: 'var(--radius-md)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', fontSize: '0.78rem', marginBottom: '4px' }}>
                 <User size={14} />
                 <span>Recipient</span>
               </div>

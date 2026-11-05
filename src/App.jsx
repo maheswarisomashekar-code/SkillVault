@@ -6,7 +6,6 @@ import { UploadModal } from './components/UploadModal';
 import { CertificatePreviewModal } from './components/CertificatePreviewModal';
 import { EditCertificateModal } from './components/EditCertificateModal';
 import { CourseVivaQuizModal } from './components/CourseVivaQuizModal';
-import { DeadlineRemindersModal } from './components/DeadlineRemindersModal';
 import { SkillUniverse3D } from './components/SkillUniverse3D';
 
 import { AuthPage } from './pages/AuthPage';
@@ -36,7 +35,6 @@ function MainAppContent() {
   const [previewCert, setPreviewCert] = useState(null);
   const [editCert, setEditCert] = useState(null);
   const [vivaCert, setVivaCert] = useState(null);
-  const [isRemindersOpen, setIsRemindersOpen] = useState(false);
 
   // Hash-based Public Portfolio detection
   const [publicPortfolioId, setPublicPortfolioId] = useState(null);
@@ -155,7 +153,6 @@ function MainAppContent() {
         isOpen={isSidebarOpen} 
         setIsOpen={setIsSidebarOpen} 
         certificates={certificates}
-        onOpenReminders={() => setIsRemindersOpen(true)}
       />
 
       {/* Main Layout Area */}
@@ -165,7 +162,6 @@ function MainAppContent() {
           setIsSidebarOpen={setIsSidebarOpen}
           onOpenUpload={() => setIsUploadOpen(true)}
           onOpenPortfolio={() => setActiveTab('portfolio')}
-          onOpenReminders={() => setIsRemindersOpen(true)}
         />
 
         <main className="content-body">
@@ -178,7 +174,6 @@ function MainAppContent() {
               onEditCertificate={setEditCert}
               onDeleteCertificate={handleDeleteCertificate}
               onTakeViva={(cert) => setVivaCert(cert)}
-              onOpenReminders={() => setIsRemindersOpen(true)}
             />
           )}
 
@@ -303,14 +298,6 @@ function MainAppContent() {
         certificate={vivaCert}
         onClose={() => setVivaCert(null)}
         onVivaSuccess={handleVivaSuccess}
-      />
-
-      {/* Expiry & Deadline Reminders Hub Modal (AWS Lambda + SES) */}
-      <DeadlineRemindersModal 
-        isOpen={isRemindersOpen}
-        onClose={() => setIsRemindersOpen(false)}
-        certificates={certificates}
-        onEditCertificate={setEditCert}
       />
     </div>
   );

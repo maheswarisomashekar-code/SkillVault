@@ -1,9 +1,9 @@
 import React from 'react';
-import { Menu, Cloud, CloudCheck, UploadCloud, ExternalLink, LogOut, Bell } from 'lucide-react';
+import { Menu, Cloud, CloudCheck, UploadCloud, ExternalLink, LogOut } from 'lucide-react';
 import { isFirebaseConfigured } from '../config/firebase';
 import { useAuth } from '../context/AuthContext';
 
-export const TopBar = ({ activeTab, setIsSidebarOpen, onOpenUpload, onOpenPortfolio, onOpenReminders }) => {
+export const TopBar = ({ activeTab, setIsSidebarOpen, onOpenUpload, onOpenPortfolio }) => {
   const { logout, userProfile, currentUser } = useAuth();
 
   const titles = {
@@ -61,18 +61,6 @@ export const TopBar = ({ activeTab, setIsSidebarOpen, onOpenUpload, onOpenPortfo
             {isFirebaseConfigured ? 'Cloud Live (Firebase)' : 'Cloud Sandbox Mode'}
           </span>
         </div>
-
-        {onOpenReminders && (
-          <button 
-            className="btn btn-secondary btn-sm"
-            onClick={onOpenReminders}
-            title="Certificate Expiry & Application Deadlines (AWS SES + Lambda)"
-            style={{ borderColor: 'rgba(245, 158, 11, 0.4)', color: '#fbbf24' }}
-          >
-            <Bell size={14} />
-            <span>Reminders</span>
-          </button>
-        )}
 
         <button 
           className="btn btn-primary btn-sm"

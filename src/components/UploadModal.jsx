@@ -12,9 +12,6 @@ import {
   Lock,
   UserX,
   XCircle,
-  Bell,
-  CalendarClock,
-  Mail,
   Zap
 } from 'lucide-react';
 import { validateCertificateFile, uploadCertificateFile, createCertificateRecord } from '../services/certificateService';
@@ -46,8 +43,6 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess, existingCertific
     issuer: '',
     recipient: '',
     issueDate: '',
-    expiryDate: '',
-    enableExpiryReminder: false,
     category: 'course',
     description: '',
     credentialId: '',
@@ -213,8 +208,6 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess, existingCertific
         issuer: extracted.issuer || '',
         recipient: extracted.recipient || '',
         issueDate: extracted.issueDate || '',
-        expiryDate: extracted.expiryDate || '',
-        enableExpiryReminder: Boolean(extracted.expiryDate),
         category: extracted.category || 'course',
         description: `Uploaded and scanned via SkillVault Cloud OCR on ${new Date().toLocaleDateString()}`,
         credentialId: extracted.credentialId || '',
@@ -836,117 +829,6 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess, existingCertific
                       ⚠️ Date not detected on certificate. Please pick issue date.
                     </div>
                   )}
-                </div>
-
-                {/* Expiry Date Field with Quick Presets */}
-                <div className="form-group" style={{ marginBottom: '14px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                    <label className="form-label" style={{ marginBottom: 0 }}>
-                      Expiration / Renewal Date
-                    </label>
-                    {formData.expiryDate ? (
-                      <span style={{ color: '#38bdf8', fontSize: '0.72rem', fontWeight: 600 }}>
-                        📅 Configured
-                      </span>
-                    ) : (
-                      <span style={{ color: 'var(--text-muted)', fontSize: '0.72rem' }}>
-                        Optional (AWS, GCP, Cisco)
-                      </span>
-                    )}
-                  </div>
-                  <input 
-                    type="date" 
-                    className="form-input" 
-                    value={formData.expiryDate || ''} 
-                    onChange={(e) => setFormData({ 
-                      ...formData, 
-                      expiryDate: e.target.value,
-                      enableExpiryReminder: e.target.value ? true : formData.enableExpiryReminder
-                    })}
-                  />
-                  <div style={{ display: 'flex', gap: '6px', marginTop: '6px', flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', alignSelf: 'center' }}>Presets:</span>
-                    <button 
-                      type="button" 
-                      onClick={() => {
-                        const d = new Date(formData.issueDate || Date.now());
-                        d.setFullYear(d.getFullYear() + 1);
-                        setFormData({ ...formData, expiryDate: d.toISOString().split('T')[0], enableExpiryReminder: true });
-                      }}
-                      style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '4px', background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-subtle)', color: 'var(--text-secondary)', cursor: 'pointer' }}
-                    >
-                      +1 Year
-                    </button>
-                    <button 
-                      type="button" 
-                      onClick={() => {
-                        const d = new Date(formData.issueDate || Date.now());
-                        d.setFullYear(d.getFullYear() + 2);
-                        setFormData({ ...formData, expiryDate: d.toISOString().split('T')[0], enableExpiryReminder: true });
-                      }}
-                      style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '4px', background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-subtle)', color: '#38bdf8', cursor: 'pointer' }}
-                    >
-                      +2 Yrs (AWS/GCP)
-                    </button>
-                    <button 
-                      type="button" 
-                      onClick={() => {
-                        const d = new Date(formData.issueDate || Date.now());
-                        d.setFullYear(d.getFullYear() + 3);
-                        setFormData({ ...formData, expiryDate: d.toISOString().split('T')[0], enableExpiryReminder: true });
-                      }}
-                      style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '4px', background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-subtle)', color: 'var(--text-secondary)', cursor: 'pointer' }}
-                    >
-                      +3 Years
-                    </button>
-                    <button 
-                      type="button" 
-                      onClick={() => setFormData({ ...formData, expiryDate: '', enableExpiryReminder: false })}
-                      style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '4px', background: 'transparent', border: 'none', color: '#fb7185', cursor: 'pointer' }}
-                    >
-                      No Expiry
-                    </button>
-                  </div>
-                </div>
-
-                {/* Scheduled 7-Day Expiry Email Reminder (AWS SES & Lambda) */}
-                <div style={{
-                  gridColumn: 'span 2',
-                  padding: '12px 16px',
-                  borderRadius: 'var(--radius-md)',
-                  background: formData.expiryDate ? 'rgba(56, 189, 248, 0.08)' : 'var(--bg-surface-elevated)',
-                  border: formData.expiryDate ? '1px solid rgba(56, 189, 248, 0.25)' : '1px solid var(--border-subtle)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '12px',
-                  marginBottom: '4px'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                    <Bell size={18} style={{ color: formData.expiryDate ? '#38bdf8' : 'var(--text-muted)', marginTop: '2px', flexShrink: 0 }} />
-                    <div>
-                      <div style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span>Scheduled 7-Day Expiry Email Reminder</span>
-                        <span style={{ fontSize: '0.7rem', padding: '1px 6px', borderRadius: '4px', background: 'rgba(14, 165, 233, 0.2)', color: '#38bdf8' }}>
-                          AWS Lambda + SES
-                        </span>
-                      </div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '2px', lineHeight: 1.4 }}>
-                        {formData.expiryDate ? (
-                          <>Dispatches automated renewal notice to <strong>{currentUser?.email || 'your email'}</strong> exactly 1 week before {formData.expiryDate} via Amazon SES & EventBridge daily cron.</>
-                        ) : (
-                          <>Set an expiration date above to activate automated 7-day email reminders via AWS SES & scheduled Lambda.</>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <input 
-                    type="checkbox" 
-                    disabled={!formData.expiryDate}
-                    checked={formData.expiryDate ? formData.enableExpiryReminder : false}
-                    onChange={(e) => setFormData({ ...formData, enableExpiryReminder: e.target.checked })}
-                    style={{ width: '18px', height: '18px', accentColor: '#0ea5e9', cursor: formData.expiryDate ? 'pointer' : 'not-allowed' }}
-                  />
                 </div>
 
                 <div className="form-group" style={{ marginBottom: '14px' }}>

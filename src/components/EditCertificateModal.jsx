@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, CheckCircle2, Loader2, Edit3, Bell } from 'lucide-react';
+import { X, CheckCircle2, Loader2, Edit3 } from 'lucide-react';
 import { updateCertificateRecord } from '../services/certificateService';
 import { normalizeToIsoDate } from '../services/ocrService';
 
@@ -13,8 +13,6 @@ export const EditCertificateModal = ({ certificate, isOpen, onClose, onSaveSucce
     recipient: certificate.recipient || '',
     category: certificate.category || 'course',
     issueDate: normalizeToIsoDate(certificate.issueDate) || certificate.issueDate || '',
-    expiryDate: normalizeToIsoDate(certificate.expiryDate) || certificate.expiryDate || '',
-    enableExpiryReminder: certificate.enableExpiryReminder ?? Boolean(certificate.expiryDate),
     verificationUrl: certificate.verificationUrl || '',
     credentialId: certificate.credentialId || '',
     isPublished: certificate.isPublished !== undefined ? certificate.isPublished : true,
@@ -134,20 +132,6 @@ export const EditCertificateModal = ({ certificate, isOpen, onClose, onSaveSucce
             </div>
 
             <div className="form-group">
-              <label className="form-label">Expiration Date (Optional)</label>
-              <input 
-                type="date" 
-                className="form-input"
-                value={formData.expiryDate}
-                onChange={(e) => setFormData({ 
-                  ...formData, 
-                  expiryDate: e.target.value,
-                  enableExpiryReminder: e.target.value ? true : formData.enableExpiryReminder
-                })}
-              />
-            </div>
-
-            <div className="form-group">
               <label className="form-label">Credential ID</label>
               <input 
                 type="text" 
@@ -156,38 +140,6 @@ export const EditCertificateModal = ({ certificate, isOpen, onClose, onSaveSucce
                 onChange={(e) => setFormData({ ...formData, credentialId: e.target.value })}
               />
             </div>
-          </div>
-
-          {/* Scheduled 7-Day Expiry Email Reminder Toggle */}
-          <div style={{
-            padding: '12px 16px',
-            borderRadius: 'var(--radius-md)',
-            background: formData.expiryDate ? 'rgba(56, 189, 248, 0.08)' : 'var(--bg-surface-elevated)',
-            border: formData.expiryDate ? '1px solid rgba(56, 189, 248, 0.25)' : '1px solid var(--border-subtle)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '12px',
-            marginBottom: '16px'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Bell size={16} style={{ color: formData.expiryDate ? '#38bdf8' : 'var(--text-muted)' }} />
-              <div>
-                <div style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                  AWS Lambda + SES 7-Day Renewal Alert
-                </div>
-                <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)' }}>
-                  Dispatches an automated email 1 week before expiry via AWS EventBridge & SES
-                </div>
-              </div>
-            </div>
-            <input 
-              type="checkbox"
-              disabled={!formData.expiryDate}
-              checked={formData.expiryDate ? formData.enableExpiryReminder : false}
-              onChange={(e) => setFormData({ ...formData, enableExpiryReminder: e.target.checked })}
-              style={{ width: '18px', height: '18px', accentColor: '#0ea5e9' }}
-            />
           </div>
 
           <div className="form-group">
