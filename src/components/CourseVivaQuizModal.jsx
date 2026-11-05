@@ -61,6 +61,10 @@ export const CourseVivaQuizModal = ({ isOpen, onClose, certificate, onVivaSucces
     if (isAnswered) return; // Prevent changing after selection
     setSelectedAnswers(prev => ({ ...prev, [currentIndex]: idx }));
     setShowExplanation(true);
+    setTimeout(() => {
+      const el = document.getElementById('viva-explanation-box');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 80);
   };
 
   const handleNext = () => {
@@ -158,8 +162,11 @@ export const CourseVivaQuizModal = ({ isOpen, onClose, certificate, onVivaSucces
         className="modal-content" 
         onClick={(e) => e.stopPropagation()} 
         style={{ 
-          maxWidth: '720px', 
+          maxWidth: '740px', 
           width: '95vw',
+          maxHeight: '92vh',
+          display: 'flex',
+          flexDirection: 'column',
           background: '#090d16',
           border: '1px solid rgba(14, 165, 233, 0.3)',
           boxShadow: '0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(14, 165, 233, 0.15)',
@@ -170,12 +177,13 @@ export const CourseVivaQuizModal = ({ isOpen, onClose, certificate, onVivaSucces
       >
         {/* Header */}
         <div style={{
-          padding: '20px 24px',
+          padding: '18px 24px',
           borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
           background: 'linear-gradient(90deg, rgba(14, 165, 233, 0.1) 0%, rgba(99, 102, 241, 0.05) 100%)',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between'
+          justifyContent: 'space-between',
+          flexShrink: 0
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{
@@ -234,8 +242,8 @@ export const CourseVivaQuizModal = ({ isOpen, onClose, certificate, onVivaSucces
           </button>
         </div>
 
-        {/* Content Body */}
-        <div style={{ padding: '24px' }}>
+        {/* Content Body with Independent Smooth Scroll */}
+        <div style={{ padding: '20px 24px', overflowY: 'auto', flex: 1, WebkitOverflowScrolling: 'touch' }}>
           {!quizFinished ? (
             <div>
               {/* Progress & Question Counter */}
@@ -440,7 +448,7 @@ export const CourseVivaQuizModal = ({ isOpen, onClose, certificate, onVivaSucces
 
               {/* Real-time Technical Explanation */}
               {isAnswered && (
-                <div style={{
+                <div id="viva-explanation-box" style={{
                   background: selectedChoice === currentQ.correctIndex 
                     ? 'rgba(16, 185, 129, 0.1)' 
                     : 'rgba(244, 63, 94, 0.1)',
@@ -608,6 +616,56 @@ export const CourseVivaQuizModal = ({ isOpen, onClose, certificate, onVivaSucces
             </div>
           )}
         </div>
+
+        {/* Sticky Persistent Bottom Bar for Next Question (Always visible as soon as answered) */}
+        {!quizFinished && isAnswered && (
+          <div style={{
+            padding: '12px 24px',
+            borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+            background: 'rgba(15, 23, 42, 0.96)',
+            backdropFilter: 'blur(10px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexShrink: 0,
+            gap: '12px',
+            zIndex: 10
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.86rem' }}>
+              {selectedChoice === currentQ.correctIndex ? (
+                <span style={{ color: '#34d399', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <CheckCircle2 size={16} /> Correct!
+                </span>
+              ) : (
+                <span style={{ color: '#fb7185', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <AlertCircle size={16} /> Incorrect (See correction)
+                </span>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={handleNext}
+              className="btn btn-primary"
+              style={{
+                background: 'linear-gradient(135deg, #0ea5e9, #6366f1)',
+                border: 'none',
+                padding: '10px 24px',
+                borderRadius: '8px',
+                fontWeight: 700,
+                fontSize: '0.92rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                boxShadow: '0 4px 15px rgba(14, 165, 233, 0.4)',
+                cursor: 'pointer'
+              }}
+            >
+              <span>{currentIndex + 1 < questions.length ? 'Next Question' : 'Complete Viva Exam'}</span>
+              <ArrowRight size={16} />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
