@@ -129,11 +129,9 @@ export const AuthPage = () => {
       </div>
 
       {/* Main Two-Panel Card */}
-      <div className="auth-panel-glow" style={{
+      <div className="auth-panel-glow auth-card-grid" style={{
         maxWidth: '1040px',
         width: '100%',
-        display: 'grid',
-        gridTemplateColumns: '1.05fr 0.95fr',
         background: 'rgba(15, 23, 42, 0.88)',
         backdropFilter: 'blur(24px)',
         border: '1px solid rgba(255, 255, 255, 0.12)',
@@ -143,7 +141,7 @@ export const AuthPage = () => {
         zIndex: 1
       }}>
         {/* Left Side: Rich Project Visuals & Feature Highlights */}
-        <div style={{
+        <div className="auth-promo-panel" style={{
           background: 'linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.85))',
           padding: '48px 42px',
           display: 'flex',
@@ -284,8 +282,8 @@ export const AuthPage = () => {
         </div>
 
         {/* Right Side: Elegant Authentication Form */}
-        <div style={{
-          padding: '48px 40px',
+        <div className="auth-form-panel" style={{
+          padding: '44px 38px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center'
@@ -378,6 +376,35 @@ export const AuthPage = () => {
               <span>{isRegistering ? 'Create Account' : 'Sign In'}</span>
               <ArrowRight size={16} />
             </button>
+
+            {/* Quick Demo Login (Crucial for mobile testers & examiners) */}
+            <div style={{ marginTop: '12px' }}>
+              <button
+                type="button"
+                onClick={async () => {
+                  setLoading(true);
+                  try {
+                    await login('maheswari.student@ise.edu', 'cloud2026');
+                  } catch (e) {
+                    setError(e.message);
+                  } finally {
+                    setLoading(false);
+                  }
+                }}
+                disabled={loading}
+                className="btn btn-secondary"
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  fontSize: '0.82rem',
+                  borderColor: 'rgba(56, 189, 248, 0.4)',
+                  color: '#38bdf8',
+                  background: 'rgba(56, 189, 248, 0.08)'
+                }}
+              >
+                <span>⚡ 1-Click Instant Demo Login</span>
+              </button>
+            </div>
           </form>
 
           {/* Toggle Register/Sign In */}

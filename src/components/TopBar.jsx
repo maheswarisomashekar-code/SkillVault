@@ -30,7 +30,6 @@ export const TopBar = ({ activeTab, setIsSidebarOpen, onOpenUpload, onOpenPortfo
         <button 
           className="mobile-menu-btn"
           style={{ 
-            display: 'none', 
             color: 'var(--text-primary)', 
             background: 'var(--bg-surface-elevated)', 
             padding: '8px', 
