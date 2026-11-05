@@ -157,6 +157,12 @@ export const CertificateCard = ({ certificate, onPreview, onEdit, onDelete, onTa
           <Calendar size={14} style={{ color: 'var(--text-muted)' }} />
           <span>{certificate.issueDate || 'Date unspecified'}</span>
         </div>
+        {certificate.recipient && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>Holder:</span>
+            <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{certificate.recipient}</span>
+          </div>
+        )}
       </div>
 
       {/* Card Footer Actions */}

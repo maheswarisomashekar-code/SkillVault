@@ -53,7 +53,9 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess, existingCertific
 
   // Cross-reference document ownership vs logged-in account
   const ownershipValidation = useMemo(() => {
-    if (!accountHolderName) return { hasConflict: false };
+    if (!accountHolderName || ['student candidate', 'student', 'candidate', 'demo student'].includes(accountHolderName.toLowerCase().trim())) {
+      return { hasConflict: false };
+    }
 
     const norm = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
     const getTokens = (s) => norm(s).split(' ').filter(t => t.length >= 3);

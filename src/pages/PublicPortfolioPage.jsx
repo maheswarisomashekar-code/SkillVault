@@ -20,7 +20,7 @@ import {
   Clock
 } from 'lucide-react';
 import { GithubIcon, LinkedinIcon } from '../components/BrandIcons';
-import { getUserProfile } from '../services/profileService';
+import { getUserProfile, extractSkillsFromCertificates } from '../services/profileService';
 import { getPublicCertificates } from '../services/certificateService';
 import { getStudentProjects, getStudentExperiences } from '../services/projectService';
 import { CategoryBadge } from '../components/CategoryBadge';
@@ -142,6 +142,24 @@ export const PublicPortfolioPage = ({ portfolioId, onBackToApp }) => {
 
   const verifiedCertCount = certificates.filter(c => c.verificationStatus === 'VERIFIED').length;
 
+  // Dynamically derive authentic candidate name from profile or actual certificate recipient
+  const candidateDisplayName = (profile?.fullName && !['Student Candidate', 'Student'].includes(profile.fullName))
+    ? profile.fullName
+    : (certificates && certificates.length > 0 && certificates[0]?.recipient && !['Student', 'Verified Student'].includes(certificates[0].recipient)
+        ? certificates[0].recipient
+        : profile?.fullName || 'Student Portfolio');
+
+  // Dynamically derive verified skills: fallback to extracting directly from certificates
+  const displayedSkills = (profile?.skills && profile.skills.length > 0)
+    ? profile.skills
+    : extractSkillsFromCertificates(certificates);
+
+  const effectiveProfile = {
+    ...profile,
+    fullName: candidateDisplayName,
+    skills: displayedSkills
+  };
+
   const filteredCerts = certificates.filter(c => {
     if (selectedCertCategory === 'all') return true;
     return (c.category || 'other').toLowerCase() === selectedCertCategory;
@@ -207,13 +225,13 @@ export const PublicPortfolioPage = ({ portfolioId, onBackToApp }) => {
                 color: '#ffffff',
                 boxShadow: '0 4px 20px var(--color-primary-glow)'
               }}>
-                {(profile?.fullName || 'S')[0].toUpperCase()}
+                {(candidateDisplayName || 'S')[0].toUpperCase()}
               </div>
 
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
                   <h1 style={{ fontSize: '1.65rem', fontWeight: 800, letterSpacing: '-0.02em' }}>
-                    {profile?.fullName || 'Student Portfolio'}
+                    {candidateDisplayName}
                   </h1>
                   <span style={{
                     display: 'inline-flex',
@@ -277,10 +295,10 @@ export const PublicPortfolioPage = ({ portfolioId, onBackToApp }) => {
             </p>
           )}
 
-          {/* Skills Badges */}
-          {profile?.skills && profile.skills.length > 0 && (
+          {/* Skills Badges (Dynamically derived from verified certificates) */}
+          {displayedSkills && displayedSkills.length > 0 && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '20px' }}>
-              {profile.skills.map((skill, idx) => (
+              {displayedSkills.map((skill, idx) => (
                 <span 
                   key={idx}
                   style={{
@@ -852,7 +870,7 @@ export const PublicPortfolioPage = ({ portfolioId, onBackToApp }) => {
       <ResumeExportModal 
         isOpen={isResumeModalOpen}
         onClose={() => setIsResumeModalOpen(false)}
-        profile={profile}
+        profile={effectiveProfile}
         certificates={certificates}
         projects={projects}
         experiences={experiences}
@@ -862,7 +880,7 @@ export const PublicPortfolioPage = ({ portfolioId, onBackToApp }) => {
       <RoleAnalyzerModal 
         isOpen={isRoleModalOpen}
         onClose={() => setIsRoleModalOpen(false)}
-        profile={profile}
+        profile={effectiveProfile}
         certificates={certificates}
         projects={projects}
       />

@@ -152,6 +152,7 @@ function MainAppContent() {
         setActiveTab={setActiveTab} 
         isOpen={isSidebarOpen} 
         setIsOpen={setIsSidebarOpen} 
+        certificates={certificates}
       />
 
       {/* Main Layout Area */}
@@ -260,7 +261,7 @@ function MainAppContent() {
           )}
 
           {activeTab === 'profile' && (
-            <ProfilePage />
+            <ProfilePage certificates={certificates} />
           )}
         </main>
       </div>

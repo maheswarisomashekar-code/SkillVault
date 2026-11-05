@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import { GithubIcon } from '../components/BrandIcons';
 import { useAuth } from '../context/AuthContext';
-import { saveUserProfile } from '../services/profileService';
+import { saveUserProfile, extractSkillsFromCertificates } from '../services/profileService';
 import { updateCertificateRecord } from '../services/certificateService';
 import { 
   getStudentProjects, 
@@ -62,6 +62,27 @@ export const PortfolioManagerPage = ({ certificates = [], onCertificateUpdate, o
   const isPublic = userProfile?.isPortfolioPublic !== false;
   const portfolioId = currentUser?.uid || 'student';
   const shareableUrl = `${window.location.origin}${window.location.pathname}#/p/${portfolioId}`;
+
+  // Dynamically derive authentic candidate name and skills from certificates
+  const candidateDisplayName = (userProfile?.fullName && !['Student Candidate', 'Student'].includes(userProfile.fullName))
+    ? userProfile.fullName
+    : (certificates && certificates.length > 0 && certificates[0]?.recipient && !['Student', 'Verified Student'].includes(certificates[0].recipient)
+        ? certificates[0].recipient
+        : userProfile?.fullName || currentUser?.displayName || 'Student Candidate');
+
+  const rawSkills = Array.isArray(userProfile?.skills) ? userProfile.skills : [];
+  const isBoilerplate = rawSkills.includes('Database Management') && rawSkills.includes('Web Development');
+  const cleanSkills = isBoilerplate ? [] : rawSkills;
+  const effectiveSkills = (cleanSkills.length > 0)
+    ? cleanSkills
+    : extractSkillsFromCertificates(certificates);
+
+  const effectiveProfile = {
+    ...(userProfile || {}),
+    fullName: candidateDisplayName,
+    email: userProfile?.email || currentUser?.email || '',
+    skills: effectiveSkills
+  };
 
   useEffect(() => {
     if (currentUser?.uid) {
@@ -745,7 +766,7 @@ export const PortfolioManagerPage = ({ certificates = [], onCertificateUpdate, o
       <ResumeExportModal 
         isOpen={isResumeModalOpen}
         onClose={() => setIsResumeModalOpen(false)}
-        profile={userProfile || { fullName: currentUser?.displayName, email: currentUser?.email }}
+        profile={effectiveProfile}
         certificates={certificates}
         projects={projects}
         experiences={experiences}
@@ -755,7 +776,7 @@ export const PortfolioManagerPage = ({ certificates = [], onCertificateUpdate, o
       <RoleAnalyzerModal 
         isOpen={isRoleModalOpen}
         onClose={() => setIsRoleModalOpen(false)}
-        profile={userProfile || { fullName: currentUser?.displayName, email: currentUser?.email }}
+        profile={effectiveProfile}
         certificates={certificates}
         projects={projects}
       />

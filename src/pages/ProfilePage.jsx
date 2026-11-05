@@ -13,9 +13,9 @@ import {
 } from 'lucide-react';
 import { GithubIcon, LinkedinIcon } from '../components/BrandIcons';
 import { useAuth } from '../context/AuthContext';
-import { saveUserProfile } from '../services/profileService';
+import { saveUserProfile, extractSkillsFromCertificates } from '../services/profileService';
 
-export const ProfilePage = () => {
+export const ProfilePage = ({ certificates = [] }) => {
   const { currentUser, userProfile, refreshProfile } = useAuth();
 
   const [saving, setSaving] = useState(false);
@@ -38,27 +38,36 @@ export const ProfilePage = () => {
   });
 
   useEffect(() => {
-    if (userProfile) {
-      // Clean out boilerplate placeholder skills for real users
-      const rawSkills = Array.isArray(userProfile.skills) ? userProfile.skills : [];
-      const isBoilerplate = rawSkills.includes('Database Management') && rawSkills.includes('Web Development');
-      const cleanSkills = isBoilerplate ? [] : rawSkills;
+    // 1. Clean out placeholder skills
+    const rawSkills = Array.isArray(userProfile?.skills) ? userProfile.skills : [];
+    const isBoilerplate = rawSkills.includes('Database Management') && rawSkills.includes('Web Development');
+    let cleanSkills = isBoilerplate ? [] : rawSkills;
 
-      setFormData({
-        fullName: userProfile.fullName || currentUser?.displayName || '',
-        email: userProfile.email || currentUser?.email || '',
-        usn: userProfile.usn || '',
-        institution: userProfile.institution || '',
-        degree: userProfile.degree || '',
-        semester: userProfile.semester || '',
-        bio: userProfile.bio || '',
-        skills: cleanSkills,
-        github: userProfile.github || '',
-        linkedin: userProfile.linkedin || '',
-        isPortfolioPublic: userProfile.isPortfolioPublic !== false
-      });
+    // 2. Dynamically derive skills from real certificates if profile skills are empty
+    if (cleanSkills.length === 0 && certificates && certificates.length > 0) {
+      cleanSkills = extractSkillsFromCertificates(certificates);
     }
-  }, [userProfile, currentUser]);
+
+    // 3. Candidate name from profile, or dynamically from the candidate's actual certificate
+    const derivedCandidateName = userProfile?.fullName 
+      || (certificates[0]?.recipient && !['Student', 'Verified Student'].includes(certificates[0].recipient) ? certificates[0].recipient : '')
+      || currentUser?.displayName 
+      || '';
+
+    setFormData({
+      fullName: derivedCandidateName,
+      email: userProfile?.email || currentUser?.email || '',
+      usn: userProfile?.usn || '',
+      institution: userProfile?.institution || (certificates[0]?.issuer || ''),
+      degree: userProfile?.degree || '',
+      semester: userProfile?.semester || '',
+      bio: userProfile?.bio || '',
+      skills: cleanSkills,
+      github: userProfile?.github || '',
+      linkedin: userProfile?.linkedin || '',
+      isPortfolioPublic: userProfile?.isPortfolioPublic !== false
+    });
+  }, [userProfile, currentUser, certificates]);
 
   const handleAddSkill = (e) => {
     e.preventDefault();
@@ -280,7 +289,24 @@ export const ProfilePage = () => {
 
         {/* Skills Tag Input */}
         <div className="form-group" style={{ marginBottom: '24px' }}>
-          <label className="form-label">Verified Skill Demonstration Tags</label>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
+            <label className="form-label" style={{ margin: 0 }}>Verified Skill Demonstration Tags</label>
+            {certificates && certificates.length > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  const autoSkills = extractSkillsFromCertificates(certificates);
+                  const merged = Array.from(new Set([...formData.skills, ...autoSkills]));
+                  setFormData(prev => ({ ...prev, skills: merged }));
+                }}
+                className="btn btn-secondary btn-sm"
+                style={{ fontSize: '0.74rem', padding: '3px 10px', color: '#38bdf8', borderColor: 'rgba(56, 189, 248, 0.3)' }}
+                title="Extract skills directly from your uploaded certificates"
+              >
+                <span>⚡ Auto-Sync Skills from Certificates</span>
+              </button>
+            )}
+          </div>
           <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
             <input 
               type="text" 

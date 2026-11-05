@@ -13,8 +13,14 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-export const Sidebar = ({ activeTab, setActiveTab, isOpen, setIsOpen }) => {
+export const Sidebar = ({ activeTab, setActiveTab, isOpen, setIsOpen, certificates = [] }) => {
   const { currentUser, userProfile, logout } = useAuth();
+
+  const candidateName = (userProfile?.fullName && !['Student Candidate', 'Student'].includes(userProfile.fullName))
+    ? userProfile.fullName
+    : (certificates && certificates.length > 0 && certificates[0]?.recipient && !['Student', 'Verified Student'].includes(certificates[0].recipient)
+        ? certificates[0].recipient
+        : userProfile?.fullName || currentUser?.displayName || 'Student');
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -73,11 +79,11 @@ export const Sidebar = ({ activeTab, setActiveTab, isOpen, setIsOpen }) => {
       <div className="sidebar-footer">
         <div className="user-quick-profile" style={{ marginBottom: '8px' }}>
           <div className="avatar-circle">
-            {(userProfile?.fullName || currentUser?.displayName || 'S')[0].toUpperCase()}
+            {(candidateName || 'S')[0].toUpperCase()}
           </div>
           <div className="user-text-meta">
             <div className="user-name-title">
-              {userProfile?.fullName || currentUser?.displayName || 'Student'}
+              {candidateName}
             </div>
             <div className="user-subtext">
               {userProfile?.usn || userProfile?.degree || currentUser?.email || 'Student Account'}

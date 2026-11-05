@@ -9,15 +9,87 @@ import {
 
 const LOCAL_PROFILES_KEY = 'skillvault_local_profiles';
 
+/**
+ * Dynamically extracts verified competencies & technical skills
+ * directly from the candidate's actual certificates and credentials!
+ */
+export const extractSkillsFromCertificates = (certificates = []) => {
+  const skillsSet = new Set();
+
+  certificates.forEach(cert => {
+    const text = `${cert.title || ''} ${cert.description || ''} ${cert.issuer || ''} ${cert.rawOcrText || ''}`.toLowerCase();
+
+    // 1. Environmental, Policy & Sustainability
+    if (text.includes('environment') || text.includes('sustainability') || text.includes('climate') || text.includes('policy') || text.includes('jindal')) {
+      skillsSet.add('Environmental Policy & Governance');
+      skillsSet.add('Environmental Impact Assessment (EIA)');
+      skillsSet.add('Sustainability Practice');
+      skillsSet.add('Climate Action & SDGs');
+    }
+
+    // 2. Google Cloud Platform
+    if (text.includes('google cloud') || text.includes('gcp') || text.includes('associate cloud engineer')) {
+      skillsSet.add('Google Cloud Platform (GCP)');
+      skillsSet.add('Cloud Deployment & Operations');
+    }
+
+    // 3. Containerization & Kubernetes
+    if (text.includes('kubernetes') || text.includes('containerization') || text.includes('docker') || text.includes('microservices')) {
+      skillsSet.add('Kubernetes Orchestration');
+      skillsSet.add('Docker Containers');
+      skillsSet.add('Microservices Architecture');
+    }
+
+    // 4. AWS, Cloud Storage & Serverless
+    if (text.includes('aws') || text.includes('amazon') || text.includes('serverless') || text.includes('s3') || text.includes('ec2') || text.includes('lambda')) {
+      skillsSet.add('Amazon Web Services (AWS)');
+      skillsSet.add('Serverless Architecture');
+      skillsSet.add('AWS S3 Cloud Storage');
+    }
+
+    // 5. DevOps, CI/CD & Cloud Infrastructure
+    if (text.includes('devops') || text.includes('ci/cd') || text.includes('terraform') || text.includes('pipeline')) {
+      skillsSet.add('DevOps Automation');
+      skillsSet.add('CI/CD Pipelines');
+    }
+
+    // 6. Hackathons & Rapid MVP Prototyping
+    if (text.includes('hackathon') || text.includes('first prize') || text.includes('winner') || text.includes('innovation')) {
+      skillsSet.add('Rapid Prototyping');
+      skillsSet.add('Agile Sprint Engineering');
+    }
+
+    // 7. AI, Machine Learning & OCR
+    if (text.includes('machine learning') || text.includes('ai') || text.includes('ocr') || text.includes('tesseract')) {
+      skillsSet.add('Machine Learning & AI');
+      skillsSet.add('Computer Vision & Document OCR');
+    }
+
+    // 8. Python & Data Science
+    if (text.includes('python') || text.includes('data science') || text.includes('pandas') || text.includes('analytics')) {
+      skillsSet.add('Python Engineering');
+      skillsSet.add('Data Analytics');
+    }
+
+    // 9. Economics & Financial Analysis
+    if (text.includes('economic') || text.includes('economics') || text.includes('finance') || text.includes('econometric')) {
+      skillsSet.add('Economic Analysis');
+      skillsSet.add('Financial Econometrics');
+    }
+  });
+
+  return Array.from(skillsSet);
+};
+
 const DEMO_EVALUATOR_PROFILE = {
-  fullName: 'Maheswari S',
-  email: 'maheswari.ise@student.edu',
-  usn: '4NICS20',
-  institution: 'Department of Information Science & Engineering',
-  degree: 'Bachelor of Engineering (ISE)',
-  semester: '5th Semester',
-  bio: 'Information Science student passionate about cloud architecture, serverless deployments, and intelligent systems.',
-  skills: ['Cloud Computing', 'Firebase', 'React.js', 'Google Cloud Platform', 'REST APIs', 'OCR Processing'],
+  fullName: 'Student Candidate',
+  email: 'student@ise.edu',
+  usn: '',
+  institution: '',
+  degree: 'Bachelor of Engineering',
+  semester: '',
+  bio: 'Engineering student managing verified digital credentials, cloud architectures, and academic achievements.',
+  skills: [],
   github: 'https://github.com',
   linkedin: 'https://linkedin.com',
   isPortfolioPublic: true,

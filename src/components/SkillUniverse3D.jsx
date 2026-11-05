@@ -15,6 +15,7 @@ import {
   X,
   RotateCw
 } from 'lucide-react';
+import { extractSkillsFromCertificates } from '../services/profileService';
 
 export const SkillUniverse3D = ({ certificates = [], projects = [], userProfile = null, onLaunchViva = null }) => {
   const canvasRef = useRef(null);
@@ -31,11 +32,17 @@ export const SkillUniverse3D = ({ certificates = [], projects = [], userProfile 
     const nodes = [];
     const links = [];
 
-    // 1. Central Core Node
+    // 1. Central Core Node (Dynamically derived from profile or actual certificate recipient)
+    const candidateName = (userProfile?.fullName && !['Student Candidate', 'Student'].includes(userProfile.fullName))
+      ? userProfile.fullName
+      : (certificates && certificates.length > 0 && certificates[0]?.recipient && !['Student', 'Verified Student'].includes(certificates[0].recipient)
+          ? certificates[0].recipient
+          : userProfile?.fullName || 'Student Core');
+
     const centerNode = {
       id: 'center_core',
-      label: userProfile?.fullName || 'Student Core',
-      sublabel: userProfile?.usn || 'SkillVault Node',
+      label: candidateName,
+      sublabel: userProfile?.usn || (certificates[0]?.recipient ? 'Verified Candidate' : 'SkillVault Node'),
       category: 'CORE',
       color: '#38bdf8',
       radius: 28,
@@ -46,7 +53,7 @@ export const SkillUniverse3D = ({ certificates = [], projects = [], userProfile 
       vy: 0,
       glow: '#0284c7',
       mastery: 98,
-      details: 'Central cryptographic identity and cloud credentials anchor'
+      details: `Central cryptographic identity for ${candidateName} and cloud credentials anchor`
     };
     nodes.push(centerNode);
 
@@ -241,6 +248,45 @@ export const SkillUniverse3D = ({ certificates = [], projects = [], userProfile 
         details: `Issuer: ${cert.issuer || 'Academic'} • Issued: ${cert.issueDate || 'Recent'} • SHA-256 Ledger Verified`
       });
       links.push({ source: 'dom_academic', target: certNodeId, color: '#ec4899', width: 1.5 });
+    });
+
+    // 5. Dynamic verified skills from candidate's actual credentials
+    const dynamicCredSkills = extractSkillsFromCertificates(certificates);
+    dynamicCredSkills.forEach((skillName, sIdx) => {
+      const existing = nodes.find(n => n.label && n.label.toLowerCase() === skillName.toLowerCase());
+      if (!existing) {
+        const sAngle = (sIdx * 1.05) + 0.3;
+        const sDist = 125;
+        let parentDomain = 'dom_academic';
+        const lower = skillName.toLowerCase();
+        if (lower.includes('cloud') || lower.includes('aws') || lower.includes('gcp') || lower.includes('kubernetes') || lower.includes('docker') || lower.includes('devops')) {
+          parentDomain = 'dom_cloud';
+        } else if (lower.includes('ai') || lower.includes('machine learning') || lower.includes('ocr')) {
+          parentDomain = 'dom_ai';
+        }
+
+        const parent = nodes.find(n => n.id === parentDomain);
+        const x = (parent?.x || 0) + Math.cos(sAngle) * sDist;
+        const y = (parent?.y || 0) + Math.sin(sAngle) * sDist;
+        const dynSkillId = `dyn_skill_${sIdx}`;
+
+        nodes.push({
+          id: dynSkillId,
+          label: skillName,
+          category: parentDomain === 'dom_cloud' ? 'CLOUD' : parentDomain === 'dom_ai' ? 'AI' : 'ACADEMIC',
+          color: '#38bdf8',
+          glow: '#0284c7',
+          radius: 12,
+          x,
+          y,
+          z: ((sIdx % 4) - 2) * 35,
+          vx: 0,
+          vy: 0,
+          mastery: 94,
+          details: `Verified competency dynamically extracted from certificate: ${skillName}`
+        });
+        links.push({ source: parentDomain, target: dynSkillId, color: '#38bdf8', width: 1.2 });
+      }
     });
 
     return { nodes, links };
