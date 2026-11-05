@@ -140,6 +140,19 @@ export const EditCertificateModal = ({ certificate, isOpen, onClose, onSaveSucce
                 onChange={(e) => setFormData({ ...formData, credentialId: e.target.value })}
               />
             </div>
+
+            <div className="form-group">
+              <label className="form-label">Verification Status</label>
+              <select 
+                className="form-select"
+                value={formData.verificationStatus}
+                onChange={(e) => setFormData({ ...formData, verificationStatus: e.target.value })}
+              >
+                <option value="VERIFIED">🟢 Verified</option>
+                <option value="PENDING_REVIEW">🟡 Pending Review</option>
+                <option value="OCR_PROCESSED">🔵 OCR Scanned</option>
+              </select>
+            </div>
           </div>
 
           <div className="form-group">

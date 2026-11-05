@@ -113,6 +113,7 @@ export const CourseVivaQuizModal = ({ isOpen, onClose, certificate, onVivaSucces
       const updated = await updateCertificateRecord(certificate.id, {
         vivaScore: scorePercent,
         vivaStatus: scorePercent >= 70 ? 'PASSED' : 'FAILED',
+        verificationStatus: scorePercent >= 70 ? 'VERIFIED' : (certificate.verificationStatus || 'VERIFIED'),
         vivaPassedAt: new Date().toISOString(),
         vivaQuestionsTotal: questions.length,
         vivaQuestionsCorrect: correctCount
