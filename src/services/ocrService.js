@@ -164,6 +164,7 @@ export const extractCertificateFields = (rawText) => {
   let recipient = '';
   let issuer = '';
   let issueDate = '';
+  let expiryDate = '';
   let credentialId = '';
   let verificationUrl = '';
   let category = 'course';
@@ -431,6 +432,37 @@ export const extractCertificateFields = (rawText) => {
 
   const isoIssueDate = normalizeToIsoDate(issueDate);
 
+  // 5b. Universal Certificate Expiry & Recertification Date Extractor
+  const expiryLabeledMatch = fullText.match(/(?:valid (?:until|through|till)|expiration date|expires on|expire date|expiry date|validity(?: period)?|recertification by)[:\s]+([A-Za-z0-9,.\s/-]{4,25})/i);
+  if (expiryLabeledMatch) {
+    const candidate = expiryLabeledMatch[1].trim();
+    const normalized = normalizeToIsoDate(candidate);
+    if (normalized) {
+      expiryDate = normalized;
+    }
+  }
+
+  if (!expiryDate) {
+    const expiryKeywordsMatch = fullText.match(/(?:expires|valid through|valid until)\s+([A-Za-z]{3,9}\s+\d{1,2},?\s+\d{4}|\d{1,2}[-/.]\d{1,2}[-/.]\d{4}|\d{4}[-/.]\d{1,2}[-/.]\d{1,2}|[A-Za-z]{3,9}\s+\d{4})/i);
+    if (expiryKeywordsMatch) {
+      const normalized = normalizeToIsoDate(expiryKeywordsMatch[1]);
+      if (normalized) {
+        expiryDate = normalized;
+      }
+    }
+  }
+
+  // Cloud Certification Default Validity (AWS, Google Cloud, Cisco, Red Hat credentials typically valid for 3 years)
+  if (!expiryDate && isoIssueDate && /(?:Google Cloud|AWS|Amazon Web Services|Cisco|Red Hat)/i.test(issuer + ' ' + title)) {
+    try {
+      const parts = isoIssueDate.split('-');
+      if (parts.length === 3) {
+        const expYear = parseInt(parts[0], 10) + 3;
+        expiryDate = `${expYear}-${parts[1]}-${parts[2]}`;
+      }
+    } catch (_) {}
+  }
+
   // 6. Universal Credential ID & URL Extractor
   // Roll number, Certificate ID, License No, Credential ID
   const idRegexes = [
@@ -607,6 +639,9 @@ export const extractCertificateFields = (rawText) => {
     recipient: recipient || '',
     issuer: issuer || 'Independent',
     issueDate: finalIssueDate,
+    expiryDate: expiryDate || '',
+    enableExpiryReminder: Boolean(expiryDate),
+    ocrEngine: 'Tesseract.js (In-Browser Web Worker)',
     category,
     credentialId,
     verificationUrl,

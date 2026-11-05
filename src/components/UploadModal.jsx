@@ -11,7 +11,11 @@ import {
   ShieldAlert,
   Lock,
   UserX,
-  XCircle
+  XCircle,
+  Bell,
+  CalendarClock,
+  Mail,
+  Zap
 } from 'lucide-react';
 import { validateCertificateFile, uploadCertificateFile, createCertificateRecord } from '../services/certificateService';
 import { runTesseractOCR } from '../services/ocrService';
@@ -42,6 +46,8 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess, existingCertific
     issuer: '',
     recipient: '',
     issueDate: '',
+    expiryDate: '',
+    enableExpiryReminder: false,
     category: 'course',
     description: '',
     credentialId: '',
@@ -201,12 +207,14 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess, existingCertific
       setDetectedRecipient(extracted.recipient || '');
       setOcrWarnings(extracted.warnings || []);
 
-      // Auto-populate whatever fields OCR extracted
+      // Auto-populate whatever fields OCR extracted (Tesseract.js runs free in browser)
       setFormData({
         title: extracted.title || '',
         issuer: extracted.issuer || '',
         recipient: extracted.recipient || '',
         issueDate: extracted.issueDate || '',
+        expiryDate: extracted.expiryDate || '',
+        enableExpiryReminder: Boolean(extracted.expiryDate),
         category: extracted.category || 'course',
         description: `Uploaded and scanned via SkillVault Cloud OCR on ${new Date().toLocaleDateString()}`,
         credentialId: extracted.credentialId || '',
@@ -218,7 +226,8 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess, existingCertific
         fileName: uploadResult.fileName,
         fileSize: uploadResult.fileSize,
         fileType: uploadResult.fileType,
-        rawOcrText: extracted.rawText || ''
+        rawOcrText: extracted.rawText || '',
+        ocrEngine: 'Tesseract.js (Client-Side $0 AWS Cost)'
       });
 
       setStage('review');
@@ -676,10 +685,63 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess, existingCertific
                 </div>
               )}
 
+              {/* In-Browser Tesseract.js Auto-Fill Callout ($0 AWS Cost) */}
+              <div style={{
+                padding: '14px 16px',
+                borderRadius: 'var(--radius-md)',
+                background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.1), rgba(16, 185, 129, 0.08))',
+                border: '1px solid rgba(14, 165, 233, 0.3)',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '12px',
+                marginBottom: '20px'
+              }}>
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '8px',
+                  background: 'rgba(14, 165, 233, 0.2)',
+                  color: '#38bdf8',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  marginTop: '2px'
+                }}>
+                  <Zap size={18} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    <span>⚡ Auto-Filled by Tesseract.js (Client-Side OCR)</span>
+                    <span style={{
+                      fontSize: '0.7rem',
+                      padding: '2px 8px',
+                      borderRadius: '9999px',
+                      background: 'rgba(16, 185, 129, 0.2)',
+                      color: '#34d399',
+                      border: '1px solid rgba(16, 185, 129, 0.4)',
+                      fontWeight: 700
+                    }}>
+                      $0 AWS Cost • 100% In-Browser
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: '4px 0 0', lineHeight: 1.5 }}>
+                    Tesseract.js runs directly in your browser via WebAssembly web workers for free — zero AWS Textract/Vision charges! Issuer, title, and dates are auto-filled so you don't type metadata for 20+ certificates. Review the extracted fields below and edit/correct any details as needed.
+                  </p>
+                </div>
+              </div>
+
               {/* Form Fields */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div className="form-group" style={{ gridColumn: 'span 2', marginBottom: '14px' }}>
-                  <label className="form-label">Certificate Title / Program Name *</label>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <label className="form-label" style={{ marginBottom: 0 }}>Certificate Title / Program Name *</label>
+                    {formData.title && (
+                      <span style={{ color: '#34d399', fontSize: '0.72rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        ✨ Auto-filled from OCR (Click to edit)
+                      </span>
+                    )}
+                  </div>
                   <input 
                     type="text" 
                     className="form-input" 
@@ -691,7 +753,14 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess, existingCertific
                 </div>
 
                 <div className="form-group" style={{ marginBottom: '14px' }}>
-                  <label className="form-label">Issuing Organization / Authority *</label>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <label className="form-label" style={{ marginBottom: 0 }}>Issuing Organization / Authority *</label>
+                    {formData.issuer && (
+                      <span style={{ color: '#34d399', fontSize: '0.72rem', fontWeight: 600 }}>
+                        ✨ Auto-filled
+                      </span>
+                    )}
+                  </div>
                   <input 
                     type="text" 
                     className="form-input" 
@@ -746,14 +815,16 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess, existingCertific
                 </div>
 
                 <div className="form-group" style={{ marginBottom: '14px' }}>
-                  <label className="form-label">
-                    Issue Date
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <label className="form-label" style={{ marginBottom: 0 }}>
+                      Issue Date
+                    </label>
                     {formData.issueDate && Boolean(formData.rawOcrText) && (
-                      <span style={{ color: '#34d399', fontSize: '0.74rem', marginLeft: '6px', fontWeight: 600 }}>
-                        ✓ Detected from Document
+                      <span style={{ color: '#34d399', fontSize: '0.72rem', fontWeight: 600 }}>
+                        ✓ Detected from OCR
                       </span>
                     )}
-                  </label>
+                  </div>
                   <input 
                     type="date" 
                     className="form-input" 
@@ -765,6 +836,117 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess, existingCertific
                       ⚠️ Date not detected on certificate. Please pick issue date.
                     </div>
                   )}
+                </div>
+
+                {/* Expiry Date Field with Quick Presets */}
+                <div className="form-group" style={{ marginBottom: '14px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <label className="form-label" style={{ marginBottom: 0 }}>
+                      Expiration / Renewal Date
+                    </label>
+                    {formData.expiryDate ? (
+                      <span style={{ color: '#38bdf8', fontSize: '0.72rem', fontWeight: 600 }}>
+                        📅 Configured
+                      </span>
+                    ) : (
+                      <span style={{ color: 'var(--text-muted)', fontSize: '0.72rem' }}>
+                        Optional (AWS, GCP, Cisco)
+                      </span>
+                    )}
+                  </div>
+                  <input 
+                    type="date" 
+                    className="form-input" 
+                    value={formData.expiryDate || ''} 
+                    onChange={(e) => setFormData({ 
+                      ...formData, 
+                      expiryDate: e.target.value,
+                      enableExpiryReminder: e.target.value ? true : formData.enableExpiryReminder
+                    })}
+                  />
+                  <div style={{ display: 'flex', gap: '6px', marginTop: '6px', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', alignSelf: 'center' }}>Presets:</span>
+                    <button 
+                      type="button" 
+                      onClick={() => {
+                        const d = new Date(formData.issueDate || Date.now());
+                        d.setFullYear(d.getFullYear() + 1);
+                        setFormData({ ...formData, expiryDate: d.toISOString().split('T')[0], enableExpiryReminder: true });
+                      }}
+                      style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '4px', background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-subtle)', color: 'var(--text-secondary)', cursor: 'pointer' }}
+                    >
+                      +1 Year
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => {
+                        const d = new Date(formData.issueDate || Date.now());
+                        d.setFullYear(d.getFullYear() + 2);
+                        setFormData({ ...formData, expiryDate: d.toISOString().split('T')[0], enableExpiryReminder: true });
+                      }}
+                      style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '4px', background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-subtle)', color: '#38bdf8', cursor: 'pointer' }}
+                    >
+                      +2 Yrs (AWS/GCP)
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => {
+                        const d = new Date(formData.issueDate || Date.now());
+                        d.setFullYear(d.getFullYear() + 3);
+                        setFormData({ ...formData, expiryDate: d.toISOString().split('T')[0], enableExpiryReminder: true });
+                      }}
+                      style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '4px', background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-subtle)', color: 'var(--text-secondary)', cursor: 'pointer' }}
+                    >
+                      +3 Years
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => setFormData({ ...formData, expiryDate: '', enableExpiryReminder: false })}
+                      style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '4px', background: 'transparent', border: 'none', color: '#fb7185', cursor: 'pointer' }}
+                    >
+                      No Expiry
+                    </button>
+                  </div>
+                </div>
+
+                {/* Scheduled 7-Day Expiry Email Reminder (AWS SES & Lambda) */}
+                <div style={{
+                  gridColumn: 'span 2',
+                  padding: '12px 16px',
+                  borderRadius: 'var(--radius-md)',
+                  background: formData.expiryDate ? 'rgba(56, 189, 248, 0.08)' : 'var(--bg-surface-elevated)',
+                  border: formData.expiryDate ? '1px solid rgba(56, 189, 248, 0.25)' : '1px solid var(--border-subtle)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '12px',
+                  marginBottom: '4px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                    <Bell size={18} style={{ color: formData.expiryDate ? '#38bdf8' : 'var(--text-muted)', marginTop: '2px', flexShrink: 0 }} />
+                    <div>
+                      <div style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span>Scheduled 7-Day Expiry Email Reminder</span>
+                        <span style={{ fontSize: '0.7rem', padding: '1px 6px', borderRadius: '4px', background: 'rgba(14, 165, 233, 0.2)', color: '#38bdf8' }}>
+                          AWS Lambda + SES
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '2px', lineHeight: 1.4 }}>
+                        {formData.expiryDate ? (
+                          <>Dispatches automated renewal notice to <strong>{currentUser?.email || 'your email'}</strong> exactly 1 week before {formData.expiryDate} via Amazon SES & EventBridge daily cron.</>
+                        ) : (
+                          <>Set an expiration date above to activate automated 7-day email reminders via AWS SES & scheduled Lambda.</>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <input 
+                    type="checkbox" 
+                    disabled={!formData.expiryDate}
+                    checked={formData.expiryDate ? formData.enableExpiryReminder : false}
+                    onChange={(e) => setFormData({ ...formData, enableExpiryReminder: e.target.checked })}
+                    style={{ width: '18px', height: '18px', accentColor: '#0ea5e9', cursor: formData.expiryDate ? 'pointer' : 'not-allowed' }}
+                  />
                 </div>
 
                 <div className="form-group" style={{ marginBottom: '14px' }}>

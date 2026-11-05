@@ -12,7 +12,8 @@ import {
   Sparkles,
   Target,
   FileText,
-  Orbit
+  Orbit,
+  Bell
 } from 'lucide-react';
 import { StatCard } from '../components/StatCard';
 import { SkillDistributionChart } from '../components/SkillDistributionChart';
@@ -30,7 +31,8 @@ export const DashboardPage = ({
   onPreviewCertificate, 
   onEditCertificate, 
   onDeleteCertificate,
-  onTakeViva
+  onTakeViva,
+  onOpenReminders
 }) => {
   const { userProfile, currentUser } = useAuth();
 
@@ -132,6 +134,17 @@ export const DashboardPage = ({
         </div>
 
         <div style={{ display: 'flex', gap: '10px', zIndex: 1, flexWrap: 'wrap' }}>
+          {onOpenReminders && (
+            <button 
+              className="btn btn-secondary" 
+              onClick={onOpenReminders}
+              style={{ borderColor: 'rgba(245, 158, 11, 0.4)', color: '#fbbf24' }}
+              title="View certificate expirations & application deadlines with AWS SES alerts"
+            >
+              <Bell size={15} />
+              <span>Deadlines & Expiry</span>
+            </button>
+          )}
           <button className="btn btn-secondary" onClick={() => setIsRoleModalOpen(true)}>
             <Target size={15} style={{ color: '#818cf8' }} />
             <span>Role Readiness</span>

@@ -158,6 +158,25 @@ export const CertificateCard = ({ certificate, onPreview, onEdit, onDelete, onTa
           <Calendar size={14} style={{ color: 'var(--text-muted)' }} />
           <span>{certificate.issueDate || 'Date unspecified'}</span>
         </div>
+        {certificate.expiryDate && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{
+              fontSize: '0.72rem',
+              padding: '2px 8px',
+              borderRadius: '4px',
+              background: 'rgba(245, 158, 11, 0.12)',
+              color: '#fbbf24',
+              border: '1px solid rgba(245, 158, 11, 0.3)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              fontWeight: 600
+            }}>
+              <span>⏳ Expires: {certificate.expiryDate}</span>
+              <span style={{ fontSize: '0.68rem', color: '#38bdf8' }}>• 7d SES Alert</span>
+            </span>
+          </div>
+        )}
         {certificate.recipient && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>Holder:</span>

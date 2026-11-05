@@ -9,11 +9,12 @@ import {
   LogOut, 
   Layers, 
   Orbit,
-  X
+  X,
+  Bell
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-export const Sidebar = ({ activeTab, setActiveTab, isOpen, setIsOpen, certificates = [] }) => {
+export const Sidebar = ({ activeTab, setActiveTab, isOpen, setIsOpen, certificates = [], onOpenReminders }) => {
   const { currentUser, userProfile, logout } = useAuth();
 
   const candidateName = (userProfile?.fullName && !['Student Candidate', 'Student'].includes(userProfile.fullName))
@@ -26,6 +27,7 @@ export const Sidebar = ({ activeTab, setActiveTab, isOpen, setIsOpen, certificat
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'universe', label: '3D Skill Universe', icon: Orbit },
     { id: 'certificates', label: 'My Credentials', icon: Award },
+    { id: 'reminders', label: 'Deadlines & Alerts', icon: Bell },
     { id: 'upload', label: 'Smart Upload & OCR', icon: UploadCloud },
     { id: 'portfolio', label: 'Shareable Portfolio', icon: Globe },
     { id: 'validator', label: 'Verify Credential', icon: ShieldCheck },
@@ -33,7 +35,11 @@ export const Sidebar = ({ activeTab, setActiveTab, isOpen, setIsOpen, certificat
   ];
 
   const handleNavClick = (id) => {
-    setActiveTab(id);
+    if (id === 'reminders' && onOpenReminders) {
+      onOpenReminders();
+    } else {
+      setActiveTab(id);
+    }
     if (setIsOpen) setIsOpen(false);
   };
 
