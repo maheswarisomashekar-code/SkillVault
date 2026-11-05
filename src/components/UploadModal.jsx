@@ -181,25 +181,27 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess, existingCertific
         extracted = await runTesseractOCR(filePreview || file);
         ocrSucceeded = true;
       } catch (ocrErr) {
-        console.warn('OCR processing encountered error; falling back to manual entry:', ocrErr);
+        console.warn('OCR processing encountered error; marking as unreadable:', ocrErr);
         extracted = {
-          title: file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, ' '),
+          title: '',
           issuer: '',
           recipient: '',
           issueDate: '',
-          category: 'course',
-          confidenceScore: 30,
-          warnings: ['Document could not be parsed automatically. Please fill details manually.']
+          category: 'other',
+          confidenceScore: 0,
+          isLikelyCertificate: false,
+          documentType: 'RANDOM_IMAGE_OR_PHOTO',
+          warnings: ['No readable certificate text detected in this image. Non-certificate photos, animals, and unreadable graphics are strictly rejected.']
         };
       }
 
-      setOcrConfidence(extracted.confidenceScore);
-      setIsLikelyCertificate(extracted.isLikelyCertificate !== false);
-      setDetectedDocumentType(extracted.documentType || 'CERTIFICATE');
+      setOcrConfidence(extracted.confidenceScore || 0);
+      setIsLikelyCertificate(extracted.isLikelyCertificate === true);
+      setDetectedDocumentType(extracted.documentType || 'NON_CERTIFICATE_DOCUMENT');
       setDetectedRecipient(extracted.recipient || '');
       setOcrWarnings(extracted.warnings || []);
 
-      // Always auto-populate whatever fields OCR extracted so the user doesn't have to retype
+      // Auto-populate whatever fields OCR extracted
       setFormData({
         title: extracted.title || '',
         issuer: extracted.issuer || '',
@@ -209,7 +211,7 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess, existingCertific
         description: `Uploaded and scanned via SkillVault Cloud OCR on ${new Date().toLocaleDateString()}`,
         credentialId: extracted.credentialId || '',
         verificationUrl: extracted.verificationUrl || '',
-        isPublished: extracted.isLikelyCertificate !== false,
+        isPublished: extracted.isLikelyCertificate === true,
         verificationStatus: extracted.verificationUrl ? 'PENDING_REVIEW' : 'OCR_PROCESSED',
         fileUrl: uploadResult.downloadUrl,
         storagePath: uploadResult.storagePath,
@@ -234,10 +236,10 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess, existingCertific
       return;
     }
 
-    // Strict Non-Certificate Rejection Guard (Blocks project reports, index pages, documentation, flyers)
-    if (isLikelyCertificate === false) {
+    // Strict Non-Certificate Rejection Guard (Blocks animal photos, problem statements, project reports, flyers)
+    if (isLikelyCertificate !== true) {
       setErrorMessage(
-        'Upload Blocked: This document is a Project Report / Documentation / Non-Certificate file. SkillVault strictly stores and verifies authentic course credentials, certificates, and diplomas.'
+        'Upload Blocked: Document rejected! SkillVault only accepts authentic educational and professional certificates with proof of conferment. Random photos (such as animal photos), competition problem statements, and project reports cannot be saved.'
       );
       return;
     }
@@ -598,13 +600,17 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess, existingCertific
                       🚫 Upload Blocked: Non-Certificate Document Detected
                     </div>
                     <div style={{ fontSize: '0.82rem', color: '#fca5a5', lineHeight: 1.5 }}>
-                      {detectedDocumentType === 'PROJECT_REPORT_OR_DOCUMENT' ? (
+                      {detectedDocumentType === 'RANDOM_IMAGE_OR_PHOTO' ? (
+                        <>
+                          This file was identified as a <strong>random photo, animal image, landscape, or non-text graphic</strong>. SkillVault only accepts educational credentials and strictly rejects non-certificate images.
+                        </>
+                      ) : detectedDocumentType === 'PROJECT_REPORT_OR_DOCUMENT' ? (
                         <>
                           This document was identified as a <strong>Project Report, Table of Contents, or Academic Documentation</strong>. SkillVault is a verified credential vault and strictly rejects non-certificate files.
                         </>
                       ) : detectedDocumentType === 'EVENT_ANNOUNCEMENT_OR_BROCHURE' ? (
                         <>
-                          This document was identified as an <strong>Event Announcement or Flyer</strong> with registration details, not an issued completion certificate.
+                          This document was identified as a <strong>Competition Problem Statement, Event Announcement, or Rulesheet</strong> with registration details, not an individual completion certificate.
                         </>
                       ) : (
                         <>
@@ -884,11 +890,11 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess, existingCertific
                 <button 
                   type="submit" 
                   className="btn btn-primary"
-                  disabled={stage === 'saving' || duplicateValidation.isDuplicate || !isLikelyCertificate}
+                  disabled={stage === 'saving' || duplicateValidation.isDuplicate || isLikelyCertificate !== true}
                   style={
                     duplicateValidation.isDuplicate
                       ? { opacity: 0.6, cursor: 'not-allowed', background: '#475569' }
-                      : !isLikelyCertificate
+                      : isLikelyCertificate !== true
                       ? { opacity: 0.6, cursor: 'not-allowed', background: '#dc2626', borderColor: '#ef4444' }
                       : {}
                   }
@@ -898,7 +904,7 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess, existingCertific
                       <Loader2 size={16} className="spin-animation" />
                       <span>Saving to Cloud...</span>
                     </>
-                  ) : !isLikelyCertificate ? (
+                  ) : isLikelyCertificate !== true ? (
                     <>
                       <XCircle size={16} />
                       <span>Upload Blocked (Not a Certificate)</span>

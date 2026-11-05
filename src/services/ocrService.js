@@ -457,18 +457,43 @@ export const extractCertificateFields = (rawText) => {
   const cleanedRawText = (rawText || '').trim();
   const wordCount = cleanedRawText.split(/\s+/).filter(Boolean).length;
 
-  // Markers that strongly indicate an event announcement, flyer, pamphlet, rulesheet, or brochure
+  // REJECTION 1: Insufficient text (< 10 words) -> Random photos, animals (tiger, etc.), memes, landscapes
+  if (wordCount < 10) {
+    return {
+      title: '',
+      recipient: '',
+      issuer: '',
+      issueDate: '',
+      category: 'other',
+      credentialId: '',
+      verificationUrl: '',
+      rawText: rawText || '',
+      confidenceScore: 0,
+      isLikelyCertificate: false,
+      documentType: 'RANDOM_IMAGE_OR_PHOTO',
+      wordCount,
+      warnings: [
+        'Image contains no readable certificate text (less than 10 words detected).',
+        'Photos of animals (e.g. tiger, wildlife), landscapes, objects, and unreadable graphics are strictly rejected from SkillVault.'
+      ]
+    };
+  }
+
+  // Markers that strongly indicate an event announcement, competition problem statement, rulesheet, or brochure
   const eventAnnouncementPatterns = [
+    /problem\s+statements?/i,
+    /problem\s+description/i,
+    /kannada\s+hackathon/i,
+    /hackathon\s+problem/i,
     /registration\s+closes/i,
     /registration\s+(?:deadline|window|starts|open|details|fees?)/i,
     /register\s+(?:at|before|now|here|online)/i,
-    /submission\s+(?:window|deadline|closes|dates?)/i,
+    /submission\s+(?:window|deadline|closes|dates?|guidelines)/i,
     /last\s+date\s+(?:to|of|for)/i,
     /about\s+the\s+(?:hackathon|event|workshop|competition|fest|symposium|conference)/i,
     /why\s+(?:this|attend|join)\s+(?:hackathon|event|workshop|competition)/i,
     /who\s+can\s+(?:participate|apply|attend)/i,
     /eligibility\s*(?:criteria|:)/i,
-    /problem\s+statements?/i,
     /prize\s+pool/i,
     /cash\s+prizes?/i,
     /prizes\s+worth/i,
@@ -477,7 +502,9 @@ export const extractCertificateFields = (rawText) => {
     /guidelines\s+for/i,
     /call\s+for\s+(?:papers?|proposals?|participation)/i,
     /poster\s+presentation/i,
-    /code\.\s*create\.\s*celebrate/i
+    /code\.\s*create\.\s*celebrate/i,
+    /team\s+size/i,
+    /evaluation\s+criteria/i
   ];
 
   // Markers that indicate a project report, thesis, synopsis, index table, or documentation
@@ -511,12 +538,11 @@ export const extractCertificateFields = (rawText) => {
   const matchedReportMarkers = projectReportPatterns.filter(pattern => pattern.test(fullText));
   const isProjectReport = matchedReportMarkers.length >= 1;
 
-  // Phrases that indicate authentic certificate / credential conferment
+  // Strict phrases that MUST exist to prove authentic certificate conferment to an individual
   const confermentPatterns = [
     /this\s+is\s+to\s+certify\s+that/i,
     /(?:this\s+)?certificate\s+(?:is\s+)?(?:proudly\s+)?(?:awarded|presented)\s+to/i,
     /certificate\s+of\s+(?:completion|achievement|participation|merit|excellence|appreciation|recognition|attendance)/i,
-    /(?:online\s+)?certification/i,
     /(?:for|has|in)\s+succes*fully\s+completing/i,
     /has\s+successfully\s+completed/i,
     /has\s+participated\s+in/i,
@@ -525,13 +551,8 @@ export const extractCertificateFields = (rawText) => {
     /certifies\s+that/i,
     /conferred\s+upon/i,
     /has\s+secured\s+(?:first|second|third|1st|2nd|3rd|\d+th)\s+(?:place|rank|position)/i,
-    /nptel|swayam|skill\s+india|coursera|udemy|hackerrank|datacamp|credly/i,
-    /consolidated\s+sc?ore/i,
-    /proctored\s+exam/i,
     /candidates\s+certified/i,
-    /roll\s*no[:\s]/i,
-    /credits?\s+(?:recommended|earned)/i,
-    /dean\s+educational\s+outreach|coordinator|head\s+of\s+department/i
+    /consolidated\s+score\b[\s\S]{1,40}\bproctored\s+exam/i
   ];
 
   const hasConfermentProof = confermentPatterns.some(pattern => pattern.test(fullText));
@@ -539,27 +560,27 @@ export const extractCertificateFields = (rawText) => {
   let isLikelyCertificate = true;
   let documentType = 'CERTIFICATE';
 
-  if (isProjectReport && !hasConfermentProof) {
+  if (isProjectReport) {
     // Definitive Project Report / Documentation / Index Table
     isLikelyCertificate = false;
     documentType = 'PROJECT_REPORT_OR_DOCUMENT';
     confidenceScore = 10;
     warnings.push('Document identified as a Project Report, Table of Contents, or Academic Documentation, NOT an authentic certificate.');
     warnings.push('SkillVault strictly accepts verified completion certificates and credentials issued to a candidate.');
-  } else if (isEventAnnouncement && !hasConfermentProof) {
-    // Definitive Event Flyer / Brochure / Notice
+  } else if (isEventAnnouncement && (!hasConfermentProof || !recipient)) {
+    // Definitive Event Flyer / Competition Problem Statement / Circular
     isLikelyCertificate = false;
     documentType = 'EVENT_ANNOUNCEMENT_OR_BROCHURE';
-    confidenceScore = 15;
-    warnings.push('Document appears to be an Event Announcement, Flyer, or Brochure (e.g. Hackathon or Workshop notice with registration deadlines), NOT an issued student certificate.');
-    warnings.push('Valid certificates must be issued to a named recipient and include proof of completion or award conferment.');
+    confidenceScore = 10;
+    warnings.push('Document identified as a Competition Problem Statement, Event Announcement, or Rulesheet, NOT an issued student certificate.');
+    warnings.push('Problem statements and event flyers cannot be uploaded. Valid certificates must be awarded to a named individual.');
   } else if (!hasConfermentProof) {
-    // Generic non-certificate document
+    // Generic non-certificate document or photo
     isLikelyCertificate = false;
     documentType = 'NON_CERTIFICATE_DOCUMENT';
-    confidenceScore = 15;
+    confidenceScore = 10;
     warnings.push('Document lacks official certificate conferment text ("This is to certify that", "Certificate of Completion", "Awarded to").');
-    warnings.push('General PDFs, report sheets, textbook pages, and notes cannot be saved as credentials.');
+    warnings.push('General PDFs, report sheets, textbook pages, animal photos, and notes are rejected.');
   } else {
     confidenceScore = 65;
     if (title) confidenceScore += 10;
