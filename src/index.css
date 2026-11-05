@@ -602,6 +602,13 @@ input, textarea, select {
   transform: translateY(-3px);
 }
 
+.auth-card-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  width: 100%;
+  max-width: 1040px;
+}
+
 .feature-pill-hover {
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
@@ -790,8 +797,12 @@ input, textarea, select {
     display: none !important;
   }
 
+  .auth-mobile-brand {
+    display: flex !important;
+  }
+
   .auth-form-panel {
-    padding: 32px 20px !important;
+    padding: 32px 24px !important;
     width: 100% !important;
   }
 

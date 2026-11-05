@@ -16,7 +16,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 
 export const AuthPage = () => {
-  const { login, register, authError } = useAuth();
+  const { login, register, loginDemoStudent, authError } = useAuth();
 
   const [isRegistering, setIsRegistering] = useState(false);
   const [email, setEmail] = useState('');
@@ -128,10 +128,12 @@ export const AuthPage = () => {
         <Cloud size={110} strokeWidth={1.3} />
       </div>
 
-      {/* Main Two-Panel Card */}
+      {/* Main Two-Panel Card: Side-by-Side Dual Column */}
       <div className="auth-panel-glow auth-card-grid" style={{
         maxWidth: '1040px',
         width: '100%',
+        display: 'grid',
+        gridTemplateColumns: '1.05fr 0.95fr',
         background: 'rgba(15, 23, 42, 0.88)',
         backdropFilter: 'blur(24px)',
         border: '1px solid rgba(255, 255, 255, 0.12)',
@@ -288,6 +290,17 @@ export const AuthPage = () => {
           flexDirection: 'column',
           justifyContent: 'center'
         }}>
+          {/* Mobile-only compact brand header */}
+          <div className="auth-mobile-brand" style={{ display: 'none', alignItems: 'center', gap: '10px', marginBottom: '22px' }}>
+            <div className="brand-icon-wrapper" style={{ width: '38px', height: '38px' }}>
+              <Cloud size={20} />
+            </div>
+            <div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#f8fafc' }}>SkillVault</div>
+              <div style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 600 }}>Cloud Credential Platform</div>
+            </div>
+          </div>
+
           <div style={{ marginBottom: '28px' }}>
             <h3 style={{ fontSize: '1.45rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
               {isRegistering ? 'Create Your Account' : 'Welcome Back'}
@@ -384,7 +397,7 @@ export const AuthPage = () => {
                 onClick={async () => {
                   setLoading(true);
                   try {
-                    await login('maheswari.student@ise.edu', 'cloud2026');
+                    await loginDemoStudent();
                   } catch (e) {
                     setError(e.message);
                   } finally {
