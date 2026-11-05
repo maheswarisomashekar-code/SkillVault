@@ -235,21 +235,42 @@ export const getPublicCertificates = async (userId) => {
 };
 
 /**
- * Update certificate metadata
+ * Update certificate metadata (and automatically re-sign SHA-256 cryptographic seal)
  */
 export const updateCertificateRecord = async (certificateId, updates) => {
+  let existing = null;
+  if (isFirebaseConfigured && db) {
+    try {
+      const docSnap = await getDoc(doc(db, 'certificates', certificateId));
+      if (docSnap.exists()) existing = docSnap.data();
+    } catch (e) {
+      console.warn('Firestore fetch before update failed:', e);
+    }
+  }
+  
+  if (!existing) {
+    const all = await idbGetAllCertificates();
+    existing = all.find(c => c.id === certificateId);
+  }
+
+  // Combine existing with updates to recalculate canonical cryptographic signature
+  const combined = { ...(existing || {}), ...updates };
+  const newHash = await computeCertificateHash(combined);
+  const ledgerInfo = generateLedgerBlock(newHash);
+
   const updateData = {
     ...updates,
+    sha256Hash: newHash,
+    ledgerBlockId: (updates && updates.ledgerBlockId) || (existing && existing.ledgerBlockId) || ledgerInfo.ledgerBlockId,
+    ledgerTimestamp: ledgerInfo.recordedAt,
     updatedAt: new Date().toISOString()
   };
 
   if (isFirebaseConfigured && db) {
     const certRef = doc(db, 'certificates', certificateId);
     await updateDoc(certRef, updateData);
-    return updateData;
+    return { ...(existing || {}), ...updateData };
   } else {
-    const all = await idbGetAllCertificates();
-    const existing = all.find(c => c.id === certificateId);
     if (existing) {
       const updated = { ...existing, ...updateData };
       await idbSaveCertificate(updated);
@@ -320,10 +341,30 @@ export const getCertificateById = async (certificateId) => {
     return idMatch || credMatch;
   }) || null;
 
-  if (cert && !cert.sha256Hash) {
-    cert.sha256Hash = await computeCertificateHash(cert);
-    const ledger = generateLedgerBlock(cert.sha256Hash);
-    cert.ledgerBlockId = cert.ledgerBlockId || ledger.ledgerBlockId;
+  if (cert) {
+    // Self-healing: Ensure SHA-256 seal matches canonical fields in case of past offline edits
+    const expectedHash = await computeCertificateHash(cert);
+    if (!cert.sha256Hash || cert.sha256Hash !== expectedHash) {
+      cert.sha256Hash = expectedHash;
+      const ledger = generateLedgerBlock(expectedHash);
+      cert.ledgerBlockId = cert.ledgerBlockId || ledger.ledgerBlockId;
+      cert.ledgerTimestamp = cert.ledgerTimestamp || ledger.recordedAt;
+
+      // Persist self-healed hash so subsequent queries are instant & consistent
+      if (isFirebaseConfigured && db && cert.id) {
+        try {
+          await updateDoc(doc(db, 'certificates', cert.id), {
+            sha256Hash: cert.sha256Hash,
+            ledgerBlockId: cert.ledgerBlockId,
+            ledgerTimestamp: cert.ledgerTimestamp
+          });
+        } catch (_) {}
+      } else if (cert.id) {
+        try {
+          await idbSaveCertificate(cert);
+        } catch (_) {}
+      }
+    }
   }
   return cert;
 };

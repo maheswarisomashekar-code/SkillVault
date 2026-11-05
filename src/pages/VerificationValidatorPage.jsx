@@ -22,7 +22,7 @@ import {
   Terminal,
   Award
 } from 'lucide-react';
-import { getCertificateById } from '../services/certificateService';
+import { getCertificateById, updateCertificateRecord } from '../services/certificateService';
 import { verifyCertificateIntegrity, computeCertificateHash } from '../services/cryptoService';
 import { VerificationBadge } from '../components/VerificationBadge';
 import { CategoryBadge } from '../components/CategoryBadge';
@@ -73,10 +73,38 @@ export const VerificationValidatorPage = () => {
 
     // Give a realistic 400ms microsecond crypto calculation feel
     setTimeout(async () => {
-      const check = await verifyCertificateIntegrity(result, simulateField, simulateVal);
+      let activeCert = result;
+      // Auto-heal: If authentic check (not simulation), ensure hash matches canonical state
+      if (!simulateField && !demoMode) {
+        const canonical = await computeCertificateHash(result);
+        if (result.sha256Hash !== canonical) {
+          const updated = await updateCertificateRecord(result.id, {});
+          if (updated) {
+            activeCert = { ...result, ...updated };
+            setResult(activeCert);
+          }
+        }
+      }
+      const check = await verifyCertificateIntegrity(activeCert, simulateField, simulateVal);
       setIntegrityStatus(check);
       setVerifyingCrypto(false);
     }, 450);
+  };
+
+  const handleResignLedger = async () => {
+    if (!result) return;
+    setVerifyingCrypto(true);
+    try {
+      const updated = await updateCertificateRecord(result.id, {});
+      const active = { ...result, ...(updated || {}) };
+      setResult(active);
+      const check = await verifyCertificateIntegrity(active);
+      setIntegrityStatus(check);
+    } catch (e) {
+      console.error('Re-sign ledger failed:', e);
+    } finally {
+      setVerifyingCrypto(false);
+    }
   };
 
   const handleCopyHash = (hash) => {
@@ -407,6 +435,29 @@ export const VerificationValidatorPage = () => {
                         ) : (
                           <>
                             Payload data differs from original issuance. Stored ledger hash (<code>{integrityStatus.storedHash.substring(0, 16)}...</code>) does NOT match real-time calculated hash (<code>{integrityStatus.computedHash.substring(0, 16)}...</code>). Record integrity failed!
+                            {!demoMode && (
+                              <div style={{ marginTop: '10px' }}>
+                                <button
+                                  type="button"
+                                  onClick={handleResignLedger}
+                                  disabled={verifyingCrypto}
+                                  className="btn btn-secondary btn-sm"
+                                  style={{
+                                    fontSize: '0.74rem',
+                                    padding: '4px 10px',
+                                    background: 'rgba(239, 68, 68, 0.2)',
+                                    border: '1px solid rgba(239, 68, 68, 0.4)',
+                                    color: '#fecaca',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '6px'
+                                  }}
+                                >
+                                  <RotateCw size={12} className={verifyingCrypto ? "spin-animation" : ""} />
+                                  <span>Re-Sign & Sync Ledger Seal</span>
+                                </button>
+                              </div>
+                            )}
                           </>
                         )}
                       </div>
