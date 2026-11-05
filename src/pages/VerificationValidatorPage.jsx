@@ -19,7 +19,8 @@ import {
   Copy,
   Check,
   Sparkles,
-  Terminal
+  Terminal,
+  Award
 } from 'lucide-react';
 import { getCertificateById } from '../services/certificateService';
 import { verifyCertificateIntegrity, computeCertificateHash } from '../services/cryptoService';
@@ -243,6 +244,60 @@ export const VerificationValidatorPage = () => {
                 <strong style={{ fontSize: '0.9rem', color: '#38bdf8' }}>{result.confidenceScore || 85}% Confirmed</strong>
               </div>
             </div>
+
+            {/* AI Viva Examination Defense Authenticity Badge */}
+            {result.vivaScore !== undefined && result.vivaScore >= 70 && (
+              <div style={{
+                padding: '16px 20px',
+                borderRadius: 'var(--radius-md)',
+                background: 'linear-gradient(135deg, rgba(234, 179, 8, 0.12), rgba(16, 185, 129, 0.08))',
+                border: '1px solid rgba(234, 179, 8, 0.4)',
+                marginBottom: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '12px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    background: 'rgba(234, 179, 8, 0.2)',
+                    color: '#facc15',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    boxShadow: '0 0 16px rgba(234, 179, 8, 0.35)'
+                  }}>
+                    <Award size={22} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.96rem', fontWeight: 800, color: '#fde047', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <Sparkles size={14} />
+                      <span>⭐ Viva-Verified Credential (Oral Defense Authenticated)</span>
+                    </div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                      Candidate scored <strong style={{ color: '#facc15' }}>{result.vivaScore}%</strong> in dynamic AI oral defense questioning • Proves authentic subject matter mastery beyond paper possession
+                    </div>
+                  </div>
+                </div>
+                <span style={{
+                  padding: '4px 12px',
+                  borderRadius: '9999px',
+                  background: 'rgba(234, 179, 8, 0.25)',
+                  border: '1px solid rgba(234, 179, 8, 0.5)',
+                  color: '#fde047',
+                  fontSize: '0.78rem',
+                  fontWeight: 800,
+                  letterSpacing: '0.04em'
+                }}>
+                  ⭐ VIVA-VERIFIED
+                </span>
+              </div>
+            )}
 
             {/* Cryptographic SHA-256 Ledger Box */}
             <div style={{

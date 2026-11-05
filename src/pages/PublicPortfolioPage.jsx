@@ -719,6 +719,22 @@ export const PublicPortfolioPage = ({ portfolioId, onBackToApp }) => {
                       }}>
                         SHA-256 Sealed
                       </span>
+                      {cert.vivaScore !== undefined && cert.vivaScore >= 70 && (
+                        <span style={{
+                          fontSize: '0.7rem',
+                          padding: '2px 8px',
+                          borderRadius: '9999px',
+                          background: 'linear-gradient(135deg, rgba(234, 179, 8, 0.2), rgba(16, 185, 129, 0.2))',
+                          color: '#facc15',
+                          border: '1px solid rgba(234, 179, 8, 0.5)',
+                          fontWeight: 800,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '3px'
+                        }} title="Subject competency authenticated via AI Viva defense">
+                          <span>⭐ Viva-Verified ({cert.vivaScore}%)</span>
+                        </span>
+                      )}
                     </div>
 
                     <h3 style={{

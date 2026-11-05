@@ -61,17 +61,18 @@ export const CertificatePreviewModal = ({ certificate, isOpen, onClose, onUpdate
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
               <CategoryBadge category={certificate.category} />
               <VerificationBadge status={certificate.verificationStatus} />
-              {certificate.vivaScore !== undefined && (
+              {certificate.vivaScore !== undefined && certificate.vivaScore >= 70 && (
                 <span style={{
-                  fontSize: '0.72rem',
-                  padding: '2px 8px',
-                  borderRadius: '4px',
-                  background: 'rgba(16, 185, 129, 0.15)',
-                  color: '#34d399',
-                  border: '1px solid rgba(16, 185, 129, 0.3)',
-                  fontWeight: 700
+                  fontSize: '0.74rem',
+                  padding: '3px 10px',
+                  borderRadius: '9999px',
+                  background: 'linear-gradient(135deg, rgba(234, 179, 8, 0.2), rgba(16, 185, 129, 0.2))',
+                  color: '#facc15',
+                  border: '1px solid rgba(234, 179, 8, 0.5)',
+                  fontWeight: 800,
+                  boxShadow: '0 0 10px rgba(234, 179, 8, 0.3)'
                 }}>
-                  🏆 Viva Score: {certificate.vivaScore}% (Passed)
+                  ⭐ Viva-Verified ({certificate.vivaScore}%) • Oral Defense Authenticated
                 </span>
               )}
             </div>

@@ -250,6 +250,7 @@ function MainAppContent() {
             <PortfolioManagerPage 
               certificates={certificates}
               onCertificateUpdate={handleEditSuccess}
+              onTakeViva={(item) => setVivaCert(item)}
               onPreviewPublicPortfolio={(id) => {
                 window.location.hash = `#/p/${id}`;
               }}

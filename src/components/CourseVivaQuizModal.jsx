@@ -241,6 +241,48 @@ export const CourseVivaQuizModal = ({ isOpen, onClose, certificate, onVivaSucces
               {/* Progress & Question Counter */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ display: 'inline-flex', gap: '3px', background: 'rgba(255, 255, 255, 0.05)', padding: '2px', borderRadius: '6px', border: '1px solid rgba(255, 255, 255, 0.1)', marginRight: '6px' }}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setQuestionCount(5);
+                        loadFreshQuestions(5);
+                      }}
+                      style={{
+                        padding: '2px 7px',
+                        fontSize: '0.7rem',
+                        fontWeight: 700,
+                        borderRadius: '4px',
+                        border: 'none',
+                        background: questions.length <= 5 ? '#0ea5e9' : 'transparent',
+                        color: questions.length <= 5 ? '#ffffff' : '#94a3b8',
+                        cursor: 'pointer'
+                      }}
+                      title="5 Questions (Speed Demo)"
+                    >
+                      5 Qs
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setQuestionCount(10);
+                        loadFreshQuestions(10);
+                      }}
+                      style={{
+                        padding: '2px 7px',
+                        fontSize: '0.7rem',
+                        fontWeight: 700,
+                        borderRadius: '4px',
+                        border: 'none',
+                        background: questions.length > 5 ? '#0ea5e9' : 'transparent',
+                        color: questions.length > 5 ? '#ffffff' : '#94a3b8',
+                        cursor: 'pointer'
+                      }}
+                      title="10 Questions (Comprehensive Exam)"
+                    >
+                      10 Qs
+                    </button>
+                  </div>
                   <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#38bdf8' }}>
                     Viva Question {currentIndex + 1} of {questions.length}
                   </span>
@@ -265,7 +307,7 @@ export const CourseVivaQuizModal = ({ isOpen, onClose, certificate, onVivaSucces
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <button 
-                    onClick={() => loadFreshQuestions()}
+                    onClick={() => loadFreshQuestions(questionCount)}
                     type="button"
                     style={{
                       display: 'inline-flex',

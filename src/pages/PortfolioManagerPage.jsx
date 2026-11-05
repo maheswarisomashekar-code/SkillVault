@@ -20,7 +20,8 @@ import {
   CheckCircle2,
   AlertTriangle,
   Target,
-  FileText
+  FileText,
+  BookOpen
 } from 'lucide-react';
 import { GithubIcon } from '../components/BrandIcons';
 import { useAuth } from '../context/AuthContext';
@@ -39,7 +40,7 @@ import { ExperienceModal } from '../components/ExperienceModal';
 import { ResumeExportModal } from '../components/ResumeExportModal';
 import { RoleAnalyzerModal } from '../components/RoleAnalyzerModal';
 
-export const PortfolioManagerPage = ({ certificates = [], onCertificateUpdate, onPreviewPublicPortfolio }) => {
+export const PortfolioManagerPage = ({ certificates = [], onCertificateUpdate, onPreviewPublicPortfolio, onTakeViva }) => {
   const { currentUser, userProfile, refreshProfile } = useAuth();
   const [copied, setCopied] = useState(false);
   const [updating, setUpdating] = useState(false);
@@ -497,6 +498,25 @@ export const PortfolioManagerPage = ({ certificates = [], onCertificateUpdate, o
                           {isPublished ? <Eye size={13} /> : <EyeOff size={13} />}
                           <span>{isPublished ? 'Published' : 'Hidden'}</span>
                         </button>
+                        {onTakeViva && (
+                          <button
+                            className="btn btn-secondary btn-sm"
+                            onClick={() => onTakeViva({
+                              id: proj.id,
+                              title: proj.title,
+                              issuer: (proj.techStack || []).join(', ') || 'Engineering Project',
+                              category: 'project',
+                              rawOcrText: `${proj.title} ${proj.description || ''} ${(proj.techStack || []).join(' ')}`,
+                              description: proj.description,
+                              vivaScore: proj.vivaScore
+                            })}
+                            style={{ borderColor: 'rgba(56, 189, 248, 0.4)', color: '#38bdf8', background: 'rgba(56, 189, 248, 0.08)' }}
+                            title="Take AI Viva Exam on this project"
+                          >
+                            <BookOpen size={13} />
+                            <span>{proj.vivaScore !== undefined ? `⭐ ${proj.vivaScore}%` : 'Take Viva'}</span>
+                          </button>
+                        )}
                         <button
                           className="btn btn-secondary btn-sm"
                           onClick={() => {
@@ -603,6 +623,17 @@ export const PortfolioManagerPage = ({ certificates = [], onCertificateUpdate, o
                         {isCertPublished ? <Eye size={14} /> : <EyeOff size={14} />}
                         <span>{isCertPublished ? 'Published' : 'Hidden'}</span>
                       </button>
+                      {onTakeViva && (
+                        <button
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => onTakeViva(cert)}
+                          style={{ borderColor: 'rgba(56, 189, 248, 0.4)', color: '#38bdf8', background: 'rgba(56, 189, 248, 0.08)' }}
+                          title="Take AI Viva Exam on this credential"
+                        >
+                          <BookOpen size={13} />
+                          <span>{cert.vivaScore !== undefined ? `⭐ ${cert.vivaScore}%` : 'Take Viva'}</span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 );
