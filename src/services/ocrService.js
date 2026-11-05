@@ -480,8 +480,36 @@ export const extractCertificateFields = (rawText) => {
     /code\.\s*create\.\s*celebrate/i
   ];
 
+  // Markers that indicate a project report, thesis, synopsis, index table, or documentation
+  const projectReportPatterns = [
+    /\btable\s+of\s+contents\b/i,
+    /\bcontents\s+(?:page|no|index)\b/i,
+    /\bindex\b[\s\S]{1,60}\bcontents\b/i,
+    /\bcontents\b[\s\S]{1,60}\bpage\b/i,
+    /\bproject\s+report\b/i,
+    /\bmini\s+project\b/i,
+    /\bmajor\s+project\b/i,
+    /\bcapstone\s+project\b/i,
+    /\bliterature\s+(?:survey|review)\b/i,
+    /\bproblem\s+statement\b/i,
+    /\bwork\s*flow\s+diagram\b/i,
+    /\bmethodology\b/i,
+    /\bcontext\s+and\s+background\b/i,
+    /\bscope\s+and\s+report\s+structure\b/i,
+    /\btools\s+and\s+technologies\b/i,
+    /\bmodel\s+validation\b/i,
+    /\b1\.\s*introduction\b/i,
+    /\b2\.\s*design\b/i,
+    /\b3\.\s*methodology\b/i,
+    /\b4\.\s*tools\b/i,
+    /\b5\.\s*results?\b/i
+  ];
+
   const matchedAnnouncementMarkers = eventAnnouncementPatterns.filter(pattern => pattern.test(fullText));
   const isEventAnnouncement = matchedAnnouncementMarkers.length >= 1;
+
+  const matchedReportMarkers = projectReportPatterns.filter(pattern => pattern.test(fullText));
+  const isProjectReport = matchedReportMarkers.length >= 1;
 
   // Phrases that indicate authentic certificate / credential conferment
   const confermentPatterns = [
@@ -511,24 +539,29 @@ export const extractCertificateFields = (rawText) => {
   let isLikelyCertificate = true;
   let documentType = 'CERTIFICATE';
 
-  if (isEventAnnouncement && !hasConfermentProof) {
+  if (isProjectReport && !hasConfermentProof) {
+    // Definitive Project Report / Documentation / Index Table
+    isLikelyCertificate = false;
+    documentType = 'PROJECT_REPORT_OR_DOCUMENT';
+    confidenceScore = 10;
+    warnings.push('Document identified as a Project Report, Table of Contents, or Academic Documentation, NOT an authentic certificate.');
+    warnings.push('SkillVault strictly accepts verified completion certificates and credentials issued to a candidate.');
+  } else if (isEventAnnouncement && !hasConfermentProof) {
     // Definitive Event Flyer / Brochure / Notice
     isLikelyCertificate = false;
     documentType = 'EVENT_ANNOUNCEMENT_OR_BROCHURE';
     confidenceScore = 15;
     warnings.push('Document appears to be an Event Announcement, Flyer, or Brochure (e.g. Hackathon or Workshop notice with registration deadlines), NOT an issued student certificate.');
     warnings.push('Valid certificates must be issued to a named recipient and include proof of completion or award conferment.');
-  } else if (!hasConfermentProof && !recipient) {
-    // Generic text document or image with no certificate markers
+  } else if (!hasConfermentProof) {
+    // Generic non-certificate document
     isLikelyCertificate = false;
     documentType = 'NON_CERTIFICATE_DOCUMENT';
-    confidenceScore = 20;
-    warnings.push('No certificate conferment text ("This is to certify that", "Certificate of Completion") or recipient name found.');
-  } else if (!hasConfermentProof) {
-    confidenceScore = 35;
-    warnings.push('Document lacks standard conferment phrases. Verification required.');
+    confidenceScore = 15;
+    warnings.push('Document lacks official certificate conferment text ("This is to certify that", "Certificate of Completion", "Awarded to").');
+    warnings.push('General PDFs, report sheets, textbook pages, and notes cannot be saved as credentials.');
   } else {
-    confidenceScore = 60;
+    confidenceScore = 65;
     if (title) confidenceScore += 10;
     if (issuer && issuer !== 'Authorized Provider') confidenceScore += 10;
     if (recipient) confidenceScore += 10;

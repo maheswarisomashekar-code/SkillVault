@@ -10,7 +10,8 @@ import {
   ExternalLink,
   ShieldAlert,
   Lock,
-  UserX
+  UserX,
+  XCircle
 } from 'lucide-react';
 import { validateCertificateFile, uploadCertificateFile, createCertificateRecord } from '../services/certificateService';
 import { runTesseractOCR } from '../services/ocrService';
@@ -230,6 +231,14 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess, existingCertific
     e.preventDefault();
     if (!formData.title || !formData.issuer) {
       setErrorMessage('Please provide certificate title and issuing organization.');
+      return;
+    }
+
+    // Strict Non-Certificate Rejection Guard (Blocks project reports, index pages, documentation, flyers)
+    if (isLikelyCertificate === false) {
+      setErrorMessage(
+        'Upload Blocked: This document is a Project Report / Documentation / Non-Certificate file. SkillVault strictly stores and verifies authentic course credentials, certificates, and diplomas.'
+      );
       return;
     }
 
@@ -559,33 +568,47 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess, existingCertific
                 </div>
               )}
 
-              {/* Document Validity Check Banner */}
+              {/* Strict Non-Certificate Rejection Alert Banner */}
               {!isLikelyCertificate && (
                 <div style={{
-                  padding: '14px 16px',
+                  padding: '16px 18px',
                   borderRadius: 'var(--radius-md)',
-                  background: 'rgba(245, 158, 11, 0.12)',
-                  border: '1px solid rgba(245, 158, 11, 0.45)',
+                  background: 'rgba(239, 68, 68, 0.12)',
+                  border: '1px solid rgba(239, 68, 68, 0.45)',
                   display: 'flex',
                   alignItems: 'flex-start',
-                  gap: '12px',
+                  gap: '14px',
                   marginBottom: '20px'
                 }}>
-                  <AlertTriangle size={24} style={{ color: '#fbbf24', flexShrink: 0, marginTop: '2px' }} />
+                  <div style={{
+                    width: '38px',
+                    height: '38px',
+                    borderRadius: '50%',
+                    background: 'rgba(239, 68, 68, 0.2)',
+                    color: '#f87171',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    <XCircle size={22} />
+                  </div>
                   <div>
-                    <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#fbbf24' }}>
-                      {detectedDocumentType === 'EVENT_ANNOUNCEMENT_OR_BROCHURE' 
-                        ? 'Notice: Event Announcement / Flyer Pattern Detected' 
-                        : 'Review Credential Details'}
+                    <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#f87171', marginBottom: '4px' }}>
+                      🚫 Upload Blocked: Non-Certificate Document Detected
                     </div>
-                    <div style={{ fontSize: '0.8rem', color: '#f8fafc', marginTop: '4px', lineHeight: 1.5 }}>
-                      {detectedDocumentType === 'EVENT_ANNOUNCEMENT_OR_BROCHURE' ? (
+                    <div style={{ fontSize: '0.82rem', color: '#fca5a5', lineHeight: 1.5 }}>
+                      {detectedDocumentType === 'PROJECT_REPORT_OR_DOCUMENT' ? (
                         <>
-                          This document has characteristics of an event brochure or announcement. Please double check that the Certificate Title, Issuing Authority, and Recipient Name below are accurate before saving.
+                          This document was identified as a <strong>Project Report, Table of Contents, or Academic Documentation</strong>. SkillVault is a verified credential vault and strictly rejects non-certificate files.
+                        </>
+                      ) : detectedDocumentType === 'EVENT_ANNOUNCEMENT_OR_BROCHURE' ? (
+                        <>
+                          This document was identified as an <strong>Event Announcement or Flyer</strong> with registration details, not an issued completion certificate.
                         </>
                       ) : (
                         <>
-                          Some certificate fields could not be recognized automatically with high confidence. Please verify or correct the title and issuer details below before saving.
+                          This file lacks official certificate conferment proof (no "This is to certify that" or "Certificate of Completion"). Only genuine credential certificates can be uploaded.
                         </>
                       )}
                     </div>
@@ -861,13 +884,24 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess, existingCertific
                 <button 
                   type="submit" 
                   className="btn btn-primary"
-                  disabled={stage === 'saving' || duplicateValidation.isDuplicate}
-                  style={duplicateValidation.isDuplicate ? { opacity: 0.6, cursor: 'not-allowed', background: '#475569' } : {}}
+                  disabled={stage === 'saving' || duplicateValidation.isDuplicate || !isLikelyCertificate}
+                  style={
+                    duplicateValidation.isDuplicate
+                      ? { opacity: 0.6, cursor: 'not-allowed', background: '#475569' }
+                      : !isLikelyCertificate
+                      ? { opacity: 0.6, cursor: 'not-allowed', background: '#dc2626', borderColor: '#ef4444' }
+                      : {}
+                  }
                 >
                   {stage === 'saving' ? (
                     <>
                       <Loader2 size={16} className="spin-animation" />
                       <span>Saving to Cloud...</span>
+                    </>
+                  ) : !isLikelyCertificate ? (
+                    <>
+                      <XCircle size={16} />
+                      <span>Upload Blocked (Not a Certificate)</span>
                     </>
                   ) : duplicateValidation.isDuplicate ? (
                     <>
