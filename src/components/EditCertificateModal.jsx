@@ -1,23 +1,41 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { X, CheckCircle2, Loader2, Edit3 } from 'lucide-react';
 import { updateCertificateRecord } from '../services/certificateService';
 import { normalizeToIsoDate } from '../services/ocrService';
 
 export const EditCertificateModal = ({ certificate, isOpen, onClose, onSaveSuccess }) => {
-  if (!isOpen || !certificate) return null;
-
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
-    title: certificate.title || '',
-    issuer: certificate.issuer || '',
-    recipient: certificate.recipient || '',
-    category: certificate.category || 'course',
-    issueDate: normalizeToIsoDate(certificate.issueDate) || certificate.issueDate || '',
-    verificationUrl: certificate.verificationUrl || '',
-    credentialId: certificate.credentialId || '',
-    isPublished: certificate.isPublished !== undefined ? certificate.isPublished : true,
-    verificationStatus: certificate.verificationStatus || 'OCR_PROCESSED'
+    title: certificate?.title || '',
+    issuer: certificate?.issuer || '',
+    recipient: certificate?.recipient || '',
+    category: certificate?.category || 'course',
+    issueDate: normalizeToIsoDate(certificate?.issueDate) || certificate?.issueDate || '',
+    verificationUrl: certificate?.verificationUrl || '',
+    credentialId: certificate?.credentialId || '',
+    isPublished: certificate?.isPublished !== undefined ? certificate.isPublished : true,
+    verificationStatus: certificate?.verificationStatus || 'OCR_PROCESSED'
   });
+
+  // Keep hooks unconditional and refresh the form whenever a different
+  // certificate is opened. This prevents stale fields when switching records.
+  useEffect(() => {
+    if (!certificate) return;
+    setFormData({
+      title: certificate.title || '',
+      issuer: certificate.issuer || '',
+      recipient: certificate.recipient || '',
+      category: certificate.category || 'course',
+      issueDate: normalizeToIsoDate(certificate.issueDate) || certificate.issueDate || '',
+      verificationUrl: certificate.verificationUrl || '',
+      credentialId: certificate.credentialId || '',
+      isPublished: certificate.isPublished !== undefined ? certificate.isPublished : true,
+      verificationStatus: certificate.verificationStatus || 'OCR_PROCESSED'
+    });
+    setSaving(false);
+  }, [certificate]);
+
+  if (!isOpen || !certificate) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();

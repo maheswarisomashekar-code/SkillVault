@@ -296,8 +296,7 @@ export const ProfilePage = ({ certificates = [] }) => {
                 type="button"
                 onClick={() => {
                   const autoSkills = extractSkillsFromCertificates(certificates);
-                  const merged = Array.from(new Set([...formData.skills, ...autoSkills]));
-                  setFormData(prev => ({ ...prev, skills: merged }));
+                  setFormData(prev => ({ ...prev, skills: autoSkills }));
                 }}
                 className="btn btn-secondary btn-sm"
                 style={{ fontSize: '0.74rem', padding: '3px 10px', color: '#38bdf8', borderColor: 'rgba(56, 189, 248, 0.3)' }}

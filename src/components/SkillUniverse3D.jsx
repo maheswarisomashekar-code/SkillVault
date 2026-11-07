@@ -96,9 +96,11 @@ export const SkillUniverse3D = ({ certificates = [], projects = [], userProfile 
         angle: (Math.PI * 2) / 5,
         mastery: 92,
         rating: 'Advanced Developer',
-        formula: `Calculated from ${fullstackProjects.length || 2} GitHub projects + React 19 / Node stack.`,
+        formula: fullstackProjects.length > 0 
+          ? `Calculated from ${fullstackProjects.length} engineering projects + React 19 / Node stack.`
+          : 'Calculated from SkillVault full-stack platform codebase + React 19 architecture.',
         breakdown: [
-          { label: 'Active Code Repositories', score: '40%', detail: fullstackProjects.length > 0 ? fullstackProjects.map(p => p.title).join(', ') : 'kannadavaividhya, reviewpulse' },
+          { label: 'Active Code Repositories', score: '40%', detail: fullstackProjects.length > 0 ? fullstackProjects.map(p => p.title).join(', ') : 'SkillVault Cloud System' },
           { label: 'Modern Frontend Architecture', score: '30%', detail: 'React 19, Hooks, Vite native ESM' },
           { label: 'REST API & Asynchronous I/O', score: '22%', detail: 'Node.js, Express, async event loop' }
         ]

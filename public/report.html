@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cloud-Based Skill Credential & Digital Portfolio System - Maheswari S</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background: #475569;
+      font-family: 'Times New Roman', Times, serif;
+      color: #000000;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .page {
+      width: 210mm;
+      height: 297mm;
+      margin: 15px auto;
+      background: #ffffff;
+      position: relative;
+      page-break-after: always;
+      break-after: page;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    @media print {
+      body {
+        background: #ffffff;
+      }
+      .page {
+        margin: 0;
+        box-shadow: none;
+        width: 210mm;
+        height: 297mm;
+        page-break-after: always;
+        break-after: page;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+    .border-box {
+      position: absolute;
+      top: 9mm;
+      bottom: 9mm;
+      left: 10mm;
+      right: 10mm;
+      border: 1.5px solid #000000;
+      padding: 10mm 14mm;
+      box-sizing: border-box;
+      font-size: 11pt;
+      line-height: 1.42;
+    }
+    .page-num {
+      text-align: center;
+      font-size: 11pt;
+      margin-bottom: 8px;
+      font-weight: normal;
+    }
+    .chap-heading {
+      text-align: center;
+      font-size: 13pt;
+      font-weight: bold;
+      text-decoration: underline;
+      margin-top: 6px;
+      margin-bottom: 14px;
+      letter-spacing: 0.02em;
+    }
+    .sec-heading {
+      font-size: 11.5pt;
+      font-weight: bold;
+      margin-top: 10px;
+      margin-bottom: 6px;
+    }
+    p {
+      text-align: justify;
+      margin: 0 0 7px 0;
+      text-justify: inter-word;
+    }
+    ul, ol {
+      margin: 4px 0 8px 22px;
+      padding: 0;
+    }
+    li {
+      margin-bottom: 4px;
+      text-align: justify;
+      text-justify: inter-word;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+      font-size: 10pt;
+    }
+    table, th, td {
+      border: 1px solid #000000;
+    }
+    th, td {
+      padding: 5px 8px;
+      text-align: left;
+    }
+    th {
+      font-weight: bold;
+    }
+    .print-btn {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      padding: 12px 20px;
+      background: #0284c7;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 9999;
+    }
+    .print-btn:hover {
+      background: #0369a1;
+    }
+  </style>
+</head>
+<body>
+
+  <button class="print-btn no-print" onclick="window.print()">
+    🖨️ Print / Save as PDF (Exact 19 Pages)
+  </button>
+
+  <!-- ==================== PAGE 1: COVER PAGE ==================== -->
+  <div class="page" id="page-1">
+    <div class="border-box" style="display: flex; flex-direction: column; justify-content: space-between; text-align: center; padding: 12mm 14mm 10mm 14mm;">
+      <div>
+        <h2 style="font-size: 13.5pt; font-weight: bold; margin: 0 0 3px 0; letter-spacing: 0.02em;">VISVESVARAYA TECHNOLOGICAL UNIVERSITY, BELGAUM</h2>
+        <h3 style="font-size: 11pt; font-weight: normal; margin: 0 0 14px 0;">“Jnana Sangama”, Belgaum-590018</h3>
+        
+        <!-- VTU Emblem -->
+        <div style="margin: 6px auto 14px auto;">
+          <svg width="86" height="86" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="46" fill="#800000" stroke="#f59e0b" stroke-width="3"/>
+            <circle cx="50" cy="50" r="38" fill="#1e3a8a" stroke="#fff" stroke-width="1.5"/>
+            <circle cx="50" cy="50" r="28" fill="#fff" />
+            <path d="M50 26 L54 36 L65 36 L56 43 L60 54 L50 47 L40 54 L44 43 L35 36 L46 36 Z" fill="#d97706" />
+            <text x="50" y="88" font-family="'Times New Roman', serif" font-size="8" font-weight="bold" fill="#fff" text-anchor="middle">VTU BELGAUM</text>
+          </svg>
+        </div>
+
+        <p style="font-size: 11pt; margin: 0 0 6px 0;">A Report On</p>
+        <h2 style="font-size: 13.5pt; font-weight: bold; margin: 0 0 14px 0; line-height: 1.3;">
+          “Cloud-Based Skill Credential & Digital Portfolio System”
+        </h2>
+
+        <p style="font-size: 10.5pt; margin: 0 0 3px 0;">Submitted in partial fulfillment for the course</p>
+        <p style="font-size: 11.5pt; font-weight: bold; margin: 0 0 16px 0;">BIS505 – Cloud Computing Experiential Learning</p>
+
+        <p style="font-size: 10.5pt; margin: 0 0 2px 0;">Submitted by</p>
+        <p style="font-size: 12pt; font-weight: bold; margin: 0 0 1px 0;">Maheswari S</p>
+        <p style="font-size: 11.5pt; font-weight: bold; margin: 0 0 1px 0;">4NI24IS097</p>
+        <p style="font-size: 10.5pt; margin: 0 0 16px 0;">5th Semester, Section D</p>
+
+        <p style="font-size: 10.5pt; margin: 0 0 2px 0;">Under the Guidance of</p>
+        <p style="font-size: 11.5pt; font-weight: bold; margin: 0 0 1px 0;">Ms. Prajakta S Madankar</p>
+        <p style="font-size: 10.5pt; margin: 0 0 1px 0;">Assistant Professor</p>
+        <p style="font-size: 10.5pt; margin: 0 0 1px 0;">Dept of IS&E</p>
+        <p style="font-size: 10.5pt; margin: 0 0 12px 0;">NIE, Mysuru</p>
+      </div>
+
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 0 6px;">
+          <div style="text-align: left; max-width: 48%;">
+            <!-- NIE Emblem -->
+            <svg width="42" height="42" viewBox="0 0 60 60" style="display: block; margin-bottom: 4px;">
+              <polygon points="30,5 55,20 55,45 30,55 5,45 5,20" fill="#991b1b" stroke="#f59e0b" stroke-width="2"/>
+              <text x="30" y="36" fill="#fff" font-family="'Times New Roman', serif" font-size="12" font-weight="bold" text-anchor="middle">NIE</text>
+            </svg>
+            <p style="font-size: 9.5pt; font-weight: bold; margin: 0;">Department of Information Science</p>
+            <p style="font-size: 9.5pt; font-weight: bold; margin: 0;">& Engineering</p>
+            <p style="font-size: 9pt; margin: 0;">Mysuru – 570008</p>
+          </div>
+          <div style="text-align: right; max-width: 50%;">
+            <!-- ISE Emblem -->
+            <svg width="42" height="42" viewBox="0 0 60 60" style="display: inline-block; margin-bottom: 4px;">
+              <circle cx="30" cy="30" r="26" fill="#1e3a8a" stroke="#38bdf8" stroke-width="2"/>
+              <text x="30" y="34" fill="#fff" font-family="'Times New Roman', serif" font-size="9" font-weight="bold" text-anchor="middle">IS&E</text>
+            </svg>
+            <p style="font-size: 9.5pt; font-weight: bold; margin: 0;">The National Institute of Engineering</p>
+            <p style="font-size: 8.5pt; margin: 0;">(An Autonomous Institute under VTU)</p>
+            <p style="font-size: 9pt; margin: 0;">Mysuru – 570008</p>
+          </div>
+        </div>
+
+        <p style="font-size: 11pt; font-weight: bold; margin: 0 0 8px 0;">2026 – 2027</p>
+
+        <!-- Evaluation Table -->
+        <div style="max-width: 220px; margin: 0 0 0 auto;">
+          <table style="margin: 0; font-size: 9.5pt;">
+            <tr>
+              <td style="padding: 3px 6px;">Presentation (20)</td>
+              <td style="width: 70px; padding: 3px 6px;"></td>
+            </tr>
+            <tr>
+              <td style="padding: 3px 6px;">Report (20)</td>
+              <td style="padding: 3px 6px;"></td>
+            </tr>
+            <tr>
+              <td style="padding: 3px 6px;">Viva (10)</td>
+              <td style="padding: 3px 6px;"></td>
+            </tr>
+            <tr>
+              <td style="padding: 3px 6px; font-weight: bold;">Total (50)</td>
+              <td style="padding: 3px 6px;"></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 2: CERTIFICATE ==================== -->
+  <div class="page" id="page-2">
+    <div class="border-box" style="display: flex; flex-direction: column; justify-content: space-between; padding: 14mm 16mm 14mm 16mm;">
+      <div>
+        <div style="text-align: center; margin-bottom: 12px;">
+          <h2 style="font-size: 15pt; font-weight: bold; margin: 0 0 4px 0;">The National Institute of Engineering</h2>
+          <h3 style="font-size: 12pt; font-weight: bold; margin: 0 0 2px 0;">Department of Information Science and Engineering</h3>
+          <h3 style="font-size: 12pt; font-weight: bold; margin: 0 0 14px 0;">MYSURU- 570018</h3>
+
+          <div style="display: flex; justify-content: center; gap: 40px; margin-bottom: 16px;">
+            <svg width="55" height="55" viewBox="0 0 60 60">
+              <circle cx="30" cy="30" r="26" fill="#1e3a8a" stroke="#38bdf8" stroke-width="2"/>
+              <text x="30" y="34" fill="#fff" font-family="'Times New Roman', serif" font-size="9" font-weight="bold" text-anchor="middle">IS&E</text>
+            </svg>
+            <svg width="55" height="55" viewBox="0 0 60 60">
+              <polygon points="30,5 55,20 55,45 30,55 5,45 5,20" fill="#991b1b" stroke="#f59e0b" stroke-width="2"/>
+              <text x="30" y="36" fill="#fff" font-family="'Times New Roman', serif" font-size="12" font-weight="bold" text-anchor="middle">NIE</text>
+            </svg>
+          </div>
+
+          <h2 style="font-size: 14pt; font-weight: bold; text-decoration: underline; margin: 0 0 24px 0;">Certificate</h2>
+        </div>
+
+        <p style="font-size: 11.5pt; line-height: 1.6; text-align: justify; margin-bottom: 20px;">
+          Certifies that the Project titled <strong>“Cloud-Based Skill Credential & Digital Portfolio System”</strong> is presented by <strong>Maheswari S (4NI24IS097)</strong> in partial fulfilment for the requirements of the fifth semester BE in Information Science & Engineering prescribed by The National Institute of Engineering, Autonomous Institution under Visvesvaraya Technological University, Belagavi. It is certified that all corrections/suggestions indicated for Internal Assessment have been incorporated. The Project Done for Cloud Computing for fifth Semester.
+        </p>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px;">
+        <div style="font-size: 11pt; line-height: 1.35;">
+          <p style="margin: 0 0 35px 0;">Signature of Guide</p>
+          <p style="font-weight: bold; margin: 0;">Ms. Prajaktha S Madankar</p>
+          <p style="margin: 0;">Dept. of ISE</p>
+          <p style="margin: 0;">NIE, Mysuru</p>
+        </div>
+
+        <div style="font-size: 11pt; line-height: 1.35; text-align: right;">
+          <p style="margin: 0 0 35px 0;">Signature/Seal of HOD</p>
+          <p style="font-weight: bold; margin: 0;">Dr. Shashank Dhananjaya</p>
+          <p style="margin: 0;">HoD & Professor</p>
+          <p style="margin: 0;">Dept. of ISE</p>
+          <p style="margin: 0;">NIE, Mysuru</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 3: ABSTRACT ==================== -->
+  <div class="page" id="page-3">
+    <div class="border-box">
+      <h2 style="text-align: center; font-size: 14pt; font-weight: bold; margin: 0 0 14px 0;">ABSTRACT</h2>
+      <h3 style="text-align: center; font-size: 11.5pt; font-weight: bold; margin: 0 0 16px 0;">
+        Cloud-Based Skill Credential and Digital Portfolio System
+      </h3>
+
+      <p>
+        The increasing demand for verified technical qualifications has created a critical need for efficient, tamper-proof academic credential management and digital portfolio systems. Traditional credential verification methods provide limited visibility into authentic student competencies and make it difficult for employers and institutions to verify certificates without time-consuming manual correspondence. To address these challenges, this project proposes <strong>SkillVault</strong>, a Cloud-Based Skill Credential and Digital Portfolio System, designed to catalog academic credentials, automate metadata ingestion, enforce cryptographic authenticity, and provide interactive oral defense evaluation.
+      </p>
+
+      <p>
+        The proposed system utilizes a serverless static cloud architecture deployed on Amazon Web Services (AWS S3) in the <code>ap-southeast-2</code> region. To overcome the recurring costs of cloud-hosted optical character recognition, the system executes Tesseract.js inside the browser’s WebAssembly runtime, extracting course titles, issuing bodies, recipient names, and dates on the client side at zero cloud operational expense.
+      </p>
+
+      <p>
+        Additionally, SkillVault integrates the W3C Web Crypto API to generate immutable SHA-256 cryptographic signatures and ledger block descriptors for every registered credential. When queried through the Public Verification Registry, real-time recalculation detects unauthorized alterations instantly. The platform also introduces an AI-powered Viva Exam module that generates subject-specific oral defense questions and utilizes speech synthesis, awarding a “Viva-Verified” badge upon passing (&ge; 70%).
+      </p>
+
+      <p>
+        The proposed system demonstrates how cloud storage and edge computing can be combined to provide scalable, centralized, and mathematically verified credential management. SkillVault aims to eliminate resume fraud, reduce administrative verification overhead, and support students in building recruiter-ready portfolios.
+      </p>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 4: TABLE OF CONTENTS ==================== -->
+  <div class="page" id="page-4">
+    <div class="border-box">
+      <h2 style="text-align: center; font-size: 14pt; font-weight: bold; margin: 0 0 24px 0;">TABLE OF CONTENTS</h2>
+      
+      <ol style="font-size: 11.5pt; line-height: 1.75; margin-left: 28px;">
+        <li>Introduction</li>
+        <li>Problem Statement</li>
+        <li>Objectives</li>
+        <li>Existing System</li>
+        <li>Proposed System</li>
+        <li>Technologies Used</li>
+        <li>Cloud Computing Concepts</li>
+        <li>AWS Cloud Environment</li>
+        <li>System Implementation</li>
+        <li>Advantages and Limitations</li>
+        <li>Future Enhancements</li>
+        <li>Conclusion</li>
+        <li>References</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 5: CHAPTER 1 (PAGE 1) ==================== -->
+  <div class="page" id="page-5">
+    <div class="border-box">
+      <div class="page-num">1</div>
+      <h2 class="chap-heading">CHAPTER 1: INTRODUCTION</h2>
+
+      <h3 class="sec-heading">1.1 Introduction</h3>
+      <p>
+        Digital credentials and technical certifications represent an essential component of modern education and hiring. Documenting verified competencies is necessary for demonstrating skills, improving career readiness, and distinguishing genuine talent from unverified claims. Traditional credential management methods often depend on physical certificates or static scanned PDF files. These methods may make it difficult for academic institutions and recruiters to detect altered documents, extract metadata quickly, and evaluate whether candidates genuinely understand the underlying course concepts.
+      </p>
+      <p>
+        SkillVault is developed to make credential management and skill validation more efficient by using the concepts of cloud computing and browser-based edge processing. It allows students to manage academic certificates, projects, and credentials through an integrated web-based platform.
+      </p>
+      <p>
+        The system extracts certificate information using client-side Optical Character Recognition (OCR) powered by WebAssembly, eliminating the recurring cost of cloud vision APIs. Extracted metadata is cryptographically sealed using SHA-256 digests and tied to cloud ledger blocks to ensure tamper-proofing.
+      </p>
+      <p>
+        The project also explores cloud computing through Amazon Web Services. Amazon S3 provides high-durability, serverless cloud storage for hosting the production static website, while client-side storage runtimes maintain credential records with sub-millisecond retrieval speeds.
+      </p>
+
+      <h3 class="sec-heading">1.2 Overview of the Project</h3>
+      <p>SkillVault provides an integrated digital credential environment where users can:</p>
+      <ul>
+        <li>Upload certificate images and PDFs with instant browser-based validation.</li>
+        <li>Automatically extract metadata (Title, Issuer, Recipient, Date) using in-browser WebAssembly OCR.</li>
+        <li>Generate immutable SHA-256 cryptographic fingerprints and ledger block descriptors.</li>
+        <li>Verify credential authenticity in real-time through a public recruiter verification portal.</li>
+        <li>Simulate data tampering interactively to observe cryptographic anti-tamper alerts.</li>
+        <li>Participate in AI-driven Viva oral examinations with real-time speech synthesis.</li>
+        <li>Earn "Viva-Verified" badges upon demonstrating subject matter mastery (&ge; 70%).</li>
+        <li>Publish customizable, shareable public portfolio URLs for technical recruiters.</li>
+        <li>Host the complete web application serverlessly on Amazon Web Services S3.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 6: CHAPTER 2 & CHAPTER 3 (PAGE 2) ==================== -->
+  <div class="page" id="page-6">
+    <div class="border-box">
+      <div class="page-num">2</div>
+      <h2 class="chap-heading">CHAPTER 2: PROBLEM STATEMENT</h2>
+      <p>
+        Traditional credential management methods often require users to manually type certificate details and store unverified digital copies. These methods may not provide real-time verification or effective ways to prevent unauthorized tampering.
+      </p>
+      <p>Some common problems include:</p>
+      <ul>
+        <li>Difficulty verifying certificate authenticity in real time without contacting issuing bodies.</li>
+        <li>Vulnerability of digital certificates to image manipulation and forged recipient names.</li>
+        <li>Manual data entry fatigue when students upload multiple course credentials.</li>
+        <li>Prohibitive API billing costs associated with cloud-hosted OCR services like AWS Textract.</li>
+        <li>Lack of mechanisms to test whether a certificate holder genuinely learned the subject.</li>
+        <li>Lack of proper centralized portfolio presentation for recruiters and academic evaluators.</li>
+      </ul>
+      <p>
+        Therefore, there is a need for a smart credential verification system that automates metadata ingestion, ensures tamper-proof authenticity, and supports interactive competency evaluation.
+      </p>
+      <p>
+        SkillVault addresses these problems by combining client-side edge computing with cloud storage to ingest, protect, and verify credential data.
+      </p>
+
+      <h2 class="chap-heading" style="margin-top: 18px;">CHAPTER 3: OBJECTIVES</h2>
+      <p>The main objectives of SkillVault are:</p>
+      <ol style="margin-left: 22px;">
+        <li>To develop a web-based smart credential management and portfolio system.</li>
+        <li>To perform optical character recognition directly in the browser using WebAssembly.</li>
+        <li>To automatically extract credential metadata without incurring cloud OCR API costs.</li>
+        <li>To generate SHA-256 cryptographic digests for tamper-proof credential verification.</li>
+        <li>To provide real-time verification through a public registry search portal.</li>
+        <li>To simulate data tampering interactively to demonstrate cryptographic protection.</li>
+        <li>To implement an AI Viva oral exam module testing domain competence.</li>
+        <li>To provide speech synthesis audio support for viva examination defense.</li>
+        <li>To host the production web application serverlessly on Amazon Web Services S3.</li>
+        <li>To understand the role of cloud computing and edge offloading in secure web systems.</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 7: CHAPTER 4 & CHAPTER 5 (PAGE 3) ==================== -->
+  <div class="page" id="page-7">
+    <div class="border-box">
+      <div class="page-num">3</div>
+      <h2 class="chap-heading">CHAPTER 4: EXISTING SYSTEM</h2>
+      <h3 class="sec-heading">4.1 Existing System</h3>
+      <p>
+        Traditional credential verification systems generally depend on manual inspection of paper certificates or static PDF uploads on generic file-sharing platforms. Users must manually type certificate metadata to catalog their credentials.
+      </p>
+      <p>
+        Some enterprise verification platforms provide centralized validation, but they typically require subscription fees, centralized backend servers, and expensive cloud OCR infrastructure that increases operational costs.
+      </p>
+
+      <h3 class="sec-heading">4.2 Limitations of the Existing System</h3>
+      <ul>
+        <li>Manual data entry takes time and causes typographical errors.</li>
+        <li>Real-time verification facilities are limited or require third-party intervention.</li>
+        <li>Static PDFs can be easily altered using image-editing software.</li>
+        <li>Cloud OCR solutions incur recurring per-page transaction fees.</li>
+        <li>Certificates do not reflect whether the holder actively mastered the subject.</li>
+        <li>Hosting complex backend servers increases deployment and maintenance costs.</li>
+      </ul>
+
+      <h2 class="chap-heading" style="margin-top: 14px;">CHAPTER 5: PROPOSED SYSTEM</h2>
+      <h3 class="sec-heading">5.1 Proposed System</h3>
+      <p>
+        SkillVault is proposed as a cloud-based credential verification and digital portfolio system that simplifies the ingestion, storage, and validation of academic achievements.
+      </p>
+      <p>
+        The system extracts text from certificate files using Tesseract.js inside browser WebAssembly and populates form fields automatically. The application canonicalizes certificate data and computes a 256-bit SHA-256 cryptographic digest tied to an immutable ledger block descriptor.
+      </p>
+      <p>
+        The platform is hosted on Amazon S3 static website hosting, providing global accessibility with zero server management. Users can share public portfolio links, test authentic oral defense questioning, and verify credentials against the cloud ledger in real time.
+      </p>
+
+      <h3 class="sec-heading">5.2 Main Modules</h3>
+      <p><strong>1. Edge OCR Ingestion Module</strong></p>
+      <p>
+        This module uses Tesseract.js inside a background Web Worker to parse uploaded certificate files locally and extract Title, Issuer, Recipient, and Date without cloud costs.
+      </p>
+      <p><strong>2. Cryptographic Hashing Module</strong></p>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 8: CHAPTER 5 (CONT.) & CHAPTER 6 (PAGE 4) ==================== -->
+  <div class="page" id="page-8">
+    <div class="border-box">
+      <div class="page-num">4</div>
+      <p>
+        This module canonicalizes certificate metadata and computes standard SHA-256 digests using the W3C Web Crypto API, binding the record to a unique ledger identifier (e.g. BLK-100234-749C5747).
+      </p>
+      <p><strong>3. Real-Time Verification Module</strong></p>
+      <p>
+        This module enables recruiters to enter Credential IDs to verify metadata against the ledger. Any tampering triggers an immediate cryptographic mismatch alert.
+      </p>
+      <p><strong>4. Cloud Object Storage Module</strong></p>
+      <p>
+        Amazon S3 is used to host static web assets and distribute production bundles globally with high durability and availability.
+      </p>
+      <p><strong>5. AI Viva Defense Module</strong></p>
+      <p>
+        This module generates subject-specific viva questions, grades candidate responses in real time, and awards the "Viva-Verified" credential badge upon scoring &ge; 70%.
+      </p>
+      <p><strong>6. Tamper Simulation Module</strong></p>
+      <p>
+        This module allows evaluators to simulate data tampering by modifying letters in student names to demonstrate the real-time cryptographic integrity guard.
+      </p>
+      <p><strong>7. Public Portfolio Showcase Module</strong></p>
+      <p>
+        This module generates shareable portfolio URLs with category filters (Courses, Badges, Projects) and direct verification links for recruiters.
+      </p>
+      <p><strong>8. Dashboard Module</strong></p>
+      <p>
+        The dashboard provides an overview of credential metrics, verified badges, OCR scanning records, and role-readiness indicators.
+      </p>
+
+      <h2 class="chap-heading" style="margin-top: 14px;">CHAPTER 6: TECHNOLOGIES USED</h2>
+      <h3 class="sec-heading">6.1 Frontend Technologies</h3>
+      <p><strong>React.js</strong></p>
+      <p>
+        React is a JavaScript library used to develop interactive user interfaces. SkillVault uses React 19 to structure the portfolio interface, manage state across modals, and render verification outcomes.
+      </p>
+      <p><strong>Vite</strong></p>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 9: CHAPTER 6 (CONT.) (PAGE 5) ==================== -->
+  <div class="page" id="page-9">
+    <div class="border-box">
+      <div class="page-num">5</div>
+      <p>
+        Vite is a next-generation frontend build tool that provides a fast development environment and compiles optimized production bundles for deployment.
+      </p>
+      <p><strong>CSS</strong></p>
+      <p>
+        CSS is used to style the dashboard, design responsive modal dialogs, and ensure consistent, accessible UI components.
+      </p>
+      <p><strong>Lucide React</strong></p>
+      <p>
+        Lucide React provides lightweight vector icons for navigation, verification badges, status shields, and security indicators.
+      </p>
+
+      <h3 class="sec-heading">6.2 Edge Machine Learning & Security</h3>
+      <p><strong>Tesseract.js (WebAssembly)</strong></p>
+      <p>
+        Tesseract.js is a pure JavaScript and WebAssembly port of the Tesseract OCR engine. It runs optical character recognition directly within the client's browser, eliminating recurring cloud API charges.
+      </p>
+      <p><strong>W3C Web Crypto API</strong></p>
+      <p>
+        The Web Crypto API provides native cryptographic functions in the browser. SkillVault uses <code>crypto.subtle.digest('SHA-256')</code> for hardware-accelerated, tamper-proof document hashing.
+      </p>
+
+      <h3 class="sec-heading">6.3 Cloud Hosting and Storage</h3>
+      <p><strong>Amazon S3</strong></p>
+      <p>
+        Amazon Simple Storage Service (S3) is an object storage service used to host the static website. It delivers HTML, CSS, JavaScript, and SVG assets with high durability and low latency.
+      </p>
+      <p><strong>IndexedDB</strong></p>
+      <p>
+        IndexedDB is a browser-native transactional database used for persistent client-side storage of certificate records and base64 attachments without local storage quota limits.
+      </p>
+
+      <h3 class="sec-heading">6.4 Audio & Interactive Evaluation</h3>
+      <p><strong>Web Speech API</strong></p>
+      <p>
+        The browser-native SpeechSynthesis interface synthesizes spoken audio for viva exam questions, providing an authentic oral defense evaluation experience.
+      </p>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 10: CHAPTER 7 (PAGE 6) ==================== -->
+  <div class="page" id="page-10">
+    <div class="border-box">
+      <div class="page-num">6</div>
+      <h2 class="chap-heading">CHAPTER 7: CLOUD COMPUTING CONCEPTS</h2>
+      <h3 class="sec-heading">7.1 Cloud Computing</h3>
+      <p>
+        Cloud computing is the delivery of computing resources such as servers, storage, databases, and networking services over the internet.
+      </p>
+      <p>
+        Instead of purchasing and maintaining physical servers, users can access computing resources from cloud service providers whenever required.
+      </p>
+      <p>
+        Cloud computing provides flexibility, scalability, availability, and cost efficiency.
+      </p>
+      <p>
+        In SkillVault, cloud computing concepts are explored through Amazon Web Services (AWS). AWS S3 is used for serverless static website hosting and global asset distribution.
+      </p>
+
+      <h3 class="sec-heading">7.2 Cloud Service Models</h3>
+      <p>Cloud computing is commonly classified into three service models.</p>
+      <p><strong>Infrastructure as a Service (IaaS)</strong></p>
+      <p>
+        IaaS provides virtualized computing infrastructure over the internet. Users can access virtual machines, raw storage, and networking resources without purchasing physical hardware.
+      </p>
+      <p><strong>Platform as a Service (PaaS)</strong></p>
+      <p>
+        PaaS provides a platform and environment for developing, running, and managing applications without requiring users to manage the underlying infrastructure.
+      </p>
+      <p><strong>Software as a Service (SaaS) / Storage as a Service</strong></p>
+      <p>
+        SaaS provides ready-to-use software applications over the internet accessible through web browsers. Amazon S3 static hosting exemplifies Storage-as-a-Service, delivering web applications without server management.
+      </p>
+
+      <h3 class="sec-heading">7.3 Amazon Web Services (AWS)</h3>
+      <p>
+        Amazon Web Services is a comprehensive cloud computing platform that provides services for computing, storage, networking, databases, security, and application deployment.
+      </p>
+      <p>
+        AWS allows developers and organizations to build and manage applications using scalable, on-demand cloud resources.
+      </p>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 11: CHAPTER 7 (CONT.) (PAGE 7) ==================== -->
+  <div class="page" id="page-11">
+    <div class="border-box">
+      <div class="page-num">7</div>
+      <p>Some important AWS services include:</p>
+      <ul>
+        <li><strong>Amazon S3:</strong> Provides scalable object storage and static website hosting.</li>
+        <li><strong>Amazon CloudFront:</strong> Delivers low-latency global content delivery (CDN).</li>
+        <li><strong>Amazon EC2:</strong> Provides resizable virtual computing servers.</li>
+        <li><strong>AWS Lambda:</strong> Executes serverless code in response to system events.</li>
+        <li><strong>AWS IAM:</strong> Manages users, security roles, permissions, and access policies.</li>
+        <li><strong>Amazon DynamoDB:</strong> Provides managed serverless NoSQL database services.</li>
+        <li><strong>Amazon CloudWatch:</strong> Monitors cloud resources and application metrics.</li>
+      </ul>
+
+      <h3 class="sec-heading">7.4 Amazon S3</h3>
+      <p>
+        Amazon Simple Storage Service (S3) is an object storage service offering industry-leading scalability, data availability, security, and performance.
+      </p>
+      <p>
+        S3 stores data as objects within buckets. It is designed for 99.999999999% (11 9's) of durability and offers flexible static website hosting capabilities.
+      </p>
+      <p>Important features of Amazon S3 include:</p>
+      <ul>
+        <li>Bucket creation and regional data residency.</li>
+        <li>Static website hosting with configurable index and error documents.</li>
+        <li>Granular access control using Bucket Policies and Access Control Lists.</li>
+        <li>High data durability through automated replication across Availability Zones.</li>
+        <li>Pay-as-you-go pricing with zero idle server running costs.</li>
+      </ul>
+
+      <h3 class="sec-heading">7.5 Important S3 Concepts</h3>
+      <p><strong>Bucket</strong></p>
+      <p>
+        A bucket is a container for objects stored in Amazon S3. In this project, bucket <code>04112026</code> is provisioned to host the SkillVault web application.
+      </p>
+      <p><strong>Object</strong></p>
+      <p>
+        An object consists of file data and metadata. Static files (index.html, JavaScript, CSS, and SVG icons) are stored as objects in S3.
+      </p>
+      <p><strong>Bucket Policy</strong></p>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 12: CHAPTER 7 (CONT.) (PAGE 8) ==================== -->
+  <div class="page" id="page-12">
+    <div class="border-box">
+      <div class="page-num">8</div>
+      <p>
+        A bucket policy is a JSON-based access policy used to grant permissions to S3 resources. A public read policy allows internet users to access hosted website assets.
+      </p>
+      <p><strong>Region</strong></p>
+      <p>
+        A region is a geographical area where AWS operates its cloud infrastructure. Bucket <code>04112026</code> is hosted in the Asia Pacific (Sydney) region (<code>ap-southeast-2</code>).
+      </p>
+      <p><strong>Availability Zone</strong></p>
+      <p>
+        An Availability Zone is an isolated location within an AWS region. S3 automatically replicates data across multiple Availability Zones to ensure high availability.
+      </p>
+
+      <h3 class="sec-heading">7.6 Other Cloud & Web Concepts Used in SkillVault</h3>
+      <p><strong>Client-Side Edge Computing</strong></p>
+      <p>
+        Edge computing offloads compute-heavy workloads to user devices. By executing OCR and cryptographic hashing in the browser, SkillVault reduces cloud compute costs and eliminates server bottlenecks.
+      </p>
+      <p><strong>WebAssembly (WASM)</strong></p>
+      <p>
+        WebAssembly provides a secure, sandboxed execution environment in web browsers running compiled code at near-native speeds. It allows Tesseract to perform neural OCR without cloud servers.
+      </p>
+      <p><strong>Cryptographic SHA-256 Hashing</strong></p>
+      <p>
+        SHA-256 converts arbitrary data into a fixed 256-bit hash. Any alteration in the input data dramatically changes the digest, providing mathematical proof of document integrity.
+      </p>
+      <p><strong>Web Workers</strong></p>
+      <p>
+        Web Workers execute JavaScript on background threads, allowing heavy image processing and OCR execution to proceed without freezing the user interface.
+      </p>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 13: CHAPTER 7 (CONT.) (PAGE 9) ==================== -->
+  <div class="page" id="page-13">
+    <div class="border-box">
+      <div class="page-num">9</div>
+      <h3 class="sec-heading">7.7 Benefits of Cloud Computing</h3>
+      <ul>
+        <li><strong>Scalability:</strong> Cloud resources scale seamlessly to support varying numbers of concurrent portfolio visitors.</li>
+        <li><strong>Cost Efficiency:</strong> Users can avoid purchasing and maintaining physical servers and pay only for active storage and data transfer.</li>
+        <li><strong>High Availability:</strong> Multi-zone cloud replication guarantees continuous access to portfolio credentials without single points of failure.</li>
+        <li><strong>Zero Maintenance Overhead:</strong> Serverless architectures eliminate the need for operating system patching, virtual machine maintenance, and server restarts.</li>
+        <li><strong>Accessibility:</strong> Cloud-hosted applications can be accessed worldwide over standard web browsers.</li>
+        <li><strong>Data Integrity:</strong> Cloud-anchored cryptographic signatures provide decentralized trust and verifiable authenticity.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 14: CHAPTER 8 (PAGE 10) ==================== -->
+  <div class="page" id="page-14">
+    <div class="border-box">
+      <div class="page-num">10</div>
+      <h2 class="chap-heading">CHAPTER 8: AWS CLOUD ENVIRONMENT</h2>
+      <p>
+        The project uses Amazon Web Services (AWS) as its cloud computing platform. Amazon S3 is used to host and distribute the production single-page application bundle, while client-side edge runtimes manage machine learning and cryptographic operations.
+      </p>
+      <p>The following table describes the cloud environment associated with the project.</p>
+
+      <table style="width: 100%; border: 1px solid #000; font-size: 10pt; margin: 12px 0;">
+        <thead>
+          <tr style="background: #f8fafc;">
+            <th style="border: 1px solid #000; width: 40%;">Configuration</th>
+            <th style="border: 1px solid #000; width: 60%;">Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="border: 1px solid #000; font-weight: bold;">Cloud Provider</td><td style="border: 1px solid #000;">Amazon Web Services (AWS)</td></tr>
+          <tr><td style="border: 1px solid #000; font-weight: bold;">Hosting Service</td><td style="border: 1px solid #000;">Amazon S3 (Static Website Hosting)</td></tr>
+          <tr><td style="border: 1px solid #000; font-weight: bold;">Bucket Name</td><td style="border: 1px solid #000;">04112026</td></tr>
+          <tr><td style="border: 1px solid #000; font-weight: bold;">Region</td><td style="border: 1px solid #000;">Asia Pacific (Sydney) [ap-southeast-2]</td></tr>
+          <tr><td style="border: 1px solid #000; font-weight: bold;">Access Policy</td><td style="border: 1px solid #000;">Public Read (s3:GetObject)</td></tr>
+          <tr><td style="border: 1px solid #000; font-weight: bold;">Index Document</td><td style="border: 1px solid #000;">index.html</td></tr>
+          <tr><td style="border: 1px solid #000; font-weight: bold;">Error Document</td><td style="border: 1px solid #000;">index.html (SPA Fallback)</td></tr>
+        </tbody>
+      </table>
+
+      <h3 class="sec-heading">8.1 Role of Amazon S3 in the Project</h3>
+      <p>
+        Amazon S3 provides cloud storage infrastructure for delivering the web application. In SkillVault, S3 hosts the compiled React bundle, JavaScript code, stylesheets, and vector assets. S3 serves these files over standard HTTP web endpoints, allowing recruiters and evaluators to access portfolios globally.
+      </p>
+      <p>
+        The use of S3 demonstrates how a modern web application can be deployed without running dedicated virtual machines, achieving near-zero idle cost and zero server administration.
+      </p>
+
+      <h3 class="sec-heading">8.2 Relevance of Cloud Computing to SkillVault</h3>
+      <p>Cloud computing is relevant to SkillVault because:</p>
+      <ul>
+        <li>It provides high-durability infrastructure for hosting the application globally.</li>
+        <li>It enables serverless static delivery without managing physical or virtual servers.</li>
+        <li>It allows recruiters worldwide to verify student credentials over public web endpoints.</li>
+        <li>It offloads heavy compute to the edge, demonstrating modern cost-optimized cloud architectures.</li>
+        <li>It provides practical experience with AWS S3 provisioning, bucket policies, and web hosting.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 15: CHAPTER 9 (PAGE 11) ==================== -->
+  <div class="page" id="page-15">
+    <div class="border-box">
+      <div class="page-num">11</div>
+      <h2 class="chap-heading">CHAPTER 9: SYSTEM IMPLEMENTATION</h2>
+      <h3 class="sec-heading">9.1 Frontend Implementation</h3>
+      <p>
+        The frontend of SkillVault is developed using React.js and Vite. It provides the user interface through which users interact with the credential vault, portfolio views, and verification tools.
+      </p>
+      <p>
+        React components structure the application into distinct views: Dashboard, Credential Management, Public Portfolio, Verification Portal, and Viva Exam Modals.
+      </p>
+
+      <h3 class="sec-heading">9.2 Client-Side OCR Implementation</h3>
+      <p>
+        The application integrates Tesseract.js inside a background Web Worker. When a user uploads a certificate image or PDF, the worker extracts raw text, filters OCR noise, and uses regular expression patterns to auto-fill course titles, universities, recipient names, and dates.
+      </p>
+
+      <h3 class="sec-heading">9.3 Cryptographic Integrity Implementation</h3>
+      <p>
+        The cryptographic integrity module normalizes metadata fields into a canonical JSON string. It uses <code>crypto.subtle.digest('SHA-256')</code> to compute a 64-character hash. The record is assigned a simulated cloud ledger block ID (e.g. <code>BLK-100234-749C5747</code>).
+      </p>
+      <p>
+        When queried, the verification portal recalculates the hash of current fields in real time and compares it with the stored ledger hash to detect unauthorized tampering.
+      </p>
+
+      <h3 class="sec-heading">9.4 AI Viva Exam Implementation</h3>
+      <p>
+        The viva module dynamically parses the course domain and generates multiple-choice questions. It provides interactive option selection, score calculation, and speech synthesis audio output using the Web Speech API. Scoring &ge; 70% upgrades the credential to “Viva-Verified”.
+      </p>
+
+      <h3 class="sec-heading">9.5 Cloud Deployment Implementation</h3>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 16: CHAPTER 9 (CONT.) (PAGE 12) ==================== -->
+  <div class="page" id="page-16">
+    <div class="border-box">
+      <div class="page-num">12</div>
+      <p>
+        The application is compiled into static production chunks using Vite. The resulting files in the <code>dist/</code> directory (index.html, JavaScript, CSS, and SVG assets) are uploaded to the AWS S3 bucket <code>04112026</code>. S3 static website hosting serves the application over standard web protocols.
+      </p>
+
+      <h3 class="sec-heading">9.6 Integration of Components</h3>
+      <p>
+        The React frontend, WebAssembly OCR engine, Web Crypto hashing module, and AWS S3 static hosting work together to provide a complete credential verification platform.
+      </p>
+      <p>
+        When a user uploads a certificate, the Web Worker extracts the metadata. The cryptographic engine signs the payload and stores the record in client persistence.
+      </p>
+      <p>
+        When an evaluator queries a Credential ID through the public verification portal, the engine performs a real-time integrity check, guaranteeing that credentials have not been tampered with.
+      </p>
+      <p>
+        This integration allows students to manage credentials, recruiters to verify documents, and examiners to conduct oral defense evaluations through a unified cloud platform.
+      </p>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 17: CHAPTER 10 (PAGE 13) ==================== -->
+  <div class="page" id="page-17">
+    <div class="border-box">
+      <div class="page-num">13</div>
+      <h2 class="chap-heading">CHAPTER 10: ADVANTAGES AND LIMITATIONS</h2>
+      <h3 class="sec-heading">10.1 Advantages</h3>
+      <ol style="margin-left: 22px;">
+        <li>Automates certificate metadata extraction using client-side WebAssembly OCR.</li>
+        <li>Eliminates cloud vision API costs by executing text recognition inside user browsers.</li>
+        <li>Guarantees credential authenticity using standard SHA-256 cryptographic hashing.</li>
+        <li>Provides instant detection of unauthorized document tampering through real-time checks.</li>
+        <li>Includes an interactive tamper simulation mode for demonstration and evaluation.</li>
+        <li>Introduces an AI Viva oral exam module testing domain competence beyond paper credentials.</li>
+        <li>Hosted serverlessly on AWS S3 with zero virtual machine maintenance overhead.</li>
+        <li>Demonstrates the practical integration of cloud storage, edge computing, and cryptography.</li>
+      </ol>
+
+      <h3 class="sec-heading">10.2 Limitations</h3>
+      <ol style="margin-left: 22px;">
+        <li>OCR accuracy depends on certificate image resolution, contrast, and layout complexity.</li>
+        <li>WebAssembly OCR processing speed varies based on client CPU performance.</li>
+        <li>Internet connectivity is required to access the hosted application from AWS S3.</li>
+        <li>The simulated ledger operates on browser-native cryptography rather than a decentralized public blockchain.</li>
+        <li>The Viva question engine currently uses pre-configured domain banks rather than dynamic live LLM streaming.</li>
+        <li>Client-side IndexedDB persistence requires browser data to remain intact unless cloud database synchronization is enabled.</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 18: CHAPTER 11 & CHAPTER 12 (PAGE 14) ==================== -->
+  <div class="page" id="page-18">
+    <div class="border-box">
+      <div class="page-num">14</div>
+      <h2 class="chap-heading">CHAPTER 11: FUTURE ENHANCEMENTS</h2>
+      <p>SkillVault can be improved further by introducing additional features.</p>
+      <ol style="margin-left: 22px;">
+        <li><strong>Amazon CloudFront Integration:</strong> Configure an AWS CloudFront CDN distribution for edge caching and custom domain SSL/TLS termination.</li>
+        <li><strong>Serverless Database Integration:</strong> Connect AWS Lambda and Amazon DynamoDB for real-time cloud synchronization across multiple student accounts.</li>
+        <li><strong>Public Blockchain Anchoring:</strong> Anchor generated SHA-256 digests onto a public blockchain (such as Polygon or Ethereum) for universal non-repudiation.</li>
+        <li><strong>Dynamic Generative AI Viva:</strong> Integrate Amazon Bedrock or cloud language models to generate fully dynamic viva questions based on custom course syllabi.</li>
+        <li><strong>Automated CI/CD Pipeline:</strong> Implement GitHub Actions to build and deploy production assets to AWS S3 automatically on master branch commits.</li>
+        <li><strong>Mobile Application:</strong> Develop a dedicated mobile app supporting offline credential access and mobile camera OCR scanning.</li>
+        <li><strong>Institutional Issuer Portals:</strong> Provide accredited universities and certification providers with bulk cryptographic signing tools.</li>
+      </ol>
+
+      <h2 class="chap-heading" style="margin-top: 14px;">CHAPTER 12: CONCLUSION</h2>
+      <p>
+        SkillVault is a cloud-based credential verification and digital portfolio system developed to simplify the management and verification of academic credentials through cloud computing and edge offloading.
+      </p>
+      <p>
+        The system extracts certificate metadata using in-browser WebAssembly OCR, cryptographically seals records with SHA-256 digital signatures, and provides real-time verification against an immutable ledger block descriptor. It also features an AI Viva Exam oral defense module that confirms authentic subject mastery.
+      </p>
+      <p>
+        By integrating React.js, Vite, WebAssembly, Web Crypto, and Amazon Web Services S3, the project demonstrates how modern technologies can be combined to build a cost-effective, serverless web system.
+      </p>
+      <p>
+        The project explores essential cloud computing principles including Storage-as-a-Service, static hosting, edge computing, and cryptographic trust. Overall, SkillVault demonstrates the practical application of cloud computing in developing a secure digital credential system.
+      </p>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 19: CHAPTER 13 (PAGE 15) ==================== -->
+  <div class="page" id="page-19">
+    <div class="border-box">
+      <div class="page-num">15</div>
+      <h2 class="chap-heading">CHAPTER 13: REFERENCES</h2>
+      <ul>
+        <li>
+          Amazon Web Services, <em>Amazon S3 Documentation</em>.<br>
+          <a href="https://docs.aws.amazon.com/s3/" style="color: #000; text-decoration: underline;">https://docs.aws.amazon.com/s3/</a>
+        </li>
+        <li>
+          Amazon Web Services, <em>Hosting a Static Website on Amazon S3</em>.<br>
+          <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html" style="color: #000; text-decoration: underline;">https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html</a>
+        </li>
+        <li>
+          Amazon Web Services, <em>AWS Cloud Computing Concepts</em>.<br>
+          <a href="https://aws.amazon.com/what-is-cloud-computing/" style="color: #000; text-decoration: underline;">https://aws.amazon.com/what-is-cloud-computing/</a>
+        </li>
+        <li>
+          World Wide Web Consortium (W3C), <em>Web Cryptography API (SubtleCrypto)</em>.<br>
+          <a href="https://www.w3.org/TR/WebCryptoAPI/" style="color: #000; text-decoration: underline;">https://www.w3.org/TR/WebCryptoAPI/</a>
+        </li>
+        <li>
+          Tesseract.js Documentation, <em>Pure Javascript & WebAssembly OCR</em>.<br>
+          <a href="https://tesseract.projectnaptha.com/" style="color: #000; text-decoration: underline;">https://tesseract.projectnaptha.com/</a>
+        </li>
+        <li>
+          React Documentation, <em>A JavaScript Library for Building User Interfaces</em>.<br>
+          <a href="https://react.dev/" style="color: #000; text-decoration: underline;">https://react.dev/</a>
+        </li>
+        <li>
+          Vite Documentation, <em>Next Generation Frontend Tooling</em>.<br>
+          <a href="https://vite.dev/guide/" style="color: #000; text-decoration: underline;">https://vite.dev/guide/</a>
+        </li>
+        <li>
+          Mozilla Developer Network (MDN), <em>Web Speech API (SpeechSynthesis)</em>.<br>
+          <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API" style="color: #000; text-decoration: underline;">https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API</a>
+        </li>
+        <li>
+          Mozilla Developer Network (MDN), <em>IndexedDB API for Web Applications</em>.<br>
+          <a href="https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API" style="color: #000; text-decoration: underline;">https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+</body>
+</html>

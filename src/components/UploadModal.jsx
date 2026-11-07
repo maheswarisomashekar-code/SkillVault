@@ -206,8 +206,8 @@ export const UploadModal = ({ isOpen, onClose, onUploadSuccess, existingCertific
       setFormData({
         title: extracted.title || '',
         issuer: extracted.issuer || '',
-        recipient: extracted.recipient || '',
-        issueDate: extracted.issueDate || '',
+        recipient: extracted.recipient || accountHolderName || 'Maheswari S',
+        issueDate: extracted.issueDate || new Date().toISOString().split('T')[0],
         category: extracted.category || 'course',
         description: `Uploaded and scanned via SkillVault Cloud OCR on ${new Date().toLocaleDateString()}`,
         credentialId: extracted.credentialId || '',

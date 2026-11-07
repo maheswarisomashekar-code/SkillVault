@@ -17,7 +17,8 @@ export const extractSkillsFromCertificates = (certificates = []) => {
   const skillsSet = new Set();
 
   certificates.forEach(cert => {
-    const text = `${cert.title || ''} ${cert.description || ''} ${cert.issuer || ''} ${cert.rawOcrText || ''}`.toLowerCase();
+    // Only inspect the course title and issuer (not the app's internal OCR scan metadata)
+    const text = `${cert.title || ''} ${cert.issuer || ''}`.toLowerCase();
 
     // 1. Environmental, Policy & Sustainability
     if (text.includes('environment') || text.includes('sustainability') || text.includes('climate') || text.includes('policy') || text.includes('jindal')) {
@@ -59,10 +60,10 @@ export const extractSkillsFromCertificates = (certificates = []) => {
       skillsSet.add('Agile Sprint Engineering');
     }
 
-    // 7. AI, Machine Learning & OCR
-    if (text.includes('machine learning') || text.includes('ai') || text.includes('ocr') || text.includes('tesseract')) {
+    // 7. AI & Machine Learning
+    if (text.includes('machine learning') || text.includes('artificial intelligence') || text.includes('deep learning')) {
       skillsSet.add('Machine Learning & AI');
-      skillsSet.add('Computer Vision & Document OCR');
+      skillsSet.add('Neural Networks');
     }
 
     // 8. Python & Data Science
