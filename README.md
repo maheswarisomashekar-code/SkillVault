@@ -1,9 +1,5 @@
 # SkillVault | Cloud-Based Skill Credential & Portfolio System
 
-> **Information Science and Engineering — 5th Semester Cloud Computing Individual Project**  
-> **Course Evaluation: 30 Marks**  
-> **Author:** Information Science & Engineering Student  
-> **Stack:** React (Vite), Firebase Authentication, Cloud Firestore, Cloud Storage for Firebase, Cloud OCR Pipeline (Google Cloud Vision & Tesseract.js), Firebase Hosting.
 
 ---
 
@@ -151,23 +147,3 @@ To deploy your live cloud application:
 | **8. Profile Manager** | USN, Degree, Department, Semester, Bio, verified skill demonstration tags |
 
 ---
-
-## 🎓 7. Cloud Computing Viva Examination Guide (30 Marks)
-
-### Q1: What makes this a genuine Cloud Computing project rather than a normal web app?
-> **Answer:** "This project relies on four core cloud computing service models:
-> 1. **BaaS / Serverless Storage:** Binary certificate payloads are partitioned and stored in Firebase Cloud Storage with bucket access rules.
-> 2. **Cloud NoSQL Database:** Document metadata is stored in Cloud Firestore, leveraging document-level security rules for multi-tenant data isolation.
-> 3. **Cloud Document Processing (OCR):** Unstructured image/PDF binaries undergo optical character recognition to extract structured JSON entities.
-> 4. **Cloud Authentication & Global Edge CDN:** Authentication utilizes JWT tokens issued by Firebase Auth, and the frontend is distributed via global Cloud CDN nodes on Firebase Hosting."
-
-### Q2: How is data privacy enforced in the cloud database?
-> **Answer:** "Through Firestore Security Rules (`firestore.rules`). A visitor can never perform a blanket query on private student certificates. Reading is restricted by checking `resource.data.userId == request.auth.uid || resource.data.isPublished == true`. This separation ensures that even if client-side code were modified, the cloud database will reject unauthorized read or write operations."
-
-### Q3: Why doesn't OCR extraction alone mark a certificate as 'Verified'?
-> **Answer:** "OCR simply extracts text from an uploaded raster image. Because images can be edited or forged, treating OCR output as proof of authenticity is a security flaw. In SkillVault, OCR only advances a document to `OCR_PROCESSED`. Full verification (`VERIFIED`) requires matching with an external issuer verification URL or cryptographic signature."
-
----
-
-## 📄 License
-Academic Project developed for 5th Semester ISE Cloud Computing Lab Evaluation.
